@@ -1,85 +1,99 @@
 import React, { useState } from 'react';
 import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Icon';
 import { useNavigate } from 'react-router-dom';
-import { Ingredient } from '../../types';
+import { clsx } from 'clsx';
 
 export const IngredientsList: React.FC = () => {
     const navigate = useNavigate();
-    const { ingredients, removeIngredient } = useIngredientsStore();
+    const { ingredients } = useIngredientsStore();
     const [search, setSearch] = useState('');
 
     const filteredIngredients = ingredients.filter(ing =>
         ing.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleDelete = (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (confirm('Are you sure you want to delete this ingredient?')) {
-            removeIngredient(id);
+    // Helpers for coloring logic based on the HTML reference
+    // We can randomize or hash the color based on the name if we want to stick to the design's variety
+    const getIconColor = (name: string) => {
+        const colors = [
+            'text-orange-400', 'text-red-400', 'text-green-400',
+            'text-yellow-400', 'text-blue-400', 'text-purple-400'
+        ];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
         }
+        return colors[Math.abs(hash) % colors.length];
+    };
+
+    const getIcon = (name: string) => {
+        const n = name.toLowerCase();
+        if (n.includes('egg')) return 'egg_alt';
+        if (n.includes('beef') || n.includes('meat')) return 'set_meal';
+        if (n.includes('basil') || n.includes('plant') || n.includes('veg')) return 'potted_plant';
+        if (n.includes('flour') || n.includes('grain')) return 'grain';
+        if (n.includes('water') || n.includes('liquid')) return 'water_drop';
+        if (n.includes('extract') || n.includes('oil')) return 'science';
+        return 'grocery';
     };
 
     return (
-        <div className="p-6 pb-24 flex flex-col gap-6">
-            <header className="flex justify-between items-center">
-                <h1 className="text-2xl font-extrabold">Inventory</h1>
-                <Button size="icon" onClick={() => navigate('/ingredients/new')}>
-                    <Icon name="add" />
-                </Button>
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-8 pb-5 border-b border-white/5">
+                <div className="flex items-center justify-between mb-5">
+                    <h1 className="text-[28px] font-bold text-white leading-tight">Ingredients</h1>
+                    <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white hover:bg-gray-750 transition-colors ring-1 ring-white/5">
+                        <span className="material-symbols-outlined text-[20px]">tune</span>
+                    </button>
+                </div>
+                <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 material-symbols-outlined text-[20px]">search</span>
+                    <input
+                        className="w-full pl-11 pr-4 py-3.5 bg-surface-dark border-none ring-1 ring-white/5 rounded-2xl text-[15px] focus:ring-2 focus:ring-primary outline-none text-white placeholder-gray-500 transition-shadow"
+                        placeholder="Search ingredients..."
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
             </header>
 
-            <div className="sticky top-0 z-10 bg-background-dark py-2">
-                <Input
-                    placeholder="Search ingredients..."
-                    icon="search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </div>
-
-            <div className="flex flex-col gap-4">
+            <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">
                 {filteredIngredients.length === 0 ? (
-                    <div className="text-center text-text-muted py-10">
-                        <Icon name="inventory_2" size="xl" className="opacity-20 mb-4" />
+                    <div className="text-center text-gray-500 py-10">
+                        <span className="material-symbols-outlined text-6xl opacity-20 mb-4">inventory_2</span>
                         <p>No ingredients found.</p>
-                        <Button variant="ghost" onClick={() => navigate('/ingredients/new')}>Add your first ingredient</Button>
                     </div>
                 ) : (
                     filteredIngredients.map((ing) => (
-                        <Card
+                        <div
                             key={ing.id}
-                            hoverEffect
                             onClick={() => navigate(`/ingredients/${ing.id}`)}
-                            className="flex items-center justify-between"
+                            className="bg-surface-dark p-4 rounded-2xl ring-1 ring-white/5 relative group active:scale-[0.99] transition-transform duration-200"
                         >
-                            <div>
-                                <h3 className="font-bold text-base">{ing.name}</h3>
-                                <p className="text-xs text-text-muted mt-1">
-                                    Stock: {ing.stock} {ing.unit}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <span className="font-bold text-base">Rp {ing.price.toLocaleString()}</span>
-                                    <span className="text-[10px] text-text-muted block uppercase">/{ing.unit}</span>
+                            <div className="flex items-start gap-4">
+                                <div className={clsx("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
+                                    <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
                                 </div>
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="text-text-muted hover:text-danger -mr-2"
-                                    onClick={(e) => handleDelete(ing.id, e)}
-                                >
-                                    <Icon name="delete" />
-                                </Button>
+                                <div className="flex-1 min-w-0 pr-2">
+                                    <h3 className="font-bold text-white text-[17px] leading-tight truncate">{ing.name}</h3>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                    <span className="font-bold text-white text-[15px]">Rp {ing.price.toLocaleString()}</span>
+                                    <span className="text-[10px] text-gray-500 font-semibold tracking-wide uppercase bg-white/5 px-2 py-0.5 rounded-md">/{ing.unit}</span>
+                                </div>
                             </div>
-                        </Card>
+                        </div>
                     ))
                 )}
-            </div>
+            </main>
+
+            <button
+                className="fixed bottom-[100px] right-5 h-14 w-14 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg shadow-primary/20 flex items-center justify-center transition-all z-30 active:scale-95 ring-4 ring-background-dark"
+                onClick={() => navigate('/ingredients/new')}
+            >
+                <span className="material-symbols-outlined text-[32px]">add</span>
+            </button>
         </div>
     );
 };

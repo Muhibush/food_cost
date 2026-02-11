@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useOrdersStore } from '../../store/useOrdersStore';
 import { useRecipesStore } from '../../store/useRecipesStore';
 import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Order, Recipe } from '../../types';
+import { Order as OrderType } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 
-export const OrderForm: React.FC = () => {
+export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
+    // Dashboard typically won't have an ID, but keeping logic compatible if used elsewhere
     const { id } = useParams<{ id: string }>();
     const { addOrder, updateOrder, getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+    const location = useLocation();
 
-    const [formData, setFormData] = useState<Omit<Order, 'id'>>({
+    const [formData, setFormData] = useState<Omit<OrderType, 'id'>>({
         name: `Order #${Math.floor(Math.random() * 10000)}`,
         date: format(new Date(), 'yyyy-MM-dd'),
         items: [],
@@ -22,9 +24,7 @@ export const OrderForm: React.FC = () => {
         totalCost: 0
     });
 
-    const [notes, setNotes] = useState(''); // New field from design
-
-    const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
+    const [notes, setNotes] = useState('');
 
     useEffect(() => {
         if (id) {
@@ -37,6 +37,31 @@ export const OrderForm: React.FC = () => {
             }
         }
     }, [id, getOrder]);
+
+    // Handle returned selection from RecipeSelection page
+    useEffect(() => {
+        if (location.state?.selectedRecipeIds) {
+            const selectedIds = location.state.selectedRecipeIds as string[];
+            setFormData(prev => {
+                const newItems = [...prev.items];
+
+                // Add new recipes that are not in the list
+                selectedIds.forEach(recipeId => {
+                    if (!newItems.find(i => i.recipeId === recipeId)) {
+                        newItems.push({ recipeId, quantity: 1 });
+                    }
+                });
+
+                // Remove recipes that were deselected
+                return {
+                    ...prev,
+                    items: newItems.filter(item => selectedIds.includes(item.recipeId))
+                };
+            });
+            // Clear location state to avoid re-triggering
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const getRecipeCost = (recipeId: string) => {
         const recipe = recipes.find(r => r.id === recipeId);
@@ -63,22 +88,6 @@ export const OrderForm: React.FC = () => {
         }
     }, [calculatedTotal]);
 
-    const handleAddItem = (recipe: Recipe) => {
-        setFormData(prev => {
-            const existingItemIndex = prev.items.findIndex(i => i.recipeId === recipe.id);
-            if (existingItemIndex >= 0) {
-                const newItems = [...prev.items];
-                newItems[existingItemIndex].quantity += 1;
-                return { ...prev, items: newItems };
-            } else {
-                return {
-                    ...prev,
-                    items: [...prev.items, { recipeId: recipe.id, quantity: 1, customPrice: undefined }]
-                };
-            }
-        });
-        setIsProductSelectorOpen(false);
-    };
 
     const updateItemQuantity = (index: number, delta: number) => {
         setFormData(prev => {
@@ -105,16 +114,16 @@ export const OrderForm: React.FC = () => {
 
         const orderData = {
             ...formData,
-            // Store notes in a custom field if we update the type, or just ignore for now if type prevents it
-            // For now, assuming Order type doesn't support notes yet, so just logging it or skipping
         };
 
         if (id) {
             updateOrder(id, orderData);
+            navigate('/orders');
         } else {
-            addOrder({ ...orderData, id: uuidv4(), date: new Date(formData.date).toISOString() });
+            const newId = uuidv4();
+            addOrder({ ...orderData, id: newId, date: new Date(formData.date).toISOString() });
+            navigate(`/orders/${newId}`);
         }
-        navigate('/orders');
     };
 
     const handleReset = () => {
@@ -130,9 +139,7 @@ export const OrderForm: React.FC = () => {
         }
     };
 
-    // Helper for placeholder images based on recipe name (hashing)
     const getPlaceholderImage = (name: string) => {
-        // Just returning consistent placeholder URLs from the design
         if (name.toLowerCase().includes('burger')) return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBwyMiEbTZLwjp5rbP8fohWijwTZmSDyuO1FY3VHz-X8EhOB9dnyPrDF-orfE1P9dHDDUZQCjfzO3rg9jI_OP5CXMVKsQeWBDFNjjcOBXNzNoLp5FV5TbXiWf18eFaC2qZ9bpwUOPRjEEF9Gtdi3rWE0ekTvORvzVVgIPBXgJoZdqqsFGohLEB4MfuX8s2LwlIfcg85tHeqTNFX4vOjGmJLGCd5I2ZD6mKlMtzHBQ0mKGwjTlFtE1sRx8nEuk575J4cUphWB53KEeM';
         if (name.toLowerCase().includes('cake')) return 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmeAt6a0LTDbw2NQhXUSi3STFQxZXhZc0vPKhG2JJ4ZXjyW8SCUHVBYjkhPYOeAHKNbVEvRkzEDQxVUJeO3jvAOXwFDCZDKJmaam4xD59nwyiwr21UJLLP6kjBYSrNg9NtPMd_Oyk08WKHVu-jRTnAC7YZFKP9MHFOuyeEsGbCW-S6_GlkjwJ2HQnon6Jt_PH8mDTbUPic5bjTzEggyq7VB7vTjIeUC4PnZqey7s99aDAXiAfVBaRyHEKzsKHoJyiSCd_tvMcfqUg';
         return 'https://via.placeholder.com/150';
@@ -206,10 +213,15 @@ export const OrderForm: React.FC = () => {
                 </div>
 
                 <button
-                    onClick={() => setIsProductSelectorOpen(true)}
+                    onClick={() => navigate('/orders/select-recipes', {
+                        state: {
+                            selectedRecipeIds: formData.items.map(i => i.recipeId),
+                            returnPath: '/'
+                        }
+                    })}
                     className="w-full py-4 border-2 border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 rounded-2xl flex items-center justify-center gap-2 text-primary font-bold transition-all active:scale-[0.99]"
                 >
-                    <span className="material-symbols-outlined">add_circle</span>
+                    <span className="material-symbols-outlined font-bold">add_circle</span>
                     Add / Select Recipes
                 </button>
 
@@ -286,31 +298,6 @@ export const OrderForm: React.FC = () => {
                 </div>
             </div>
 
-            {/* Validating Product Selector reused from previous implementation but styled simpler? */}
-            {isProductSelectorOpen && (
-                <div className="fixed inset-0 z-50 bg-background-dark/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-in fade-in">
-                    <div className="bg-white dark:bg-surface-dark w-full max-w-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 max-h-[80vh] flex flex-col">
-                        <header className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                            <h2 className="font-bold text-lg dark:text-white">Select Recipe</h2>
-                            <button onClick={() => setIsProductSelectorOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                                <span className="material-symbols-outlined">close</span>
-                            </button>
-                        </header>
-                        <div className="p-2 flex-1 overflow-y-auto gap-2 flex flex-col">
-                            {recipes.map(recipe => (
-                                <button
-                                    key={recipe.id}
-                                    onClick={() => handleAddItem(recipe)}
-                                    className="flex justify-between items-center p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left group"
-                                >
-                                    <span className="font-bold dark:text-white group-hover:text-primary transition-colors">{recipe.name}</span>
-                                    <span className="text-primary font-bold">Rp {Math.round(getRecipeCost(recipe.id)).toLocaleString()}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

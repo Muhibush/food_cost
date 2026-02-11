@@ -1,12 +1,15 @@
 export type UnitType = 'kg' | 'gr' | 'ltr' | 'ml' | 'pcs' | 'pack' | 'can' | 'btl';
 
+export interface IngredientOverride {
+    ingredientId: string;
+    customPrice: number;
+}
+
 export interface Ingredient {
     id: string;
     name: string;
     unit: UnitType;
     price: number; // Base price per unit
-    stock: number;
-    minStock?: number;
 }
 
 export interface RecipeIngredient {
@@ -37,6 +40,7 @@ export interface Order {
     items: OrderItem[];
     status: 'draft' | 'pending' | 'completed' | 'cancelled';
     totalCost: number; // Snapshot of total cost at time of finalization
+    ingredientOverrides?: IngredientOverride[];
 }
 
 export interface CartItem extends OrderItem {

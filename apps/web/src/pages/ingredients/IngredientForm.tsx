@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Icon';
-import { Ingredient, UnitType } from '../../types';
+import { Ingredient } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
+import { clsx } from 'clsx';
 
 export const IngredientForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const { addIngredient, updateIngredient, getIngredient } = useIngredientsStore();
+    const { addIngredient, updateIngredient, getIngredient, removeIngredient } = useIngredientsStore();
 
     const [formData, setFormData] = useState<Omit<Ingredient, 'id'>>({
         name: '',
         unit: 'kg',
         price: 0,
-        stock: 0,
-        minStock: 0,
     });
 
     useEffect(() => {
@@ -29,8 +25,14 @@ export const IngredientForm: React.FC = () => {
         }
     }, [id, getIngredient]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+
+        if (!formData.name || !formData.unit || formData.price <= 0) {
+            alert('Please fill in all required fields correctly.');
+            return;
+        }
+
         if (id) {
             updateIngredient(id, formData);
         } else {
@@ -39,96 +41,139 @@ export const IngredientForm: React.FC = () => {
         navigate('/ingredients');
     };
 
+    const handleDelete = () => {
+        if (id && confirm('Are you sure you want to delete this ingredient?')) {
+            removeIngredient(id);
+            navigate('/ingredients');
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'price' || name === 'stock' || name === 'minStock' ? Number(value) : value
+            [name]: name === 'price' ? Number(value) : value
         }));
     };
 
     return (
-        <div className="p-6 pb-24 flex flex-col min-h-screen">
-            <header className="flex items-center gap-4 mb-6">
-                <Button size="icon" variant="ghost" onClick={() => navigate(-1)} className="-ml-2">
-                    <Icon name="arrow_back" />
-                </Button>
-                <h1 className="text-xl font-extrabold">{id ? 'Edit Ingredient' : 'New Ingredient'}</h1>
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-8 pb-4 border-b border-white/5 flex items-center justify-between">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-colors"
+                >
+                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
+                </button>
+                <h1 className="text-xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                    {id ? 'Edit Ingredient' : 'Add Ingredient'}
+                </h1>
+                <div className="w-10"></div>
             </header>
 
-            <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-6">
-                <Input
-                    label="Name"
-                    name="name"
-                    placeholder="e.g. Brown Sugar"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                />
-
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-text-muted uppercase tracking-wide ml-1">Unit</label>
-                    <div className="relative">
-                        <select
-                            name="unit"
-                            value={formData.unit}
-                            onChange={handleChange}
-                            className="block w-full px-4 py-3.5 bg-surface-dark border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none shadow-sm"
-                        >
-                            <option value="kg">Kilogram (kg)</option>
-                            <option value="gr">Gram (gr)</option>
-                            <option value="ltr">Liter (l)</option>
-                            <option value="ml">Milliliter (ml)</option>
-                            <option value="pcs">Piece (pcs)</option>
-                            <option value="pack">Pack</option>
-                            <option value="can">Can</option>
-                            <option value="btl">Bottle</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-text-muted">
-                            <Icon name="expand_more" />
+            <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
+                {/* Photo Upload Placeholder */}
+                <div className="flex flex-col items-center mb-10">
+                    <div className="relative group cursor-pointer">
+                        <div className="h-32 w-32 rounded-full bg-[#1C1F2E] border-2 border-dashed border-white/20 flex items-center justify-center text-gray-400 group-hover:border-primary group-hover:text-primary transition-all overflow-hidden">
+                            <span className="material-symbols-outlined text-4xl">add_a_photo</span>
+                        </div>
+                        <div className="absolute bottom-0 right-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-white border-4 border-background-dark shadow-sm">
+                            <span className="material-symbols-outlined text-lg">edit</span>
                         </div>
                     </div>
+                    <p className="mt-3 text-sm font-medium text-gray-400">Upload Photo</p>
                 </div>
 
-                <Input
-                    label="Price per Unit (Rp)"
-                    name="price"
-                    type="number"
-                    icon="payments"
-                    placeholder="0"
-                    value={formData.price}
-                    onChange={handleChange}
-                    min={0}
-                    required
-                />
+                <form onSubmit={handleSubmit} className="space-y-8 flex-1">
+                    {/* Name */}
+                    <div className="space-y-3">
+                        <label className="block text-sm font-bold text-gray-200">Ingredient Name</label>
+                        <input
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl px-5 py-5 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg placeholder-gray-500 shadow-sm"
+                            placeholder="e.g. Premium Brown Sugar"
+                            type="text"
+                            required
+                        />
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <Input
-                        label="Current Stock"
-                        name="stock"
-                        type="number"
-                        placeholder="0"
-                        value={formData.stock}
-                        onChange={handleChange}
-                        min={0}
-                    />
-                    <Input
-                        label="Min Stock Alert"
-                        name="minStock"
-                        type="number"
-                        placeholder="0"
-                        value={formData.minStock}
-                        onChange={handleChange}
-                        min={0}
-                    />
-                </div>
+                    {/* Unit Type */}
+                    <div className="space-y-3">
+                        <label className="block text-sm font-bold text-gray-200">Unit Type</label>
+                        <div className="relative">
+                            <select
+                                name="unit"
+                                value={formData.unit}
+                                onChange={handleChange}
+                                className="w-full appearance-none bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl px-5 py-5 pr-12 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg shadow-sm"
+                                required
+                            >
+                                <option disabled value="">Select a unit</option>
+                                <option value="kg">Kilogram (KG)</option>
+                                <option value="gr">Gram (GR)</option>
+                                <option value="ltr">Liter (L)</option>
+                                <option value="ml">Milliliter (ML)</option>
+                                <option value="pcs">Piece (PCS)</option>
+                                <option value="pack">Pack</option>
+                                <option value="can">Can</option>
+                                <option value="btl">Bottle</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
+                                <span className="material-symbols-outlined">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <div className="mt-auto pt-6">
-                    <Button type="submit" className="w-full py-4 text-base">
-                        {id ? 'Update Ingredient' : 'Save Ingredient'}
-                    </Button>
+                    {/* Price */}
+                    <div className="space-y-3">
+                        <label className="block text-sm font-bold text-gray-200">Price per Unit</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-white font-semibold text-base">
+                                Rp
+                            </div>
+                            <input
+                                name="price"
+                                value={formData.price || ''}
+                                onChange={handleChange}
+                                className="w-full bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl pl-14 pr-5 py-5 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg font-medium shadow-sm placeholder-gray-500"
+                                inputMode="numeric"
+                                placeholder="0"
+                                type="number"
+                                min="0"
+                                required
+                            />
+                        </div>
+                        <p className="text-xs text-gray-500 px-1">Enter the current market price for one unit.</p>
+                    </div>
+
+
+                </form>
+            </main>
+
+            <div className="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-white/5 pb-safe z-30">
+                <div className="px-6 py-4 flex items-center justify-between gap-4 max-w-lg mx-auto">
+                    {id && (
+                        <button
+                            onClick={handleDelete}
+                            className="h-14 flex-1 bg-transparent border border-white/20 text-white font-bold text-base rounded-2xl transition-colors flex items-center justify-center hover:bg-white/5 hover:border-white/30 active:scale-95"
+                        >
+                            Delete
+                        </button>
+                    )}
+                    <button
+                        onClick={() => handleSubmit()}
+                        className={clsx(
+                            "h-14 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-2xl shadow-lg shadow-primary/30 transition-all active:scale-95 flex items-center justify-center",
+                            id ? "flex-[2]" : "w-full"
+                        )}
+                    >
+                        Save
+                    </button>
                 </div>
-            </form>
+            </div>
         </div>
     );
 };

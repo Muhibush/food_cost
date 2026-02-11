@@ -67,13 +67,7 @@ export const DesignSystem: React.FC = () => {
                 </section>
             </main>
 
-            <BottomNav
-                items={[
-                    { icon: 'grid_view', label: 'System', isActive: true },
-                    { icon: 'restaurant_menu', label: 'Recipes' },
-                    { icon: 'inventory_2', label: 'Inventory' },
-                ]}
-            />
+            <BottomNav />
         </div>
     );
 };
