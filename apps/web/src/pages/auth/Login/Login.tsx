@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Icon';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
+import { Icon } from '../../../components/ui/Icon';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -16,16 +16,16 @@ export const Login: React.FC = () => {
     };
 
     return (
-        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col justify-center px-5 antialiased">
-            <main className="w-full max-w-md mx-auto flex flex-col gap-10">
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col px-6 pt-12 pb-10 antialiased -mx-5 -mt-4">
+            <main className="w-full max-w-md mx-auto flex flex-col gap-10 flex-1 justify-center">
                 {/* Logo & Branding */}
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/20 mb-2 rotate-3 hover:rotate-0 transition-transform duration-300">
+                <div className="flex flex-col items-center gap-4 mb-4">
+                    <div className="w-20 h-20 bg-primary rounded-[28px] flex items-center justify-center shadow-2xl shadow-primary/20 rotate-3 hover:rotate-0 transition-all duration-500 border border-white/10">
                         <Icon name="restaurant_menu" size="xl" className="text-white font-bold" />
                     </div>
                     <div className="text-center">
-                        <h1 className="text-4xl font-black tracking-tight mb-1 text-white">CookCost</h1>
-                        <p className="text-sm text-gray-400 font-bold tracking-widest uppercase opacity-60">Professional Food Costing</p>
+                        <h1 className="text-4xl font-extrabold tracking-tight mb-1 text-white">CookCost</h1>
+                        <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] opacity-80">Professional Food Costing</p>
                     </div>
                 </div>
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Icon';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
+import { Icon } from '../../../components/ui/Icon';
 
 export const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -18,23 +18,23 @@ export const Register: React.FC = () => {
     };
 
     return (
-        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased pb-safe -mx-5 -mt-4">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-sm px-5 pt-12 pb-4 border-b border-white/5 font-display flex items-center gap-4">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
                 <Button
                     variant="secondary"
                     size="icon"
                     onClick={() => navigate('/login')}
-                    className="rounded-full h-10 w-10 border-none bg-white/5 hover:bg-white/10"
+                    className="rounded-full h-10 w-10 border border-white/5 bg-surface-dark hover:bg-white/10 active:scale-[0.95]"
                 >
                     <Icon name="arrow_back" />
                 </Button>
-                <h1 className="text-xl font-extrabold tracking-tight">Create Account</h1>
+                <h1 className="text-2xl font-extrabold tracking-tight">Create Account</h1>
             </header>
 
             <main className="flex-1 flex flex-col px-5 pt-8 pb-10 gap-10">
                 {/* Photo Section */}
-                <section className="flex flex-col items-center justify-center gap-4">
+                <section className="flex flex-col items-center justify-center gap-3">
                     <div className="relative group cursor-pointer active:scale-95 transition-transform">
                         <div className="w-28 h-28 rounded-full bg-surface-dark border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden transition-all group-hover:border-primary/50 group-hover:bg-primary/5 shadow-2xl">
                             <Icon name="person" size="xl" className="text-white/10 group-hover:text-primary transition-colors" />
@@ -43,7 +43,7 @@ export const Register: React.FC = () => {
                             <Icon name="add" size="sm" className="font-bold" />
                         </div>
                     </div>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest opacity-60">Add Profile Photo</p>
+                    <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">Add Profile Photo</p>
                 </section>
 
                 {/* Form Section */}

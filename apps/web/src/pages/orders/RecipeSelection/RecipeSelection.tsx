@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useRecipesStore } from '../../store/useRecipesStore';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Icon } from '../../components/ui/Icon';
+import { useRecipesStore } from '../../../store/useRecipesStore';
+import { useIngredientsStore } from '../../../store/useIngredientsStore';
+import { Icon } from '../../../components/ui/Icon';
 import { clsx } from 'clsx';
-import { Recipe } from '../../types';
+import { Recipe } from '../../../types';
 
 interface SelectionState {
     selectedRecipeIds: string[];

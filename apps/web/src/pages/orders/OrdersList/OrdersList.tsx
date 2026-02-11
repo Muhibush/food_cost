@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useOrdersStore } from '../../store/useOrdersStore';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Icon';
-import { Badge } from '../../components/ui/Badge';
+import { useOrdersStore } from '../../../store/useOrdersStore';
+import { Card } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { Icon } from '../../../components/ui/Icon';
+import { Badge } from '../../../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
@@ -28,12 +28,12 @@ export const OrdersList: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-8 pb-5 border-b border-white/5">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex justify-between items-center mb-5">
-                    <h1 className="text-[28px] font-bold text-white leading-tight">Orders</h1>
+                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Orders</h1>
                     <button
                         onClick={() => navigate('/orders/new')}
-                        className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white hover:bg-gray-750 transition-colors ring-1 ring-white/5"
+                        className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
                     >
                         <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>

@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { DesignSystem } from './pages/design/DesignSystem';
-import { OrderPage as Order } from './pages/orders/OrderPage';
+import { DesignSystem } from './pages/design/DesignSystem/DesignSystem';
+import { OrderPage as Order } from './pages/orders/OrderEntry/OrderEntry';
 import { Layout } from './components/layout/Layout';
-import { IngredientsList } from './pages/ingredients/IngredientsList';
-import { IngredientForm } from './pages/ingredients/IngredientForm';
-import { RecipesList } from './pages/recipes/RecipesList';
-import { RecipeForm } from './pages/recipes/RecipeForm';
-import { OrdersList } from './pages/orders/OrdersList';
-import { OrderForm } from './pages/orders/OrderForm';
-import { HistoryPage } from './pages/orders/HistoryPage';
-import { OrderDetail } from './pages/orders/OrderDetail';
-import { EditProfile } from './pages/account/EditProfile';
-import { ChangePin } from './pages/account/ChangePin';
-import { Login } from './pages/auth/Login';
-import { Register } from './pages/auth/Register';
-import { RecipeSelection } from './pages/orders/RecipeSelection';
-import { Profile } from './pages/account/Profile';
+import { IngredientsList } from './pages/ingredients/IngredientsList/IngredientsList';
+import { IngredientForm } from './pages/ingredients/IngredientForm/IngredientForm';
+import { RecipesList } from './pages/recipes/RecipesList/RecipesList';
+import { RecipeForm } from './pages/recipes/RecipeForm/RecipeForm';
+import { OrdersList } from './pages/orders/OrdersList/OrdersList';
+import { OrderForm } from './pages/orders/OrderForm/OrderForm';
+import { HistoryPage } from './pages/orders/History/HistoryPage';
+import { OrderDetail } from './pages/orders/OrderDetail/OrderDetail';
+import { EditProfile } from './pages/account/EditProfile/EditProfile';
+import { ChangePin } from './pages/account/ChangePin/ChangePin';
+import { Login } from './pages/auth/Login/Login';
+import { Register } from './pages/auth/Register/Register';
+import { RecipeSelection } from './pages/orders/RecipeSelection/RecipeSelection';
+import { Profile } from './pages/account/Profile/Profile';
 
 function App() {
     return (

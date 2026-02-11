@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Ingredient } from '../../types';
+import { useIngredientsStore } from '../../../store/useIngredientsStore';
+import { Ingredient } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import { clsx } from 'clsx';
 
@@ -58,14 +58,14 @@ export const IngredientForm: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-8 pb-4 border-b border-white/5 flex items-center justify-between">
+            <header className="sticky top-0 z-50 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
                 <button
                     onClick={() => navigate(-1)}
-                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-colors"
+                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
                 >
-                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
+                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
                 </button>
-                <h1 className="text-xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                <h1 className="text-2xl font-extrabold text-white absolute left-1/2 -translate-x-1/2 tracking-tight whitespace-nowrap">
                     {id ? 'Edit Ingredient' : 'Add Ingredient'}
                 </h1>
                 <div className="w-10"></div>

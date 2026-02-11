@@ -15,15 +15,15 @@ export const ChangePin: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-safe">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-sm px-5 pt-12 pb-4 border-b border-white/5 font-display">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/profile')}
-                        className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-gray-400 hover:bg-white/5 hover:text-white transition-colors active:scale-90"
+                        className="h-10 w-10 -ml-2 rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-[0.95]"
                     >
-                        <span className="material-symbols-outlined text-2xl">arrow_back</span>
+                        <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
                     </button>
-                    <h1 className="text-xl font-extrabold tracking-tight">Change PIN</h1>
+                    <h1 className="text-2xl font-extrabold tracking-tight">Change PIN</h1>
                 </div>
             </header>
 
@@ -36,7 +36,7 @@ export const ChangePin: React.FC = () => {
 
                 <section className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] pl-1" htmlFor="current-pin">Current PIN</label>
+                        <label className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Current PIN</label>
                         <div className="relative group">
                             <input
                                 className="w-full bg-surface-dark border border-white/5 rounded-2xl px-5 py-4 text-white placeholder-gray-700 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none text-xl tracking-[0.5em] font-black shadow-xl"
@@ -57,7 +57,7 @@ export const ChangePin: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] pl-1" htmlFor="new-pin">New PIN</label>
+                        <label className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">New PIN</label>
                         <div className="relative">
                             <input
                                 className="w-full bg-surface-dark border border-white/5 rounded-2xl px-5 py-4 text-white placeholder-gray-700 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none text-xl tracking-[0.5em] font-black shadow-xl"
@@ -73,7 +73,7 @@ export const ChangePin: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] pl-1" htmlFor="confirm-pin">Confirm New PIN</label>
+                        <label className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Confirm New PIN</label>
                         <div className="relative">
                             <input
                                 className="w-full bg-surface-dark border border-white/5 rounded-2xl px-5 py-4 text-white placeholder-gray-700 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none text-xl tracking-[0.5em] font-black shadow-xl"

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useOrdersStore } from '../../store/useOrdersStore';
-import { useRecipesStore } from '../../store/useRecipesStore';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
-import { Order } from '../../types';
+import { useOrdersStore } from '../../../store/useOrdersStore';
+import { useRecipesStore } from '../../../store/useRecipesStore';
+import { useIngredientsStore } from '../../../store/useIngredientsStore';
+import { Order } from '../../../types';
 import { format, parseISO } from 'date-fns';
 import { clsx } from 'clsx';
 
@@ -147,23 +147,20 @@ export const OrderDetail: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-10">
-            <header className="sticky top-0 z-30 bg-background-dark/95 backdrop-blur-md px-6 pt-8 pb-5 border-b border-white/5 shadow-sm">
-                <div className="flex items-center gap-2 mb-6">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-dark hover:bg-gray-750 transition-colors text-white border border-white/5"
-                    >
-                        <span className="material-symbols-outlined text-lg">arrow_back</span>
-                    </button>
-                </div>
-                <div className="flex items-end justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-white leading-tight tracking-tight">Order<br />Details</h1>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-1">Est. Total Cost</p>
-                        <div className="text-2xl font-extrabold font-display text-primary">Rp {Math.round(totalCost).toLocaleString()}</div>
-                    </div>
+            <header className="sticky top-0 z-30 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
+                >
+                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
+                </button>
+                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                    Order Details
+                </h1>
+                <div className="flex-1"></div>
+                <div className="text-right">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-0.5 opacity-60">Total Cost</p>
+                    <div className="text-xl font-extrabold font-display text-primary">Rp {Math.round(totalCost).toLocaleString()}</div>
                 </div>
             </header>
 

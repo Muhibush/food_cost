@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
+import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
+import { Input } from '../../../components/ui/Input';
 
 export const IngredientsList: React.FC = () => {
     const navigate = useNavigate();
@@ -39,23 +40,19 @@ export const IngredientsList: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-8 pb-5 border-b border-white/5">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-[28px] font-bold text-white leading-tight">Ingredients</h1>
-                    <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white hover:bg-gray-750 transition-colors ring-1 ring-white/5">
+                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Ingredients</h1>
+                    <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
                         <span className="material-symbols-outlined text-[20px]">tune</span>
                     </button>
                 </div>
-                <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 material-symbols-outlined text-[20px]">search</span>
-                    <input
-                        className="w-full pl-11 pr-4 py-3.5 bg-surface-dark border-none ring-1 ring-white/5 rounded-2xl text-[15px] focus:ring-2 focus:ring-primary outline-none text-white placeholder-gray-500 transition-shadow"
-                        placeholder="Search ingredients..."
-                        type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
+                <Input
+                    icon="search"
+                    placeholder="Search ingredients..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </header>
 
             <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">

@@ -15,15 +15,15 @@ export const EditProfile: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-safe">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-sm px-5 pt-12 pb-4 border-b border-white/5 font-display">
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/profile')}
-                        className="w-8 h-8 -ml-1 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors text-white active:scale-90"
+                        className="h-10 w-10 -ml-2 rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-[0.95]"
                     >
-                        <span className="material-symbols-outlined text-2xl">arrow_back</span>
+                        <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
                     </button>
-                    <h1 className="text-xl font-extrabold tracking-tight">Edit Profile</h1>
+                    <h1 className="text-2xl font-extrabold tracking-tight">Edit Profile</h1>
                 </div>
             </header>
 
@@ -46,7 +46,7 @@ export const EditProfile: React.FC = () => {
                 {/* Form Section */}
                 <form className="space-y-6 flex-1" onSubmit={(e) => e.preventDefault()}>
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-500 ml-1 uppercase tracking-wider" htmlFor="username">Username</label>
+                        <label className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Username</label>
                         <div className="relative group">
                             <input
                                 className="w-full bg-surface-dark/50 text-gray-600 border border-white/5 rounded-2xl px-5 py-4 outline-none cursor-not-allowed shadow-none font-bold"
@@ -63,7 +63,7 @@ export const EditProfile: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-400 ml-1 uppercase tracking-wider" htmlFor="name">Name</label>
+                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Name</label>
                         <div className="relative">
                             <input
                                 className="w-full bg-surface-dark text-white border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder-white/10 shadow-xl"
@@ -76,7 +76,7 @@ export const EditProfile: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-400 ml-1 uppercase tracking-wider" htmlFor="description">Description</label>
+                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Description</label>
                         <div className="relative">
                             <textarea
                                 className="w-full bg-surface-dark text-white border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder-white/10 resize-none shadow-xl leading-relaxed h-[6rem]"

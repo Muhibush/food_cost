@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useRecipesStore } from '../../store/useRecipesStore';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
+import { useRecipesStore } from '../../../store/useRecipesStore';
+import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
-import { Recipe } from '../../types';
+import { Recipe } from '../../../types';
+import { Input } from '../../../components/ui/Input';
 
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
@@ -29,33 +30,29 @@ export const RecipesList: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-5 pt-8 pb-4 border-b border-white/5">
-                <div className="flex items-center justify-between mb-5">
-                    <button className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-colors">
-                        <span className="material-symbols-outlined text-2xl">menu</span>
+            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
+                <div className="flex justify-between items-center mb-5">
+                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Recipes</h1>
+                    <button
+                        onClick={() => navigate('/recipes/new')}
+                        className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>
-                    <h1 className="text-xl font-bold text-white absolute left-1/2 -translate-x-1/2">Recipes</h1>
-                    <div className="w-10"></div>
                 </div>
-
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <span className="material-symbols-outlined text-gray-400 text-xl">search</span>
-                    </div>
-                    <input
-                        className="block w-full pl-12 pr-4 py-4 bg-surface-dark border-none ring-1 ring-white/5 rounded-2xl text-[15px] focus:ring-2 focus:ring-primary outline-none text-white placeholder-gray-500 transition-shadow"
-                        placeholder="Search recipes..."
-                        type="search"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
+                <Input
+                    icon="search"
+                    placeholder="Search recipes..."
+                    type="search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </header>
 
             <main className="flex-1 flex flex-col px-6 pt-6 pb-20">
                 <section className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">My Recipes</h3>
+                        <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">My Recipes</h3>
                         <span className="text-xs text-gray-500 font-medium">{filteredRecipes.length} items</span>
                     </div>
 
