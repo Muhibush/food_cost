@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { DesignSystem } from './pages/DesignSystem';
-import { OrderPage as Order } from './pages/order/Order';
+import { DesignSystem } from './pages/design/DesignSystem';
+import { OrderPage as Order } from './pages/orders/OrderPage';
 import { Layout } from './components/layout/Layout';
 import { IngredientsList } from './pages/ingredients/IngredientsList';
 import { IngredientForm } from './pages/ingredients/IngredientForm';
@@ -10,12 +10,12 @@ import { OrdersList } from './pages/orders/OrdersList';
 import { OrderForm } from './pages/orders/OrderForm';
 import { HistoryPage } from './pages/orders/HistoryPage';
 import { OrderDetail } from './pages/orders/OrderDetail';
-import { EditProfile } from './pages/EditProfile';
-import { ChangePin } from './pages/ChangePin';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
+import { EditProfile } from './pages/account/EditProfile';
+import { ChangePin } from './pages/account/ChangePin';
+import { Login } from './pages/auth/Login';
+import { Register } from './pages/auth/Register';
 import { RecipeSelection } from './pages/orders/RecipeSelection';
-import { Profile } from './pages/Profile';
+import { Profile } from './pages/account/Profile';
 
 function App() {
     return (

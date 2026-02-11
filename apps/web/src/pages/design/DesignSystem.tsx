@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Icon } from '../components/ui/Icon';
-import { BottomNav } from '../components/layout/BottomNav';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/Card';
+import { Badge } from '../../components/ui/Badge';
+import { Icon } from '../../components/ui/Icon';
+import { BottomNav } from '../../components/layout/BottomNav';
 
 export const DesignSystem: React.FC = () => {
     return (
