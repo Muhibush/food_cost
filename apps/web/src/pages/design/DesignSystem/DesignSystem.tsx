@@ -1,22 +1,30 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { Icon } from '../../../components/ui/Icon';
-import { BottomNav } from '../../../components/layout/BottomNav';
 
 export const DesignSystem: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <div className="bg-background-dark min-h-screen text-white font-display">
             {/* Header - Standard Pattern */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-extrabold tracking-tight">Design System</h1>
-                    <button className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
-                        <span className="material-symbols-outlined text-white text-xl">settings</span>
-                    </button>
-                </div>
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
+                >
+                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
+                </button>
+                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                    Design System
+                </h1>
+                <div className="flex-1"></div>
+                <button className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
+                    <span className="material-symbols-outlined text-white text-xl">settings</span>
+                </button>
             </header>
 
             <main className="px-6 py-8 flex flex-col gap-12 pb-40">
@@ -139,7 +147,6 @@ export const DesignSystem: React.FC = () => {
                 </section>
             </main>
 
-            <BottomNav />
         </div>
     );
 };

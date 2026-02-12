@@ -181,10 +181,13 @@ export const OrderDetail: React.FC = () => {
                     </div>
                     <div className="bg-surface-dark rounded-2xl p-4 border border-white/5">
                         <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">Order Date</label>
-                        <div className="flex items-center gap-3 bg-surface-dark/50 rounded-xl px-4 py-3 border border-white/5 focus-within:border-primary/50 transition-colors ring-1 ring-white/5">
+                        <div className="relative flex items-center gap-3 bg-surface-dark/50 rounded-xl px-4 py-3 border border-white/5 focus-within:border-primary/50 transition-colors ring-1 ring-white/5">
                             <span className="material-symbols-outlined text-gray-400 text-xl">calendar_today</span>
+                            <div className="absolute inset-0 pl-11 pr-4 py-3 flex items-center pointer-events-none text-white text-base font-semibold">
+                                {order.date ? format(parseISO(order.date), 'd MMMM yyyy') : ''}
+                            </div>
                             <input
-                                className="w-full bg-transparent border-0 p-0 text-base font-semibold text-white focus:ring-0 placeholder-gray-500"
+                                className="w-full bg-transparent border-none p-0 text-transparent placeholder-transparent focus:ring-0 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
                                 type="date"
                                 value={format(parseISO(order.date), 'yyyy-MM-dd')}
                                 onChange={(e) => setOrder({ ...order, date: new Date(e.target.value).toISOString() })}

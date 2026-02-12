@@ -5,7 +5,7 @@ import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Order as OrderType } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const OrderPage: React.FC = () => {
     const location = useLocation();
 
     const [formData, setFormData] = useState<Omit<OrderType, 'id'>>({
-        name: `Order #${Math.floor(Math.random() * 10000)}`,
+        name: '',
         date: format(new Date(), 'yyyy-MM-dd'),
         items: [],
         status: 'pending',
@@ -148,21 +148,32 @@ export const OrderPage: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
             <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
-                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
-                    New Order
-                </h1>
-                <button
-                    onClick={handleReset}
-                    className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
-                    title="Reset Form"
-                >
-                    <span className="material-symbols-outlined text-red-400 text-xl font-bold">restart_alt</span>
-                </button>
+                <div className="flex items-center gap-3">
+                    <div
+                        className="h-10 w-10 rounded-full bg-gray-700 bg-cover bg-center border-2 border-primary shadow-sm"
+                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCS04F1_8gxS_wh5p8aadS4dOwrUTeJEYiGA29E6WWvTahXdLcS9SdZPmZ2-S_ouAkT9R935-35Snl_Mi0eUDPq4ejBGgmISnmOVE85mnQf_P9BaIEhX-EpzKfrNtul39Crc0rQbXp1WXXMTzDGlV7dIXmtnTACD7TxEtO-r2IPVmcO1QmIvpAVwNRNydjD9f-krF--SW_R0_ZoY2Y9nw_ffRVBSAmcXHrEyejUi-osHG5cqA7ZGMOLU-7M_ha8lDCYiMzq373_qzc')" }}
+                    ></div>
+                    <div>
+                        <h2 className="text-base font-extrabold text-white leading-none">Chef Anderson</h2>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Kitchen Manager</p>
+                    </div>
+                </div>
             </header>
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-48 max-w-lg mx-auto w-full">
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-3xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                        New Order
+                    </h1>
+                    <button
+                        onClick={handleReset}
+                        className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
+                        title="Reset Form"
+                    >
+                        <span className="material-symbols-outlined text-red-500 text-xl font-bold">restart_alt</span>
+                    </button>
+                </div>
                 <section className="flex flex-col gap-6">
-                    <h2 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Order Details</h2>
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Order Name</label>
@@ -183,15 +194,18 @@ export const OrderPage: React.FC = () => {
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Order Date</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span className="material-symbols-outlined text-white">calendar_today</span>
+                            <div className="absolute inset-0 pl-4 pr-10 py-3.5 flex items-center pointer-events-none text-slate-900 dark:text-white sm:text-sm font-medium">
+                                {formData.date ? format(parseISO(formData.date), 'd MMMM yyyy') : ''}
                             </div>
                             <input
                                 value={formData.date}
                                 onChange={(e) => setFormData(p => ({ ...p, date: e.target.value }))}
-                                className="block w-full pl-10 pr-3 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
+                                className="block w-full pl-4 pr-10 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-transparent dark:text-transparent placeholder-transparent focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
                                 type="date"
                             />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="material-symbols-outlined text-white/50">calendar_today</span>
+                            </div>
                         </div>
                     </div>
 
@@ -207,9 +221,7 @@ export const OrderPage: React.FC = () => {
                     </div>
                 </section>
 
-                <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-
-                <section className="flex flex-col gap-4">
+                <section className="flex flex-col gap-4 mt-8">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-slate-800 dark:text-white">Selected Recipes</h3>
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">

@@ -71,7 +71,7 @@ export const OrdersList: React.FC = () => {
                                     <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
                                 </div>
                                 <p className="text-xs text-text-muted">
-                                    {format(new Date(order.date), 'dd MMM yyyy, HH:mm')}
+                                    {format(new Date(order.date), 'd MMMM yyyy')}
                                 </p>
                                 <p className="text-xs text-text-muted mt-1">
                                     {order.items.reduce((acc, item) => acc + item.quantity, 0)} Items

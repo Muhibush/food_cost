@@ -4,11 +4,29 @@ import { useNavigate } from 'react-router-dom';
 export const Profile: React.FC = () => {
     const navigate = useNavigate();
     const [isDarkMode, setIsDarkMode] = useState(true);
+    const [clickCount, setClickCount] = useState(0);
+    const clickTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const handleVersionClick = () => {
+        const newCount = clickCount + 1;
+
+        if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+
+        if (newCount >= 7) {
+            setClickCount(0);
+            navigate('/design-system');
+        } else {
+            setClickCount(newCount);
+            clickTimerRef.current = setTimeout(() => {
+                setClickCount(0);
+            }, 2000); // Reset after 2 seconds of inactivity
+        }
+    };
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-20">
             {/* Header */}
-            <header className="sticky top-0 z-30 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
                 <h1 className="text-2xl font-extrabold text-white tracking-tight">Profile</h1>
                 <button
                     className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
@@ -135,7 +153,10 @@ export const Profile: React.FC = () => {
                             <span className="material-symbols-outlined text-xl font-bold">logout</span>
                             Logout Account
                         </button>
-                        <div className="flex flex-col items-center gap-1 opacity-40">
+                        <div
+                            onClick={handleVersionClick}
+                            className="flex flex-col items-center gap-1 opacity-40 active:opacity-100 transition-opacity cursor-pointer select-none"
+                        >
                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">App Version 2.4.0</p>
                             <p className="text-[9px] font-bold text-gray-500">Build 102 • Production</p>
                         </div>
