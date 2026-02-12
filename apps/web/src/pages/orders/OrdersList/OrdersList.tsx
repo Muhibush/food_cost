@@ -28,7 +28,7 @@ export const OrdersList: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
+            <header className="sticky top-0 z-30 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex justify-between items-center mb-5">
                     <h1 className="text-2xl font-extrabold text-white tracking-tight">Orders</h1>
                     <button

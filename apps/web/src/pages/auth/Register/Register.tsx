@@ -19,8 +19,7 @@ export const Register: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased pb-safe -mx-5 -mt-4">
-            {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
                 <Button
                     variant="secondary"
                     size="icon"
@@ -29,7 +28,7 @@ export const Register: React.FC = () => {
                 >
                     <Icon name="arrow_back" />
                 </Button>
-                <h1 className="text-2xl font-extrabold tracking-tight">Create Account</h1>
+                <h1 className="text-2xl font-extrabold tracking-tight text-white">Create Account</h1>
             </header>
 
             <main className="flex-1 flex flex-col px-5 pt-8 pb-10 gap-10">

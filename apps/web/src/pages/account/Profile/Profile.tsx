@@ -8,13 +8,12 @@ export const Profile: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-20">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-extrabold tracking-tight">Account</h1>
-                    <button className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
-                        <span className="material-symbols-outlined text-white text-xl">notifications</span>
-                    </button>
-                </div>
+            <header className="sticky top-0 z-30 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
+                <h1 className="text-2xl font-extrabold text-white tracking-tight">Profile</h1>
+                <button
+                    className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
+                    <span className="material-symbols-outlined text-white text-xl">notifications</span>
+                </button>
             </header>
 
             <main className="flex-1 flex flex-col px-6 py-8 pb-32 gap-10">

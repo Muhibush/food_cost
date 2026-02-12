@@ -15,7 +15,7 @@ export const ChangePin: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-safe">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-md px-6 pt-12 pb-5 border-b border-white/5">
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/profile')}

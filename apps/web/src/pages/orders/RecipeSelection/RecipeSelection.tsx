@@ -64,33 +64,32 @@ export const RecipeSelection: React.FC = () => {
     };
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-32">
-            <header className="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-5 pt-6 pb-2 border-b border-gray-100 dark:border-gray-800 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 text-slate-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-                    >
-                        <span className="material-symbols-outlined font-bold">arrow_back</span>
-                    </button>
-                    <h1 className="text-lg font-extrabold text-slate-900 dark:text-white">Select Recipes</h1>
-                    <div className="w-8"></div>
-                </div>
-                <div className="relative mb-2">
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-32">
+            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
+                >
+                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
+                </button>
+                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                    Select Recipes
+                </h1>
+            </header>
+
+            <main className="flex-1 flex flex-col gap-6 px-6 pt-4">
+                <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                         <span className="material-symbols-outlined">search</span>
                     </div>
                     <input
-                        className="block w-full pl-10 pr-3 py-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
+                        className="block w-full pl-10 pr-3 py-3 border-none ring-1 ring-white/10 rounded-xl leading-5 bg-surface-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
                         placeholder="Search recipes..."
                         type="search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-            </header>
-
-            <main className="flex-1 flex flex-col gap-6 px-5 pt-4">
                 <section className="flex flex-col gap-4">
                     <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1">Available Recipes</h3>
                     <div className="grid grid-cols-1 gap-4">
