@@ -16,6 +16,7 @@ import { Login } from './pages/auth/Login/Login';
 import { Register } from './pages/auth/Register/Register';
 import { RecipeSelection } from './pages/orders/RecipeSelection/RecipeSelection';
 import { Profile } from './pages/account/Profile/Profile';
+import { DeveloperPage } from './pages/developer/DeveloperPage';
 
 function App() {
     return (
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile/edit" element={<EditProfile />} />
                     <Route path="/profile/change-pin" element={<ChangePin />} />
+                    <Route path="/developer" element={<DeveloperPage />} />
                     {/* Add other routes here later */}
                 </Route>
             </Routes>

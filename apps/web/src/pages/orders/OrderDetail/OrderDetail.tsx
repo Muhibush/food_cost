@@ -191,6 +191,7 @@ export const OrderDetail: React.FC = () => {
                                 type="date"
                                 value={format(parseISO(order.date), 'yyyy-MM-dd')}
                                 onChange={(e) => setOrder({ ...order, date: new Date(e.target.value).toISOString() })}
+                                onClick={(e) => e.currentTarget.showPicker()}
                             />
                         </div>
                     </div>

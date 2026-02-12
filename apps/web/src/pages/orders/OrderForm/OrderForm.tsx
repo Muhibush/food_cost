@@ -187,6 +187,7 @@ export const OrderForm: React.FC = () => {
                             <input
                                 value={formData.date}
                                 onChange={(e) => setFormData(p => ({ ...p, date: e.target.value }))}
+                                onClick={(e) => e.currentTarget.showPicker()}
                                 className="block w-full pl-4 pr-10 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-transparent dark:text-transparent placeholder-transparent focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
                                 type="date"
                             />

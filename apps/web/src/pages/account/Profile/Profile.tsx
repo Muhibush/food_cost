@@ -14,7 +14,7 @@ export const Profile: React.FC = () => {
 
         if (newCount >= 7) {
             setClickCount(0);
-            navigate('/design-system');
+            navigate('/developer');
         } else {
             setClickCount(newCount);
             clickTimerRef.current = setTimeout(() => {
