@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
-import { Order as OrderType } from '../../../types';
+// Types are imported from ../../../types usually, but let's see if we need them.
+// Removing unused imports to fix lint warnings.
 import { v4 as uuidv4 } from 'uuid';
 import { format, parseISO } from 'date-fns';
+import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
@@ -16,52 +18,41 @@ export const OrderPage: React.FC = () => {
     const { getIngredient } = useIngredientsStore();
     const location = useLocation();
 
-    const [formData, setFormData] = useState<Omit<OrderType, 'id'>>({
-        name: '',
-        date: format(new Date(), 'yyyy-MM-dd'),
-        items: [],
-        status: 'pending',
-        totalCost: 0
-    });
-
-    const [notes, setNotes] = useState('');
+    const {
+        name: draftName,
+        date: draftDate,
+        items: draftItems,
+        notes: draftNotes,
+        setName,
+        setDate,
+        setNotes,
+        setItems,
+        syncItemsFromIds,
+        resetDraft
+    } = useOrderDraftStore();
 
     useEffect(() => {
         if (id) {
             const existing = getOrder(id);
             if (existing) {
-                setFormData({
-                    ...existing,
-                    date: format(new Date(existing.date), 'yyyy-MM-dd')
-                });
+                setName(existing.name);
+                setDate(format(new Date(existing.date), 'yyyy-MM-dd'));
+                setItems(existing.items);
+                // Note: assuming notes might be added to Order type later, or handled separately
             }
         }
-    }, [id, getOrder]);
+    }, [id, getOrder, setName, setDate, setItems]);
 
     // Handle returned selection from RecipeSelection page
     useEffect(() => {
         if (location.state?.selectedRecipeIds) {
             const selectedIds = location.state.selectedRecipeIds as string[];
-            setFormData(prev => {
-                const newItems = [...prev.items];
+            syncItemsFromIds(selectedIds);
 
-                // Add new recipes that are not in the list
-                selectedIds.forEach(recipeId => {
-                    if (!newItems.find(i => i.recipeId === recipeId)) {
-                        newItems.push({ recipeId, quantity: 1 });
-                    }
-                });
-
-                // Remove recipes that were deselected
-                return {
-                    ...prev,
-                    items: newItems.filter(item => selectedIds.includes(item.recipeId))
-                };
-            });
             // Clear location state to avoid re-triggering
             window.history.replaceState({}, document.title);
         }
-    }, [location.state]);
+    }, [location.state, syncItemsFromIds]);
 
     const getRecipeCost = (recipeId: string) => {
         const recipe = recipes.find(r => r.id === recipeId);
@@ -76,66 +67,59 @@ export const OrderPage: React.FC = () => {
     }
 
     const calculatedTotal = useMemo(() => {
-        return formData.items.reduce((total, item) => {
+        return draftItems.reduce((total, item) => {
             const unitCost = item.customPrice ?? getRecipeCost(item.recipeId);
             return total + (unitCost * item.quantity);
         }, 0);
-    }, [formData.items, recipes, getIngredient]);
+    }, [draftItems, recipes, getIngredient]);
 
-    useEffect(() => {
-        if (formData.totalCost !== calculatedTotal) {
-            setFormData(prev => ({ ...prev, totalCost: calculatedTotal }));
-        }
-    }, [calculatedTotal]);
+    // Aggregated Price State Sync logic - No longer needed as we calculate on the fly or in store?
+    // Actually, calculatedTotal is used in handleSubmit. Let's keep the useMemo for display.
 
 
     const updateItemQuantity = (index: number, delta: number) => {
-        setFormData(prev => {
-            const newItems = [...prev.items];
-            newItems[index].quantity += delta;
-            if (newItems[index].quantity <= 0) {
-                return { ...prev, items: newItems.filter((_, i) => i !== index) };
-            }
-            return { ...prev, items: newItems };
-        });
+        const newItems = [...draftItems];
+        newItems[index].quantity += delta;
+        if (newItems[index].quantity <= 0) {
+            setItems(newItems.filter((_, i) => i !== index));
+        } else {
+            setItems(newItems);
+        }
     };
 
     const removeItem = (index: number) => {
-        setFormData(prev => {
-            return { ...prev, items: prev.items.filter((_, i) => i !== index) };
-        });
+        setItems(draftItems.filter((_, i) => i !== index));
     };
 
     const handleSubmit = () => {
-        if (formData.items.length === 0) {
+        if (draftItems.length === 0) {
             alert("Please add at least one item to the order.");
             return;
         }
 
         const orderData = {
-            ...formData,
+            name: draftName,
+            date: draftDate,
+            items: draftItems,
+            status: 'pending' as const,
+            totalCost: calculatedTotal,
         };
 
         if (id) {
             updateOrder(id, orderData);
+            resetDraft();
             navigate('/orders');
         } else {
             const newId = uuidv4();
-            addOrder({ ...orderData, id: newId, date: new Date(formData.date).toISOString() });
+            addOrder({ ...orderData, id: newId, date: new Date(draftDate).toISOString() });
+            resetDraft();
             navigate(`/orders/${newId}`);
         }
     };
 
     const handleReset = () => {
         if (confirm("Are you sure you want to reset the form?")) {
-            setFormData({
-                name: '',
-                date: format(new Date(), 'yyyy-MM-dd'),
-                items: [],
-                status: 'pending',
-                totalCost: 0
-            });
-            setNotes('');
+            resetDraft();
         }
     };
 
@@ -182,8 +166,8 @@ export const OrderPage: React.FC = () => {
                                 <span className="material-symbols-outlined text-gray-400">edit_note</span>
                             </div>
                             <input
-                                value={formData.name}
-                                onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+                                value={draftName}
+                                onChange={(e) => setName(e.target.value)}
                                 className="block w-full pl-10 pr-3 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
                                 placeholder="e.g. Wedding Catering"
                                 type="text"
@@ -195,11 +179,11 @@ export const OrderPage: React.FC = () => {
                         <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Order Date</label>
                         <div className="relative">
                             <div className="absolute inset-0 pl-4 pr-10 py-3.5 flex items-center pointer-events-none text-slate-900 dark:text-white sm:text-sm font-medium">
-                                {formData.date ? format(parseISO(formData.date), 'd MMMM yyyy') : ''}
+                                {draftDate ? format(parseISO(draftDate), 'd MMMM yyyy') : ''}
                             </div>
                             <input
-                                value={formData.date}
-                                onChange={(e) => setFormData(p => ({ ...p, date: e.target.value }))}
+                                value={draftDate}
+                                onChange={(e) => setDate(e.target.value)}
                                 onClick={(e) => e.currentTarget.showPicker()}
                                 className="block w-full pl-4 pr-10 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-transparent dark:text-transparent placeholder-transparent focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
                                 type="date"
@@ -213,7 +197,7 @@ export const OrderPage: React.FC = () => {
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Notes</label>
                         <textarea
-                            value={notes}
+                            value={draftNotes}
                             onChange={(e) => setNotes(e.target.value)}
                             className="block w-full px-4 py-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all resize-none"
                             placeholder="Allergies, packaging preferences, delivery instructions..."
@@ -226,14 +210,14 @@ export const OrderPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-slate-800 dark:text-white">Selected Recipes</h3>
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">
-                            {formData.items.length} Items
+                            {draftItems.length} Items
                         </span>
                     </div>
 
                     <button
                         onClick={() => navigate('/orders/select-recipes', {
                             state: {
-                                selectedRecipeIds: formData.items.map(i => i.recipeId),
+                                selectedRecipeIds: draftItems.map(i => i.recipeId),
                                 returnPath: '/'
                             }
                         })}
@@ -244,7 +228,7 @@ export const OrderPage: React.FC = () => {
                     </button>
 
                     <div className="grid grid-cols-1 gap-3">
-                        {formData.items.map((item, index) => {
+                        {draftItems.map((item, index) => {
                             const recipe = recipes.find(r => r.id === item.recipeId);
                             const unitCost = item.customPrice ?? getRecipeCost(item.recipeId);
                             const subtotal = unitCost * item.quantity;
@@ -300,12 +284,11 @@ export const OrderPage: React.FC = () => {
                     </div>
                 </section>
 
-                {/* Sticky Total Cost Footer */}
                 <div className="fixed bottom-[80px] left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-2 pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform">
                     <div className="flex items-center justify-between mb-2">
                         <div>
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">Total Cost Estimation</p>
-                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {Math.round(formData.totalCost).toLocaleString()}</div>
+                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {Math.round(calculatedTotal).toLocaleString()}</div>
                         </div>
                         <button
                             onClick={handleSubmit}
