@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useBlocker } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
@@ -7,31 +7,117 @@ import { Order } from '../../../types';
 import { format, parseISO } from 'date-fns';
 import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
+import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const location = useLocation();
-    const { getOrder, updateOrder } = useOrdersStore();
+    const { getOrder, updateOrder, addOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+    const {
+        name: draftName,
+        date: draftDate,
+        items: draftItems,
+        notes: draftNotes,
+        editingId,
+        resetDraft
+    } = useOrderDraftStore();
 
     const [order, setOrder] = useState<Order | null>(null);
+    const [originalOrder, setOriginalOrder] = useState<Order | null>(null);
+
+    const isDirty = useMemo(() => {
+        if (!order) return false;
+
+        // If we arrived from entry flow and the order isn't in the store yet, it's definitively "unsaved"
+        if (location.state?.from === 'entry' && !originalOrder) return true;
+
+        if (!originalOrder) return false;
+
+        const current = JSON.stringify(order);
+        const original = JSON.stringify(originalOrder);
+        const dirty = current !== original;
+        console.log('[OrderDetail] State Comparison:', {
+            isDirty: dirty,
+            currentName: order.name,
+            originalName: originalOrder.name,
+            itemCount: order.items.length,
+            originalItemCount: originalOrder.items.length
+        });
+        return dirty;
+    }, [order, originalOrder, location.state]);
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            isDirty && currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+        if (blocker.state === "blocked") {
+            const proceed = window.confirm("You have unsaved changes. Are you sure you want to leave?");
+            if (proceed) {
+                blocker.proceed();
+            } else {
+                blocker.reset();
+            }
+        }
+    }, [blocker]);
+
+    const handleBack = () => {
+        navigate(-1);
+    };
 
     useEffect(() => {
         if (id) {
-            const foundOrder = getOrder(id);
-            if (foundOrder) {
-                setOrder(foundOrder);
+            const foundStoreOrder = getOrder(id);
+            const isFromEntry = location.state?.from === 'entry' && id === editingId;
+
+            if (isFromEntry) {
+                // When arriving from entry flow, we MUST use the latest draft values (which might overwrite store values)
+                console.log('[OrderDetail] Initialized from Draft Store:', draftName);
+                const draftBasedOrder: Order = {
+                    id: id,
+                    name: draftName,
+                    date: draftDate,
+                    items: draftItems,
+                    notes: draftNotes,
+                    status: foundStoreOrder?.status || 'pending',
+                    totalCost: 0, // Will be calculated by useMemo
+                    ingredientOverrides: foundStoreOrder?.ingredientOverrides || []
+                };
+                setOrder(draftBasedOrder);
+                // Set originalOrder to the ACTUAL store version so we can detect changes from store
+                setOriginalOrder(foundStoreOrder ? JSON.parse(JSON.stringify(foundStoreOrder)) : null);
+            } else if (foundStoreOrder) {
+                // Normal navigation from history/list, use the store version
+                console.log('[OrderDetail] Loaded from OrdersStore:', foundStoreOrder.name);
+                const cleanOrder = JSON.parse(JSON.stringify(foundStoreOrder));
+                setOrder(cleanOrder);
+                setOriginalOrder(cleanOrder);
             } else {
                 navigate('/history');
             }
         }
-    }, [id, getOrder, navigate]);
+    }, [id, getOrder, navigate, editingId, draftName, draftDate, draftItems, draftNotes, location.state]);
 
-    // Handle returned selection from RecipeSelection page
     useEffect(() => {
-        if (location.state?.selectedRecipeIds && order) {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty]);
+
+    const syncHandled = React.useRef(false);
+
+    useEffect(() => {
+        if (location.state?.selectedRecipeIds && order && !syncHandled.current) {
+            syncHandled.current = true;
             const selectedIds = location.state.selectedRecipeIds as string[];
             const newItems = [...order.items];
 
@@ -108,7 +194,16 @@ export const OrderDetail: React.FC = () => {
 
     const handleUpdateOrder = () => {
         if (!order) return;
-        updateOrder(order.id, { ...order, totalCost });
+        const finalOrder = { ...order, totalCost };
+
+        const existingOrder = getOrder(order.id);
+        if (existingOrder) {
+            updateOrder(order.id, finalOrder);
+        } else {
+            addOrder(finalOrder);
+        }
+
+        resetDraft();
         navigate('/history');
     };
 
@@ -150,13 +245,18 @@ export const OrderDetail: React.FC = () => {
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-10">
             <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={handleBack}
                     className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
                 >
                     <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
                 </button>
-                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap flex items-center gap-2">
                     Order Details
+                    {isDirty && (
+                        <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
+                            Unsaved
+                        </span>
+                    )}
                 </h1>
                 <div className="flex-1"></div>
                 <div className="text-right">
@@ -327,7 +427,7 @@ export const OrderDetail: React.FC = () => {
                     onClick={handleUpdateOrder}
                     className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold text-lg rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 mb-4"
                 >
-                    Update Order
+                    {location.state?.from === 'entry' ? 'Save Order' : 'Update Order'}
                 </button>
             </div>
         </div>

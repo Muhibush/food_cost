@@ -17,7 +17,7 @@ import { ActionFooter } from '../../../components/ui/ActionFooter';
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const { addOrder, updateOrder, getOrder } = useOrdersStore();
+    const { getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
 
@@ -87,25 +87,14 @@ export const OrderPage: React.FC = () => {
             return;
         }
 
-        const orderData = {
-            name: draftName,
-            date: draftDate,
-            items: draftItems,
-            notes: draftNotes,
-            status: 'pending' as const,
-            totalCost: calculatedTotal,
-        };
-
-        if (id) {
-            updateOrder(id, orderData);
-            resetDraft();
-            navigate(`/orders/${id}`);
-        } else {
-            const newId = uuidv4();
-            addOrder({ ...orderData, id: newId, date: new Date(draftDate).toISOString() });
-            resetDraft();
-            navigate(`/orders/${newId}`);
+        let targetId = id;
+        if (!targetId) {
+            targetId = uuidv4();
+            setEditingId(targetId);
         }
+
+        // Navigate to OrderDetail without saving to OrdersStore yet
+        navigate(`/orders/${targetId}`, { state: { from: 'entry' } });
     };
 
     const handleReset = () => {

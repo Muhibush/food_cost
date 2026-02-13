@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { DesignSystem } from './pages/design/DesignSystem/DesignSystem';
 import { OrderPage as Order } from './pages/orders/OrderEntry/OrderEntry';
 import { Layout } from './components/layout/Layout';
@@ -18,36 +18,96 @@ import { RecipeSelection } from './pages/orders/RecipeSelection/RecipeSelection'
 import { Profile } from './pages/account/Profile/Profile';
 import { DeveloperPage } from './pages/developer/DeveloperPage';
 
-function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/design-system" element={<DesignSystem />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+const router = createBrowserRouter([
+    {
+        path: '/design-system',
+        element: <DesignSystem />,
+    },
+    {
+        path: '/login',
+        element: <Login />,
+    },
+    {
+        path: '/register',
+        element: <Register />,
+    },
+    {
+        element: <Layout />,
+        children: [
+            {
+                path: '/',
+                element: <Order />,
+            },
+            {
+                path: '/history',
+                element: <HistoryPage />,
+            },
+            {
+                path: '/ingredients',
+                element: <IngredientsList />,
+            },
+            {
+                path: '/ingredients/new',
+                element: <IngredientForm />,
+            },
+            {
+                path: '/ingredients/:id',
+                element: <IngredientForm />,
+            },
+            {
+                path: '/recipes',
+                element: <RecipesList />,
+            },
+            {
+                path: '/recipes/new',
+                element: <RecipeForm />,
+            },
+            {
+                path: '/recipes/:id',
+                element: <RecipeForm />,
+            },
+            {
+                path: '/orders',
+                element: <OrdersList />,
+            },
+            {
+                path: '/orders/new',
+                element: <OrderForm />,
+            },
+            {
+                path: '/orders/select-recipes',
+                element: <RecipeSelection />,
+            },
+            {
+                path: '/orders/:id',
+                element: <OrderDetail />,
+            },
+            {
+                path: '/profile',
+                element: <Profile />,
+            },
+            {
+                path: '/profile/edit',
+                element: <EditProfile />,
+            },
+            {
+                path: '/profile/change-pin',
+                element: <ChangePin />,
+            },
+            {
+                path: '/developer',
+                element: <DeveloperPage />,
+            },
+            {
+                path: '*',
+                element: <Navigate to="/" replace />,
+            }
+        ],
+    },
+]);
 
-                <Route element={<Layout />}>
-                    <Route path="/" element={<Order />} />
-                    <Route path="/history" element={<HistoryPage />} />
-                    <Route path="/ingredients" element={<IngredientsList />} />
-                    <Route path="/ingredients/new" element={<IngredientForm />} />
-                    <Route path="/ingredients/:id" element={<IngredientForm />} />
-                    <Route path="/recipes" element={<RecipesList />} />
-                    <Route path="/recipes/new" element={<RecipeForm />} />
-                    <Route path="/recipes/:id" element={<RecipeForm />} />
-                    <Route path="/orders" element={<OrdersList />} />
-                    <Route path="/orders/new" element={<OrderForm />} />
-                    <Route path="/orders/select-recipes" element={<RecipeSelection />} />
-                    <Route path="/orders/:id" element={<OrderDetail />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/edit" element={<EditProfile />} />
-                    <Route path="/profile/change-pin" element={<ChangePin />} />
-                    <Route path="/developer" element={<DeveloperPage />} />
-                    {/* Add other routes here later */}
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+function App() {
+    return <RouterProvider router={router} />;
 }
 
 export default App;
