@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
+import { formatCurrency } from '../../../utils/format';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { Header } from '../../../components/ui/Header';
 import { DatePicker } from '../../../components/ui/DatePicker';
@@ -19,7 +20,6 @@ export const OrderPage: React.FC = () => {
     const { addOrder, updateOrder, getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
-    const location = useLocation();
 
     const {
         name: draftName,
@@ -30,28 +30,23 @@ export const OrderPage: React.FC = () => {
         setDate,
         setNotes,
         setItems,
-        syncItemsFromIds,
+        editingId,
+        setEditingId,
         resetDraft
     } = useOrderDraftStore();
 
     useEffect(() => {
-        if (id) {
+        if (id && id !== editingId) {
             const existing = getOrder(id);
             if (existing) {
                 setName(existing.name);
                 setDate(format(new Date(existing.date), 'yyyy-MM-dd'));
                 setItems(existing.items);
+                setNotes(existing.notes || '');
+                setEditingId(id);
             }
         }
-    }, [id, getOrder, setName, setDate, setItems]);
-
-    useEffect(() => {
-        if (location.state?.selectedRecipeIds) {
-            const selectedIds = location.state.selectedRecipeIds as string[];
-            syncItemsFromIds(selectedIds);
-            window.history.replaceState({}, document.title);
-        }
-    }, [location.state, syncItemsFromIds]);
+    }, [id, editingId, getOrder, setName, setDate, setItems, setNotes, setEditingId]);
 
     const getRecipeCost = (recipeId: string) => {
         const recipe = recipes.find(r => r.id === recipeId);
@@ -96,6 +91,7 @@ export const OrderPage: React.FC = () => {
             name: draftName,
             date: draftDate,
             items: draftItems,
+            notes: draftNotes,
             status: 'pending' as const,
             totalCost: calculatedTotal,
         };
@@ -134,7 +130,7 @@ export const OrderPage: React.FC = () => {
             <main className="flex-1 flex flex-col px-6 pt-8 pb-40 max-w-lg mx-auto w-full">
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-3xl font-extrabold text-white tracking-tight whitespace-nowrap">
-                        New Order
+                        {id ? 'Edit Order' : 'New Order'}
                     </h1>
                     <button
                         onClick={handleReset}
@@ -194,7 +190,7 @@ export const OrderPage: React.FC = () => {
                                         title={recipe?.name || 'Unknown'}
                                         subtitle={
                                             <div className="text-xs font-bold text-primary">
-                                                Rp {Math.round(unitCost).toLocaleString()} <span className="text-gray-400 font-normal">/ portion</span>
+                                                Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
                                         }
                                         rightElement={
@@ -207,7 +203,7 @@ export const OrderPage: React.FC = () => {
                                         }
                                         bottomElement={
                                             <div className="flex items-center justify-between w-full">
-                                                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {Math.round(subtotal).toLocaleString()}</div>
+                                                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
                                                 <QuantitySelector
                                                     value={item.quantity}
                                                     onIncrement={() => updateItemQuantity(index, 1)}
@@ -239,7 +235,7 @@ export const OrderPage: React.FC = () => {
                     className="bottom-[84px]"
                     summary={{
                         label: "Total Cost Estimation",
-                        value: `Rp ${Math.round(calculatedTotal).toLocaleString()}`
+                        value: `Rp ${formatCurrency(Math.round(calculatedTotal))}`
                     }}
                     primaryAction={{
                         label: 'Order Detail',

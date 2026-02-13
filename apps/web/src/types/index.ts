@@ -41,6 +41,7 @@ export interface Order {
     status: 'draft' | 'pending' | 'completed' | 'cancelled';
     totalCost: number; // Snapshot of total cost at time of finalization
     ingredientOverrides?: IngredientOverride[];
+    notes?: string;
 }
 
 export interface CartItem extends OrderItem {

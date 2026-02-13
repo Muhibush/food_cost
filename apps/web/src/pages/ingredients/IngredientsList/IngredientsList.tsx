@@ -3,6 +3,7 @@ import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { Input } from '../../../components/ui/Input';
+import { formatCurrency } from '../../../utils/format';
 
 export const IngredientsList: React.FC = () => {
     const navigate = useNavigate();
@@ -76,7 +77,7 @@ export const IngredientsList: React.FC = () => {
                                     <h3 className="font-bold text-white text-[17px] leading-tight truncate">{ing.name}</h3>
                                 </div>
                                 <div className="flex flex-col items-end gap-1">
-                                    <span className="font-bold text-white text-[15px]">Rp {ing.price.toLocaleString()}</span>
+                                    <span className="font-bold text-white text-[15px]">Rp {formatCurrency(ing.price)}</span>
                                     <span className="text-[10px] text-gray-500 font-semibold tracking-wide uppercase bg-white/5 px-2 py-0.5 rounded-md">/{ing.unit}</span>
                                 </div>
                             </div>

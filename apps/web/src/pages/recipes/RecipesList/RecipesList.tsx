@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '../../../utils/format';
 import { Recipe } from '../../../types';
 import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
@@ -88,7 +89,7 @@ export const RecipesList: React.FC = () => {
                                         }
                                         bottomElement={
                                             <div className="text-[15px] font-extrabold text-white">
-                                                Rp {Math.round(costPerPortion).toLocaleString()}
+                                                Rp {formatCurrency(Math.round(costPerPortion))}
                                                 <span className="text-[11px] font-medium text-gray-500 ml-1 tracking-tight">/ portion</span>
                                             </div>
                                         }

@@ -4,6 +4,7 @@ import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Recipe, RecipeIngredient, Ingredient } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
+import { formatCurrency } from '../../../utils/format';
 import { IngredientBottomSheet } from '../../../components/ui/IngredientBottomSheet';
 
 export const RecipeForm: React.FC = () => {
@@ -234,7 +235,7 @@ export const RecipeForm: React.FC = () => {
                                     <div className="flex-1 space-y-2.5">
                                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right block mr-1">Cost Estimation</label>
                                         <div className="w-full px-5 py-4 text-right text-lg font-extrabold text-white bg-[#2A2D3A]/50 rounded-2xl border border-white/5">
-                                            Rp {Math.round(ingredientCosts[index]).toLocaleString()}
+                                            Rp {formatCurrency(Math.round(ingredientCosts[index]))}
                                         </div>
                                     </div>
                                 </div>
@@ -259,7 +260,7 @@ export const RecipeForm: React.FC = () => {
                         <div>
                             <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold block mb-1">Total Cost / Portion</span>
                             <div className="text-2xl font-black text-white flex items-baseline gap-1.5">
-                                Rp {Math.round(costPerPortion).toLocaleString()}
+                                Rp {formatCurrency(Math.round(costPerPortion))}
                                 <span className="text-xs font-medium text-gray-500 lowercase tracking-normal">est.</span>
                             </div>
                         </div>

@@ -9,12 +9,14 @@ interface OrderDraftState {
     items: OrderItem[];
     notes: string;
     totalCost: number;
+    editingId: string | null;
     setName: (name: string) => void;
     setDate: (date: string) => void;
     setNotes: (notes: string) => void;
     setItems: (items: OrderItem[]) => void;
     syncItemsFromIds: (ids: string[]) => void;
     setTotalCost: (cost: number) => void;
+    setEditingId: (id: string | null) => void;
     resetDraft: () => void;
 }
 
@@ -26,6 +28,7 @@ export const useOrderDraftStore = create<OrderDraftState>()(
             items: [],
             notes: '',
             totalCost: 0,
+            editingId: null,
             setName: (name) => set({ name }),
             setDate: (date) => set({ date }),
             setNotes: (notes) => set({ notes }),
@@ -46,12 +49,14 @@ export const useOrderDraftStore = create<OrderDraftState>()(
                 };
             }),
             setTotalCost: (totalCost) => set({ totalCost }),
+            setEditingId: (editingId) => set({ editingId }),
             resetDraft: () => set({
                 name: '',
                 date: format(new Date(), 'yyyy-MM-dd'),
                 items: [],
                 notes: '',
-                totalCost: 0
+                totalCost: 0,
+                editingId: null
             }),
         }),
         {

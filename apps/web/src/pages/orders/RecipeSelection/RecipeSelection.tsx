@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Icon } from '../../../components/ui/Icon';
+import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
+import { formatCurrency } from '../../../utils/format';
 import { clsx } from 'clsx';
 import { Recipe } from '../../../types';
 
@@ -19,6 +21,7 @@ export const RecipeSelection: React.FC = () => {
 
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+    const { syncItemsFromIds } = useOrderDraftStore();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedIds, setSelectedIds] = useState<string[]>(state?.selectedRecipeIds || []);
@@ -55,12 +58,8 @@ export const RecipeSelection: React.FC = () => {
     }, [selectedRecipes, getIngredient]);
 
     const handleConfirm = () => {
-        navigate(state?.returnPath || '/', {
-            state: {
-                ...state,
-                selectedRecipeIds: selectedIds
-            }
-        });
+        syncItemsFromIds(selectedIds);
+        navigate(-1);
     };
 
     return (
@@ -121,7 +120,7 @@ export const RecipeSelection: React.FC = () => {
                                                     "text-sm font-extrabold",
                                                     isSelected ? "text-primary" : "text-slate-700 dark:text-gray-200"
                                                 )}>
-                                                    Rp {Math.round(cost).toLocaleString()} <span className="text-xs font-normal text-gray-400">/ portion</span>
+                                                    Rp {formatCurrency(Math.round(cost))} <span className="text-xs font-normal text-gray-400">/ portion</span>
                                                 </div>
                                                 <button className={clsx(
                                                     "h-8 px-4 rounded-lg text-xs font-bold flex items-center gap-1 transition-all",
@@ -165,7 +164,7 @@ export const RecipeSelection: React.FC = () => {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Recipes Selected</span>
-                            <span className="font-extrabold text-slate-900 text-[15px]">Est. Base Cost: Rp {Math.round(totalBaseCost).toLocaleString()}</span>
+                            <span className="font-extrabold text-slate-900 text-[15px]">Est. Base Cost: Rp {formatCurrency(Math.round(totalBaseCost))}</span>
                         </div>
                     </div>
                     <button

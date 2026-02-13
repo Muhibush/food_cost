@@ -6,6 +6,7 @@ import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Order } from '../../../types';
 import { format, parseISO } from 'date-fns';
 import { clsx } from 'clsx';
+import { formatCurrency } from '../../../utils/format';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -160,7 +161,7 @@ export const OrderDetail: React.FC = () => {
                 <div className="flex-1"></div>
                 <div className="text-right">
                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-0.5 opacity-60">Total Cost</p>
-                    <div className="text-xl font-extrabold font-display text-primary">Rp {Math.round(totalCost).toLocaleString()}</div>
+                    <div className="text-xl font-extrabold font-display text-primary">Rp {formatCurrency(Math.round(totalCost))}</div>
                 </div>
             </header>
 
@@ -311,7 +312,7 @@ export const OrderDetail: React.FC = () => {
                                     <div className="h-px bg-white/5 w-full"></div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Total</span>
-                                        <span className="text-sm font-bold text-primary">Rp {Math.round(ing.total).toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-primary">Rp {formatCurrency(Math.round(ing.total))}</span>
                                     </div>
                                 </div>
                             </div>

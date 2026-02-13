@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { Icon } from '../../../components/ui/Icon';
+import { formatCurrency } from '../../../utils/format';
 import { Input } from '../../../components/ui/Input';
 import { format, parseISO, startOfMonth, isSameMonth } from 'date-fns';
 import { useRecipesStore } from '../../../store/useRecipesStore';
@@ -92,7 +93,7 @@ export const HistoryPage: React.FC = () => {
                                                 <div>
                                                     <h3 className="text-base font-bold text-white truncate mb-1">{order.name}</h3>
                                                     <p className="text-primary font-bold text-sm mb-1.5">
-                                                        Rp {Math.round(order.totalCost).toLocaleString()}
+                                                        Rp {formatCurrency(Math.round(order.totalCost))}
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center gap-2 text-xs text-gray-400">

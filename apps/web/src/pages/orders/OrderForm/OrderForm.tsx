@@ -6,6 +6,7 @@ import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Order, Recipe } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import { format, parseISO } from 'date-fns';
+import { formatCurrency } from '../../../utils/format';
 
 export const OrderForm: React.FC = () => {
     const navigate = useNavigate();
@@ -249,11 +250,11 @@ export const OrderForm: React.FC = () => {
                                                 </button>
                                             </div>
                                             <div className="text-xs font-bold text-primary mt-0.5">
-                                                Rp {Math.round(unitCost).toLocaleString()} <span className="text-gray-400 font-normal">/ portion</span>
+                                                Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between mt-2">
-                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {Math.round(subtotal).toLocaleString()}</div>
+                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
                                             <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-0.5 border border-gray-200 dark:border-gray-600 h-8">
                                                 <button
                                                     onClick={() => updateItemQuantity(index, -1)}
@@ -287,7 +288,7 @@ export const OrderForm: React.FC = () => {
                     <div className="flex items-center justify-between mb-2">
                         <div>
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">Total Cost Estimation</p>
-                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {Math.round(formData.totalCost).toLocaleString()}</div>
+                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {formatCurrency(Math.round(formData.totalCost))}</div>
                         </div>
                         <button
                             onClick={handleSubmit}
@@ -316,7 +317,7 @@ export const OrderForm: React.FC = () => {
                                         className="flex justify-between items-center p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left group"
                                     >
                                         <span className="font-bold dark:text-white group-hover:text-primary transition-colors">{recipe.name}</span>
-                                        <span className="text-primary font-bold">Rp {Math.round(getRecipeCost(recipe.id)).toLocaleString()}</span>
+                                        <span className="text-primary font-bold">Rp {formatCurrency(Math.round(getRecipeCost(recipe.id)))}</span>
                                     </button>
                                 ))}
                             </div>

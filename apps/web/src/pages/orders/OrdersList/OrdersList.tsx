@@ -6,6 +6,7 @@ import { Icon } from '../../../components/ui/Icon';
 import { Badge } from '../../../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { formatCurrency } from '../../../utils/format';
 
 export const OrdersList: React.FC = () => {
     const navigate = useNavigate();
@@ -78,7 +79,7 @@ export const OrdersList: React.FC = () => {
                                 </p>
                             </div>
                             <div className="text-right">
-                                <span className="font-bold text-base block">Rp {order.totalCost.toLocaleString()}</span>
+                                <span className="font-bold text-base block">Rp {formatCurrency(order.totalCost)}</span>
                             </div>
                         </Card>
                     ))

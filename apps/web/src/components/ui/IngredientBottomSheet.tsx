@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { BottomSheet } from './BottomSheet';
 import { Icon } from './Icon';
+import { formatCurrency } from '../../utils/format';
 import { Ingredient } from '../../types';
 import { useIngredientsStore } from '../../store/useIngredientsStore';
 
@@ -90,7 +91,7 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-white text-base">
-                                            Rp {Math.round(ing.price).toLocaleString()}
+                                            Rp {formatCurrency(Math.round(ing.price))}
                                         </p>
                                     </div>
                                 </button>
