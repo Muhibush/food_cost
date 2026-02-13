@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Badge } from '../../../components/ui/Badge';
@@ -9,10 +8,12 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
 
 export const DesignSystem: React.FC = () => {
     const [date, setDate] = useState('2026-02-13');
     const [quantity, setQuantity] = useState(12);
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
 
     return (
         <div className="bg-background-dark min-h-screen text-white font-display">
@@ -137,6 +138,30 @@ export const DesignSystem: React.FC = () => {
                             primaryAction={{ label: "Proceed to Checkout", onClick: () => alert("Clicked!") }}
                         />
                     </div>
+                </section>
+
+                {/* 07. Overlays & Dialogs */}
+                <section className="space-y-4">
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">07. Overlays & Dialogs</h3>
+                    <div className="flex gap-4">
+                        <Button
+                            className="flex-1 h-14"
+                            onClick={() => setIsAlertOpen(true)}
+                        >
+                            Open Sample Alert
+                        </Button>
+                    </div>
+
+                    <AlertDialog
+                        isOpen={isAlertOpen}
+                        title="Discard Changes?"
+                        message="You have unsaved modifications in this order. Are you sure you want to discard them? This action cannot be undone."
+                        confirmLabel="Discard"
+                        cancelLabel="Keep Editing"
+                        isDestructive
+                        onCancel={() => setIsAlertOpen(false)}
+                        onConfirm={() => setIsAlertOpen(false)}
+                    />
                 </section>
             </main>
         </div>

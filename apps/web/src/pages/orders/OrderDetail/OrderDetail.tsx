@@ -8,6 +8,7 @@ import { format, parseISO } from 'date-fns';
 import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -54,16 +55,7 @@ export const OrderDetail: React.FC = () => {
             isDirty && currentLocation.pathname !== nextLocation.pathname
     );
 
-    useEffect(() => {
-        if (blocker.state === "blocked") {
-            const proceed = window.confirm("You have unsaved changes. Are you sure you want to leave?");
-            if (proceed) {
-                blocker.proceed();
-            } else {
-                blocker.reset();
-            }
-        }
-    }, [blocker]);
+    // Removal of useEffect with window.confirm
 
     const handleBack = () => {
         navigate(-1);
@@ -430,6 +422,17 @@ export const OrderDetail: React.FC = () => {
                     {location.state?.from === 'entry' ? 'Save Order' : 'Update Order'}
                 </button>
             </div>
+
+            <AlertDialog
+                isOpen={blocker.state === 'blocked'}
+                title="Discard Changes?"
+                message="You have unsaved changes in this order. Are you sure you want to leave and discard them?"
+                confirmLabel="Leave"
+                cancelLabel="Stay"
+                isDestructive
+                onCancel={() => blocker.state === 'blocked' && blocker.reset()}
+                onConfirm={() => blocker.state === 'blocked' && blocker.proceed()}
+            />
         </div>
     );
 };
