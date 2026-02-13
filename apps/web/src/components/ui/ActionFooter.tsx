@@ -45,8 +45,8 @@ export const ActionFooter: React.FC<ActionFooterProps> = ({
                         primaryAction.variant === 'secondary'
                             ? "bg-surface-dark text-white border border-white/10"
                             : primaryAction.variant === 'danger'
-                                ? "bg-danger text-white shadow-danger/30"
-                                : "bg-primary text-white shadow-primary/30"
+                                ? "bg-danger text-white shadow-danger/10"
+                                : "bg-primary text-white shadow-primary/10"
                     )}
                 >
                     {primaryAction.isLoading && (

@@ -103,7 +103,7 @@ export const OrderPage: React.FC = () => {
         if (id) {
             updateOrder(id, orderData);
             resetDraft();
-            navigate('/orders');
+            navigate(`/orders/${id}`);
         } else {
             const newId = uuidv4();
             addOrder({ ...orderData, id: newId, date: new Date(draftDate).toISOString() });
@@ -236,12 +236,13 @@ export const OrderPage: React.FC = () => {
                 </section>
 
                 <ActionFooter
+                    className="bottom-[84px]"
                     summary={{
                         label: "Total Cost Estimation",
                         value: `Rp ${Math.round(calculatedTotal).toLocaleString()}`
                     }}
                     primaryAction={{
-                        label: id ? 'Update Order' : 'Create Order',
+                        label: 'Order Detail',
                         onClick: handleSubmit
                     }}
                 />
