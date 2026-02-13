@@ -4,6 +4,8 @@ import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
 import { Recipe } from '../../../types';
 import { Input } from '../../../components/ui/Input';
+import { Header } from '../../../components/ui/Header';
+import { MediaCard } from '../../../components/ui/MediaCard';
 
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
@@ -21,35 +23,35 @@ export const RecipesList: React.FC = () => {
         return recipe.ingredients.reduce((total, item) => {
             const ingredient = getIngredient(item.ingredientId);
             if (!ingredient) return total;
-            // simplified cost: (price * quantity) assuming unit consistency.
-            // We will improve this logic in the "Cost Calculation Logic" phase
-            // Assuming price is PER UNIT.
             return total + (ingredient.price * item.quantity);
         }, 0);
     };
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5">
-                <div className="flex justify-between items-center mb-5">
-                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Recipes</h1>
+            <Header
+                title="Recipes"
+                rightElement={
                     <button
                         onClick={() => navigate('/recipes/new')}
                         className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
                     >
                         <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>
-                </div>
-                <Input
-                    icon="search"
-                    placeholder="Search recipes..."
-                    type="search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </header>
+                }
+            />
 
             <main className="flex-1 flex flex-col px-6 pt-6 pb-20">
+                <div className="mb-6">
+                    <Input
+                        icon="search"
+                        placeholder="Search recipes..."
+                        type="search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+
                 <section className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">My Recipes</h3>
@@ -74,36 +76,23 @@ export const RecipesList: React.FC = () => {
                                 const costPerPortion = totalCost / (rec.yield || 1);
 
                                 return (
-                                    <div
+                                    <MediaCard
                                         key={rec.id}
                                         onClick={() => navigate(`/recipes/${rec.id}`)}
-                                        className="bg-surface-dark p-4 rounded-2xl shadow-sm border border-white/5 relative overflow-hidden group active:scale-[0.98] transition-all cursor-pointer"
-                                    >
-                                        <div className="flex gap-4">
-                                            <div
-                                                className="h-24 w-24 rounded-xl bg-gray-800 bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden"
-                                                style={rec.image ? { backgroundImage: `url('${rec.image}')` } : {}}
-                                            >
-                                                {!rec.image && (
-                                                    <span className="material-symbols-outlined text-gray-600 text-3xl opacity-50">fastfood</span>
-                                                )}
+                                        image={rec.image}
+                                        title={rec.name}
+                                        subtitle={
+                                            <p className="text-xs text-gray-400 line-clamp-1 mt-0.5 font-medium">
+                                                {rec.description || `${rec.ingredients.length} ingredients • Yields ${rec.yield} portions`}
+                                            </p>
+                                        }
+                                        bottomElement={
+                                            <div className="text-[15px] font-extrabold text-white">
+                                                Rp {Math.round(costPerPortion).toLocaleString()}
+                                                <span className="text-[11px] font-medium text-gray-500 ml-1 tracking-tight">/ portion</span>
                                             </div>
-                                            <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
-                                                <div>
-                                                    <h4 className="font-bold text-[17px] text-white truncate pr-2 leading-tight">{rec.name}</h4>
-                                                    <p className="text-xs text-gray-400 line-clamp-1 mt-1.5 font-medium">
-                                                        {rec.description || `${rec.ingredients.length} ingredients • Yields ${rec.yield} portions`}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-end justify-between mt-2">
-                                                    <div className="text-[15px] font-extrabold text-white">
-                                                        Rp {Math.round(costPerPortion).toLocaleString()}
-                                                        <span className="text-[11px] font-medium text-gray-500 ml-1 tracking-tight">/ portion</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        }
+                                    />
                                 );
                             })
                         )}

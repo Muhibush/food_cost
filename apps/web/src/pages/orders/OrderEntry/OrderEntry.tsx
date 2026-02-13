@@ -3,15 +3,18 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
-// Types are imported from ../../../types usually, but let's see if we need them.
-// Removing unused imports to fix lint warnings.
 import { v4 as uuidv4 } from 'uuid';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
+import { Header } from '../../../components/ui/Header';
+import { DatePicker } from '../../../components/ui/DatePicker';
+import { Input } from '../../../components/ui/Input';
+import { QuantitySelector } from '../../../components/ui/QuantitySelector';
+import { MediaCard } from '../../../components/ui/MediaCard';
+import { ActionFooter } from '../../../components/ui/ActionFooter';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
-    // Dashboard typically won't have an ID, but keeping logic compatible if used elsewhere
     const { id } = useParams<{ id: string }>();
     const { addOrder, updateOrder, getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
@@ -38,18 +41,14 @@ export const OrderPage: React.FC = () => {
                 setName(existing.name);
                 setDate(format(new Date(existing.date), 'yyyy-MM-dd'));
                 setItems(existing.items);
-                // Note: assuming notes might be added to Order type later, or handled separately
             }
         }
     }, [id, getOrder, setName, setDate, setItems]);
 
-    // Handle returned selection from RecipeSelection page
     useEffect(() => {
         if (location.state?.selectedRecipeIds) {
             const selectedIds = location.state.selectedRecipeIds as string[];
             syncItemsFromIds(selectedIds);
-
-            // Clear location state to avoid re-triggering
             window.history.replaceState({}, document.title);
         }
     }, [location.state, syncItemsFromIds]);
@@ -72,10 +71,6 @@ export const OrderPage: React.FC = () => {
             return total + (unitCost * item.quantity);
         }, 0);
     }, [draftItems, recipes, getIngredient]);
-
-    // Aggregated Price State Sync logic - No longer needed as we calculate on the fly or in store?
-    // Actually, calculatedTotal is used in handleSubmit. Let's keep the useMemo for display.
-
 
     const updateItemQuantity = (index: number, delta: number) => {
         const newItems = [...draftItems];
@@ -123,24 +118,20 @@ export const OrderPage: React.FC = () => {
         }
     };
 
-
-
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
+            <Header
+                title="Chef Anderson"
+                subtitle="Kitchen Manager"
+                leftElement={
                     <div
                         className="h-10 w-10 rounded-full bg-gray-700 bg-cover bg-center border-2 border-primary shadow-sm"
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCS04F1_8gxS_wh5p8aadS4dOwrUTeJEYiGA29E6WWvTahXdLcS9SdZPmZ2-S_ouAkT9R935-35Snl_Mi0eUDPq4ejBGgmISnmOVE85mnQf_P9BaIEhX-EpzKfrNtul39Crc0rQbXp1WXXMTzDGlV7dIXmtnTACD7TxEtO-r2IPVmcO1QmIvpAVwNRNydjD9f-krF--SW_R0_ZoY2Y9nw_ffRVBSAmcXHrEyejUi-osHG5cqA7ZGMOLU-7M_ha8lDCYiMzq373_qzc')" }}
                     ></div>
-                    <div>
-                        <h2 className="text-base font-extrabold text-white leading-none">Chef Anderson</h2>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Kitchen Manager</p>
-                    </div>
-                </div>
-            </header>
+                }
+            />
 
-            <main className="flex-1 flex flex-col px-6 pt-8 pb-20 max-w-lg mx-auto w-full">
+            <main className="flex-1 flex flex-col px-6 pt-8 pb-40 max-w-lg mx-auto w-full">
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-3xl font-extrabold text-white tracking-tight whitespace-nowrap">
                         New Order
@@ -153,42 +144,21 @@ export const OrderPage: React.FC = () => {
                         <span className="material-symbols-outlined text-red-500 text-xl font-bold">restart_alt</span>
                     </button>
                 </div>
+
                 <section className="flex flex-col gap-6">
+                    <Input
+                        label="Order Name"
+                        icon="edit_note"
+                        value={draftName}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="e.g. Wedding Catering"
+                    />
 
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Order Name</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span className="material-symbols-outlined text-gray-400">edit_note</span>
-                            </div>
-                            <input
-                                value={draftName}
-                                onChange={(e) => setName(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
-                                placeholder="e.g. Wedding Catering"
-                                type="text"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Order Date</label>
-                        <div className="relative">
-                            <div className="absolute inset-0 pl-4 pr-10 py-3.5 flex items-center pointer-events-none text-slate-900 dark:text-white sm:text-sm font-medium">
-                                {draftDate ? format(parseISO(draftDate), 'd MMMM yyyy') : ''}
-                            </div>
-                            <input
-                                value={draftDate}
-                                onChange={(e) => setDate(e.target.value)}
-                                onClick={(e) => e.currentTarget.showPicker()}
-                                className="block w-full pl-4 pr-10 py-3.5 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-transparent dark:text-transparent placeholder-transparent focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
-                                type="date"
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <span className="material-symbols-outlined text-white/50">calendar_today</span>
-                            </div>
-                        </div>
-                    </div>
+                    <DatePicker
+                        label="Order Date"
+                        value={draftDate}
+                        onChange={setDate}
+                    />
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Notes</label>
@@ -218,51 +188,34 @@ export const OrderPage: React.FC = () => {
                                 const subtotal = unitCost * item.quantity;
 
                                 return (
-                                    <div key={index} className="bg-white dark:bg-surface-dark p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-3 relative overflow-hidden">
-                                        <div
-                                            className="h-20 w-20 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner"
-                                            style={{ backgroundImage: `url('${recipe?.image || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=400'}')` }}
-                                        ></div>
-                                        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                                            <div>
-                                                <div className="flex justify-between items-start">
-                                                    <h4 className="font-bold text-base text-slate-900 dark:text-white truncate pr-6">{recipe?.name || 'Unknown'}</h4>
-                                                    <button
-                                                        onClick={() => removeItem(index)}
-                                                        className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors p-1 -mr-1 -mt-1"
-                                                    >
-                                                        <span className="material-symbols-outlined text-xl">delete</span>
-                                                    </button>
-                                                </div>
-                                                <div className="text-xs font-bold text-primary mt-0.5">
-                                                    Rp {Math.round(unitCost).toLocaleString()} <span className="text-gray-400 font-normal">/ portion</span>
-                                                </div>
+                                    <MediaCard
+                                        key={index}
+                                        image={recipe?.image}
+                                        title={recipe?.name || 'Unknown'}
+                                        subtitle={
+                                            <div className="text-xs font-bold text-primary">
+                                                Rp {Math.round(unitCost).toLocaleString()} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
-                                            <div className="flex items-center justify-between mt-2">
+                                        }
+                                        rightElement={
+                                            <button
+                                                onClick={() => removeItem(index)}
+                                                className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                            >
+                                                <span className="material-symbols-outlined text-xl">delete</span>
+                                            </button>
+                                        }
+                                        bottomElement={
+                                            <div className="flex items-center justify-between w-full">
                                                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {Math.round(subtotal).toLocaleString()}</div>
-                                                <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-0.5 border border-gray-200 dark:border-gray-600 h-8">
-                                                    <button
-                                                        onClick={() => updateItemQuantity(index, -1)}
-                                                        className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700"
-                                                    >
-                                                        <span className="material-symbols-outlined text-base">remove</span>
-                                                    </button>
-                                                    <input
-                                                        className="w-8 text-center bg-transparent border-none p-0 text-sm font-bold text-slate-800 dark:text-white focus:ring-0"
-                                                        type="text"
-                                                        value={item.quantity}
-                                                        readOnly
-                                                    />
-                                                    <button
-                                                        onClick={() => updateItemQuantity(index, 1)}
-                                                        className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700"
-                                                    >
-                                                        <span className="material-symbols-outlined text-base">add</span>
-                                                    </button>
-                                                </div>
+                                                <QuantitySelector
+                                                    value={item.quantity}
+                                                    onIncrement={() => updateItemQuantity(index, 1)}
+                                                    onDecrement={() => updateItemQuantity(index, -1)}
+                                                />
                                             </div>
-                                        </div>
-                                    </div>
+                                        }
+                                    />
                                 );
                             })}
                         </div>
@@ -282,21 +235,17 @@ export const OrderPage: React.FC = () => {
                     </button>
                 </section>
 
-                <div className="fixed bottom-[88px] left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-2 pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform">
-                    <div className="flex items-center justify-between mb-2">
-                        <div>
-                            <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">Total Cost Estimation</p>
-                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {Math.round(calculatedTotal).toLocaleString()}</div>
-                        </div>
-                        <button
-                            onClick={handleSubmit}
-                            className="bg-primary hover:bg-primary-dark text-white text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-primary/30 flex items-center gap-2 active:scale-95"
-                        >
-                            {id ? 'Update Order' : 'Create Order'}
-                        </button>
-                    </div>
-                </div>
+                <ActionFooter
+                    summary={{
+                        label: "Total Cost Estimation",
+                        value: `Rp ${Math.round(calculatedTotal).toLocaleString()}`
+                    }}
+                    primaryAction={{
+                        label: id ? 'Update Order' : 'Create Order',
+                        onClick: handleSubmit
+                    }}
+                />
             </main>
-        </div >
+        </div>
     );
 };
