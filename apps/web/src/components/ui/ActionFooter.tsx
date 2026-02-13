@@ -7,6 +7,7 @@ interface ActionFooterProps {
         onClick: () => void;
         variant?: 'primary' | 'secondary' | 'danger';
         isLoading?: boolean;
+        isDisabled?: boolean;
     };
     summary?: {
         label: string;
@@ -39,7 +40,7 @@ export const ActionFooter: React.FC<ActionFooterProps> = ({
                 {!summary && <div />}
                 <button
                     onClick={primaryAction.onClick}
-                    disabled={primaryAction.isLoading}
+                    disabled={primaryAction.isLoading || primaryAction.isDisabled}
                     className={cn(
                         "text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-lg flex items-center gap-2 active:scale-95 disabled:opacity-50",
                         primaryAction.variant === 'secondary'

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
@@ -13,6 +13,7 @@ import { Input } from '../../../components/ui/Input';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
@@ -20,6 +21,8 @@ export const OrderPage: React.FC = () => {
     const { getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+
+    const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
     const {
         name: draftName,
@@ -67,6 +70,10 @@ export const OrderPage: React.FC = () => {
         }, 0);
     }, [draftItems, recipes, getIngredient]);
 
+    const isFormValid = useMemo(() => {
+        return draftName.trim().length > 0 && draftItems.length > 0;
+    }, [draftName, draftItems]);
+
     const updateItemQuantity = (index: number, delta: number) => {
         const newItems = [...draftItems];
         newItems[index].quantity += delta;
@@ -98,9 +105,12 @@ export const OrderPage: React.FC = () => {
     };
 
     const handleReset = () => {
-        if (confirm("Are you sure you want to reset the form?")) {
-            resetDraft();
-        }
+        setIsResetDialogOpen(true);
+    };
+
+    const confirmReset = () => {
+        resetDraft();
+        setIsResetDialogOpen(false);
     };
 
     return (
@@ -228,10 +238,22 @@ export const OrderPage: React.FC = () => {
                     }}
                     primaryAction={{
                         label: 'Order Detail',
-                        onClick: handleSubmit
+                        onClick: handleSubmit,
+                        isDisabled: !isFormValid
                     }}
                 />
             </main>
+
+            <AlertDialog
+                isOpen={isResetDialogOpen}
+                title="Reset Order?"
+                message="This will clear all items and details you've entered. This action cannot be undone."
+                confirmLabel="Reset"
+                cancelLabel="Cancel"
+                isDestructive
+                onCancel={() => setIsResetDialogOpen(false)}
+                onConfirm={confirmReset}
+            />
         </div>
     );
 };

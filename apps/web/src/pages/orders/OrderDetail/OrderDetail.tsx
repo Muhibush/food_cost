@@ -425,10 +425,13 @@ export const OrderDetail: React.FC = () => {
 
             <AlertDialog
                 isOpen={blocker.state === 'blocked'}
-                title="Discard Changes?"
-                message="You have unsaved changes in this order. Are you sure you want to leave and discard them?"
-                confirmLabel="Leave"
-                cancelLabel="Stay"
+                title={!originalOrder ? "Discard New Order?" : "Discard Changes?"}
+                message={!originalOrder
+                    ? "This order hasn't been saved to your history yet. If you leave now, all details will be lost."
+                    : "You have unsaved modifications to this order. If you leave now, these changes will be lost."
+                }
+                confirmLabel="Discard"
+                cancelLabel="Keep Editing"
                 isDestructive
                 onCancel={() => blocker.state === 'blocked' && blocker.reset()}
                 onConfirm={() => blocker.state === 'blocked' && blocker.proceed()}
