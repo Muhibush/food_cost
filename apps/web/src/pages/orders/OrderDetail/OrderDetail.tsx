@@ -9,6 +9,7 @@ import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { Header } from '../../../components/ui/Header';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -50,16 +51,14 @@ export const OrderDetail: React.FC = () => {
         return dirty;
     }, [order, originalOrder, location.state]);
 
+    const isSavingRef = React.useRef(false);
+
     const blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
-            isDirty && currentLocation.pathname !== nextLocation.pathname
+            !isSavingRef.current && isDirty && currentLocation.pathname !== nextLocation.pathname
     );
 
     // Removal of useEffect with window.confirm
-
-    const handleBack = () => {
-        navigate(-1);
-    };
 
     useEffect(() => {
         if (id) {
@@ -186,6 +185,7 @@ export const OrderDetail: React.FC = () => {
 
     const handleUpdateOrder = () => {
         if (!order) return;
+        isSavingRef.current = true;
         const finalOrder = { ...order, totalCost };
 
         const existingOrder = getOrder(order.id);
@@ -235,27 +235,33 @@ export const OrderDetail: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-10">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
-                <button
-                    onClick={handleBack}
-                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
-                >
-                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
-                </button>
-                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap flex items-center gap-2">
-                    Order Details
-                    {isDirty && (
-                        <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
-                            Unsaved
-                        </span>
-                    )}
-                </h1>
-                <div className="flex-1"></div>
-                <div className="text-right">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-0.5 opacity-60">Total Cost</p>
-                    <div className="text-xl font-extrabold font-display text-primary">Rp {formatCurrency(Math.round(totalCost))}</div>
-                </div>
-            </header>
+            <Header
+                title="Order Detail"
+                showBackButton
+                rightElement={isDirty && (
+                    <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
+                        Unsaved
+                    </span>
+                )}
+                bottomElement={(
+                    <div className="flex items-center justify-between bg-surface-dark/50 rounded-2xl p-4 border border-white/5 mx-1">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-xl">payments</span>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Total Cost</p>
+                                <div className="text-lg font-extrabold font-display text-white">
+                                    Rp {formatCurrency(Math.round(totalCost))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-primary/20 text-primary px-3 py-1 rounded-lg text-xs font-bold">
+                            Estimated
+                        </div>
+                    </div>
+                )}
+            />
 
             <main className="flex-1 flex flex-col gap-6 px-6 pt-6">
                 {/* Order Information */}
