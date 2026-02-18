@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # 🎨 Antigravity Workspace Rules: Design System & UI Components
 
 ## 📌 Overview
