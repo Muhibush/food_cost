@@ -1,6 +1,9 @@
-import React from 'react';
-import { format, parseISO } from 'date-fns';
+import React, { useState } from 'react';
+import { format, parseISO, isValid } from 'date-fns';
 import { cn } from './Button';
+import { Calendar } from './Calendar';
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
+import { Icon } from './Icon';
 
 interface DatePickerProps {
     value: string;
@@ -10,6 +13,20 @@ interface DatePickerProps {
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, label, className }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Parse the ISO string value into a Date object for the calendar
+    const date = value ? parseISO(value) : undefined;
+    const isValidDate = date && isValid(date);
+
+    const handleSelect = (selectedDate: Date | undefined) => {
+        if (selectedDate) {
+            // Pass back the ISO string to the store (yyyy-MM-dd)
+            onChange(format(selectedDate, 'yyyy-MM-dd'));
+            setIsOpen(false);
+        }
+    };
+
     return (
         <div className={cn("space-y-1.5 w-full", className)}>
             {label && (
@@ -17,23 +34,45 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, label, 
                     {label}
                 </label>
             )}
-            <div className="relative group bg-white dark:bg-surface-dark rounded-xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm transition-all focus-within:ring-2 focus-within:ring-primary overflow-hidden">
-                <div className="absolute inset-0 pl-4 pr-10 py-3.5 flex items-center pointer-events-none text-slate-900 dark:text-white sm:text-sm font-medium z-20">
-                    {value ? format(parseISO(value), 'd MMMM yyyy') : 'Select Date'}
-                </div>
-                <input
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    onClick={(e) => e.currentTarget.showPicker()}
-                    className="block w-full pl-4 pr-10 py-3.5 border-none bg-transparent text-transparent dark:text-transparent placeholder-transparent focus:outline-none sm:text-sm font-medium appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none relative z-10 cursor-pointer"
-                    type="date"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-20">
-                    <span className="material-symbols-outlined text-white/50 group-focus-within:text-primary transition-colors">
-                        calendar_today
-                    </span>
-                </div>
-            </div>
+
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <PopoverTrigger asChild>
+                    <button
+                        type="button"
+                        className={cn(
+                            "relative group w-full bg-white dark:bg-surface-dark rounded-xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm transition-all hover:ring-primary focus:ring-2 focus:ring-primary overflow-hidden text-left py-3.5 pl-4 pr-10",
+                            isOpen && "ring-2 ring-primary"
+                        )}
+                    >
+                        <span className={cn(
+                            "block sm:text-sm font-medium transition-colors",
+                            isValidDate ? "text-slate-900 dark:text-white" : "text-gray-400 dark:text-gray-500"
+                        )}>
+                            {isValidDate ? format(date, 'd MMM yyyy') : 'Select Date'}
+                        </span>
+
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <Icon
+                                name="calendar_today"
+                                className={cn(
+                                    "text-white/50 transition-colors",
+                                    isOpen && "text-primary"
+                                )}
+                                size="md"
+                            />
+                        </div>
+                    </button>
+                </PopoverTrigger>
+
+                <PopoverContent className="p-0 border-none bg-surface-dark shadow-2xl rounded-3xl overflow-hidden" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={handleSelect}
+                        initialFocus
+                    />
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };
