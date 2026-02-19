@@ -7,6 +7,7 @@ import { Order } from '../../../types';
 import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
 import { format } from 'date-fns';
+import { useOrderEditStore } from '../../../store/useOrderEditStore';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Header } from '../../../components/ui/Header';
@@ -36,7 +37,9 @@ export const OrderDetail: React.FC = () => {
         setIngredientOverrides,
         setDraft,
         resetDraft
-    } = useOrderDraftStore();
+    } = useOrderEditStore();
+
+    const { resetDraft: resetDraftEntry } = useOrderDraftStore();
 
     const [originalOrder, setOriginalOrder] = useState<Order | null>(null);
 
@@ -106,9 +109,16 @@ export const OrderDetail: React.FC = () => {
                 console.log('[OrderDetail] Loading order into Draft store:', foundStoreOrder.name);
                 setDraft(foundStoreOrder);
                 setOriginalOrder(JSON.parse(JSON.stringify(foundStoreOrder)));
-            } else if (!isEditingThisOrder && location.state?.from === 'entry') {
-                // Coming from entry but ID not set correctly in store yet? 
-                // This case is handled by OrderEntry setting setEditingId before navigating.
+            } else if (!isEditingThisOrder && location.state?.from === 'entry' && location.state?.draft) {
+                // Incoming draft from OrderEntry (New Order flow)
+                console.log('[OrderDetail] Loading new order draft from OrderEntry');
+                const draftData = location.state.draft;
+                setDraft({
+                    id: id || 'temp-id',
+                    ...draftData,
+                    totalCost: 0 // Will be calculated by useMemo
+                } as Order);
+                setOriginalOrder(null);
             } else if (foundStoreOrder && !originalOrder) {
                 // Already editing, but need original for dirty check
                 setOriginalOrder(JSON.parse(JSON.stringify(foundStoreOrder)));
@@ -198,6 +208,9 @@ export const OrderDetail: React.FC = () => {
         }
 
         resetDraft();
+        if (location.state?.from === 'entry') {
+            resetDraftEntry();
+        }
         navigate('/history');
     };
 
@@ -301,7 +314,8 @@ export const OrderDetail: React.FC = () => {
                             onClick={() => navigate('/orders/select-recipes', {
                                 state: {
                                     selectedRecipeIds: draftItems.map(i => i.recipeId),
-                                    returnPath: `/orders/${id}`
+                                    returnPath: `/orders/${id}`,
+                                    storeType: 'edit'
                                 }
                             })}
                             className="flex items-center gap-1.5 bg-surface-dark hover:bg-gray-750 border border-white/10 px-3 py-1.5 rounded-lg transition-colors group"

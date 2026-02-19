@@ -103,7 +103,23 @@ export const OrderPage: React.FC = () => {
         }
 
         // Navigate to OrderDetail without saving to OrdersStore yet
-        navigate(`/orders/${targetId}`, { state: { from: 'entry' } });
+        // Pass the draft data to be picked up by the OrderEditStore in OrderDetail
+        navigate(`/orders/${targetId}`, {
+            state: {
+                from: 'entry',
+                draft: {
+                    name: draftName,
+                    date: draftDate,
+                    items: draftItems,
+                    notes: draftNotes,
+                    status: 'pending',
+                    ingredientOverrides: []
+                }
+            }
+        });
+
+        // Reset the entry draft immediately as data has been handed over to OrderEditStore
+        resetDraft();
     };
 
     const handleReset = () => {
@@ -219,7 +235,8 @@ export const OrderPage: React.FC = () => {
                         onClick={() => navigate('/orders/select-recipes', {
                             state: {
                                 selectedRecipeIds: draftItems.map(i => i.recipeId),
-                                returnPath: '/'
+                                returnPath: '/',
+                                storeType: 'draft'
                             }
                         })}
                         className="w-full py-4 border-2 border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 rounded-2xl flex items-center justify-center gap-2 text-primary font-bold transition-all active:scale-[0.99]"

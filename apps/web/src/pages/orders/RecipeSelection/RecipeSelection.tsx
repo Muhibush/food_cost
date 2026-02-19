@@ -4,6 +4,7 @@ import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Icon } from '../../../components/ui/Icon';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
+import { useOrderEditStore } from '../../../store/useOrderEditStore';
 import { formatCurrency } from '../../../utils/format';
 import { clsx } from 'clsx';
 import { Recipe } from '../../../types';
@@ -11,17 +12,25 @@ import { Recipe } from '../../../types';
 interface SelectionState {
     selectedRecipeIds: string[];
     returnPath: string;
-    orderData?: any; // To preserve partial form data if needed
+    storeType?: 'draft' | 'edit'; // New prop to determine which store to update
+    orderData?: any;
 }
 
 export const RecipeSelection: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const state = location.state as SelectionState;
+    const storeType = state?.storeType || 'draft';
 
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
-    const { syncItemsFromIds } = useOrderDraftStore();
+
+    // Choose the correct store based on storeType
+    const draftStore = useOrderDraftStore();
+    const editStore = useOrderEditStore();
+
+    const store = storeType === 'edit' ? editStore : draftStore;
+    const { syncItemsFromIds } = store;
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedIds, setSelectedIds] = useState<string[]>(state?.selectedRecipeIds || []);
