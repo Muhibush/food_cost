@@ -16,6 +16,7 @@ import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
@@ -183,12 +184,10 @@ export const OrderPage: React.FC = () => {
                 </section>
 
                 <section className="flex flex-col gap-3 mt-8">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">Selected Recipes</h3>
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">
-                            {draftItems.length} Items
-                        </span>
-                    </div>
+                    <SectionHeader
+                        title="Selected Recipes"
+                        rightElement={`${draftItems.length} Items`}
+                    />
 
                     {draftItems.length > 0 && (
                         <div className="grid grid-cols-1 gap-3">

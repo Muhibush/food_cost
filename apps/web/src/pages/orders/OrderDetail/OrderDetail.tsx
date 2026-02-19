@@ -1,3 +1,4 @@
+// 🔒 LOCKED FILE: Do not modify this file without explicit double confirmation from the user.
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useBlocker } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
@@ -14,6 +15,9 @@ import { Header } from '../../../components/ui/Header';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/Textarea';
 import { DatePicker } from '../../../components/ui/DatePicker';
+import { Badge } from '../../../components/ui/Badge';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { InfoBanner } from '../../../components/ui/InfoBanner';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -255,9 +259,13 @@ export const OrderDetail: React.FC = () => {
                 title="Order Detail"
                 showBackButton
                 rightElement={isDirty && (
-                    <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
+                    <Badge
+                        variant="warning"
+                        rounded="full"
+                        className="animate-pulse tracking-widest"
+                    >
                         Unsaved
-                    </span>
+                    </Badge>
                 )}
                 bottomElement={(
                     <div className="flex items-center justify-between bg-surface-dark/50 rounded-2xl p-4 border border-white/5 mx-1 overflow-hidden">
@@ -305,25 +313,25 @@ export const OrderDetail: React.FC = () => {
 
                 {/* Selected Recipes */}
                 <section>
-                    <div className="flex items-center justify-between mb-4 px-1">
-                        <div className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-xl">receipt_long</span>
-                            <h2 className="font-bold text-lg text-white">Selected Recipes</h2>
-                        </div>
-                        <button
-                            onClick={() => navigate('/orders/select-recipes', {
-                                state: {
-                                    selectedRecipeIds: draftItems.map(i => i.recipeId),
-                                    returnPath: `/orders/${id}`,
-                                    storeType: 'edit'
-                                }
-                            })}
-                            className="flex items-center gap-1.5 bg-surface-dark hover:bg-gray-750 border border-white/10 px-3 py-1.5 rounded-lg transition-colors group"
-                        >
-                            <span className="material-symbols-outlined text-lg text-primary group-hover:text-white transition-colors">add</span>
-                            <span className="text-xs font-bold text-white">Add</span>
-                        </button>
-                    </div>
+                    <SectionHeader
+                        title="Selected Recipes"
+                        icon="receipt_long"
+                        rightElement={
+                            <button
+                                onClick={() => navigate('/orders/select-recipes', {
+                                    state: {
+                                        selectedRecipeIds: draftItems.map(i => i.recipeId),
+                                        returnPath: `/orders/${id}`,
+                                        storeType: 'edit'
+                                    }
+                                })}
+                                className="flex items-center gap-1.5 bg-surface-dark hover:bg-gray-750 border border-white/10 px-3 py-1.5 rounded-lg transition-colors group"
+                            >
+                                <span className="material-symbols-outlined text-lg text-primary group-hover:text-white transition-colors">add</span>
+                                <span className="text-xs font-bold text-white">Add</span>
+                            </button>
+                        }
+                    />
                     <div className="flex flex-col gap-4">
                         {draftItems.map((item) => {
                             const recipe = recipes.find(r => r.id === item.recipeId);
@@ -374,17 +382,16 @@ export const OrderDetail: React.FC = () => {
 
                 {/* Aggregated Ingredients */}
                 <section className="flex flex-col gap-4 pb-32">
-                    <div className="flex items-center gap-3 mt-4 px-1">
-                        <span className="material-symbols-outlined text-primary text-xl">grocery</span>
-                        <h2 className="font-bold text-lg text-white">Total Order Ingredients</h2>
-                    </div>
+                    <SectionHeader
+                        title="Total Order Ingredients"
+                        icon="grocery"
+                        className="mt-4"
+                    />
 
-                    <div className="bg-blue-900/20 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3 mx-1">
-                        <span className="material-symbols-outlined text-blue-400 text-lg mt-0.5">info</span>
-                        <p className="text-xs text-blue-200 leading-relaxed font-medium">
-                            This list aggregates ingredients from all selected recipes. You can override unit prices for this specific order.
-                        </p>
-                    </div>
+                    <InfoBanner
+                        message="This list aggregates ingredients from all selected recipes. You can override unit prices for this specific order."
+                        className="mx-1"
+                    />
 
                     <div className="flex flex-col gap-4 mt-2">
                         {aggregatedIngredients.map((ing) => (

@@ -3,10 +3,11 @@ import { cn } from '../../utils/cn';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
     variant?: 'success' | 'warning' | 'danger' | 'default';
+    rounded?: 'md' | 'full';
 }
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-    ({ className, variant = 'default', ...props }, ref) => {
+    ({ className, variant = 'default', rounded = 'md', ...props }, ref) => {
         const variants = {
             default: 'bg-white/5 text-text-muted',
             success: 'bg-success/10 text-success border-success/20',
@@ -18,7 +19,8 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             <span
                 ref={ref}
                 className={cn(
-                    "px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide uppercase border border-transparent",
+                    "px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-transparent",
+                    rounded === 'full' ? 'rounded-full' : 'rounded-md',
                     variants[variant],
                     className
                 )}
