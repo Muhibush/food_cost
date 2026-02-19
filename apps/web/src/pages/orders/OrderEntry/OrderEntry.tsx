@@ -1,3 +1,4 @@
+// 🔒 LOCKED FILE: Do not modify this file without explicit double confirmation from the user.
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
@@ -10,6 +11,7 @@ import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { Header } from '../../../components/ui/Header';
 import { DatePicker } from '../../../components/ui/DatePicker';
 import { Input } from '../../../components/ui/Input';
+import { Textarea } from '../../../components/ui/Textarea';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
@@ -155,16 +157,13 @@ export const OrderPage: React.FC = () => {
                         onChange={setDate}
                     />
 
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Notes</label>
-                        <textarea
-                            value={draftNotes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            className="block w-full px-4 py-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all resize-none"
-                            placeholder="Allergies, packaging preferences, delivery instructions..."
-                            rows={3}
-                        ></textarea>
-                    </div>
+                    <Textarea
+                        label="Notes"
+                        value={draftNotes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Allergies, packaging preferences, delivery instructions..."
+                        rows={3}
+                    />
                 </section>
 
                 <section className="flex flex-col gap-3 mt-8">

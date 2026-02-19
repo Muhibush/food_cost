@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
+import { Textarea } from '../../../components/ui/Textarea';
 import { Badge } from '../../../components/ui/Badge';
 import { Icon } from '../../../components/ui/Icon';
 import { Header } from '../../../components/ui/Header';
@@ -91,6 +92,7 @@ export const DesignSystem: React.FC = () => {
                     <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">04. Data Entry</h3>
                     <div className="space-y-6 bg-surface-dark/50 p-6 rounded-3xl border border-white/5">
                         <Input label="Text Input" placeholder="e.g. Wedding Event" icon="edit_note" />
+                        <Textarea label="Text Area" placeholder="Enter detailed notes..." rows={3} />
                         <DatePicker label="Date Picker" value={date} onChange={setDate} />
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-bold">Quantity Selector</span>

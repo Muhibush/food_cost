@@ -40,8 +40,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, label, 
                     <button
                         type="button"
                         className={cn(
-                            "relative group w-full bg-white dark:bg-surface-dark rounded-xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm transition-all hover:ring-primary focus:ring-2 focus:ring-primary overflow-hidden text-left py-3.5 pl-4 pr-10",
-                            isOpen && "ring-2 ring-primary"
+                            "relative group w-full bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-white/10 shadow-sm hover:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary overflow-hidden text-left py-3.5 pl-4 pr-10",
+                            isOpen && "ring-1 ring-primary border-primary"
                         )}
                     >
                         <span className={cn(
@@ -54,10 +54,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, label, 
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <Icon
                                 name="calendar_today"
-                                className={cn(
-                                    "text-white/50 transition-colors",
-                                    isOpen && "text-primary"
-                                )}
+                                className="text-gray-400 dark:text-gray-500 transition-colors"
                                 size="md"
                             />
                         </div>
