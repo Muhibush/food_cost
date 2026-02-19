@@ -1,22 +1,22 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import { DesignSystem } from './pages/design/DesignSystem/DesignSystem';
-import { OrderPage as Order } from './pages/orders/OrderEntry/OrderEntry';
+import { DesignSystem } from './pages/design_system/view/DesignSystem';
+import { OrderPage as Order } from './pages/order_entry/view/OrderEntry';
 import { Layout } from './components/layout/Layout';
-import { IngredientsList } from './pages/ingredients/IngredientsList/IngredientsList';
-import { IngredientForm } from './pages/ingredients/IngredientForm/IngredientForm';
-import { RecipesList } from './pages/recipes/RecipesList/RecipesList';
-import { RecipeForm } from './pages/recipes/RecipeForm/RecipeForm';
-import { OrdersList } from './pages/orders/OrdersList/OrdersList';
-import { OrderForm } from './pages/orders/OrderForm/OrderForm';
-import { HistoryPage } from './pages/orders/History/HistoryPage';
-import { OrderDetail } from './pages/orders/OrderDetail/OrderDetail';
-import { EditProfile } from './pages/account/EditProfile/EditProfile';
-import { ChangePin } from './pages/account/ChangePin/ChangePin';
-import { Login } from './pages/auth/Login/Login';
-import { Register } from './pages/auth/Register/Register';
-import { RecipeSelection } from './pages/orders/RecipeSelection/RecipeSelection';
-import { Profile } from './pages/account/Profile/Profile';
-import { DeveloperPage } from './pages/developer/DeveloperPage';
+import { IngredientsList } from './pages/ingredient_list/view/IngredientsList';
+import { IngredientForm } from './pages/ingredient_form/view/IngredientForm';
+import { RecipesList } from './pages/recipe_list/view/RecipesList';
+import { RecipeForm } from './pages/recipe_form/view/RecipeForm';
+import { OrdersList } from './pages/order_list/view/OrdersList';
+import { OrderForm } from './pages/order_form/view/OrderForm';
+import { HistoryPage } from './pages/order_history/view/HistoryPage';
+import { OrderDetail } from './pages/order_detail/view/OrderDetail';
+import { EditProfile } from './pages/edit_profile/view/EditProfile';
+import { ChangePin } from './pages/change_pin/view/ChangePin';
+import { Login } from './pages/auth_login/view/Login';
+import { Register } from './pages/auth_register/view/Register';
+import { RecipeSelection } from './pages/recipe_selection/view/RecipeSelection';
+import { Profile } from './pages/profile_detail/view/Profile';
+import { DeveloperPage } from './pages/developer_page/view/DeveloperPage';
 
 const router = createBrowserRouter([
     {

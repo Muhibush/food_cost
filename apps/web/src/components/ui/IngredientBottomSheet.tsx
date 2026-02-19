@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Ingredient } from '../../types';
-import { useIngredientsStore } from '../../store/useIngredientsStore';
+import { useIngredientsStore } from '../../pages/ingredient_list/store/useIngredientsStore';
 import { BottomSheet } from './BottomSheet';
 import { Icon } from './Icon';
 import { Input } from './Input';
@@ -21,7 +21,7 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredIngredients = useMemo(() => {
-        return ingredients.filter(ing =>
+        return ingredients.filter((ing: Ingredient) =>
             ing.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [ingredients, searchQuery]);
@@ -67,7 +67,7 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                 {/* Ingredient List */}
                 <div className="space-y-3 pb-8">
                     {filteredIngredients.length > 0 ? (
-                        filteredIngredients.map((ing) => {
+                        filteredIngredients.map((ing: Ingredient) => {
                             const icon = getIngredientIcon(ing.name);
                             return (
                                 <button
