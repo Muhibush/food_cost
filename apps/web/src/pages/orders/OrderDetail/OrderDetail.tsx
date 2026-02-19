@@ -4,12 +4,13 @@ import { useOrdersStore } from '../../../store/useOrdersStore';
 import { useRecipesStore } from '../../../store/useRecipesStore';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Order } from '../../../types';
-import { format, parseISO } from 'date-fns';
 import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Header } from '../../../components/ui/Header';
+import { Input } from '../../../components/ui/Input';
+import { DatePicker } from '../../../components/ui/DatePicker';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -244,19 +245,19 @@ export const OrderDetail: React.FC = () => {
                     </span>
                 )}
                 bottomElement={(
-                    <div className="flex items-center justify-between bg-surface-dark/50 rounded-2xl p-4 border border-white/5 mx-1">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="flex items-center justify-between bg-surface-dark/50 rounded-2xl p-4 border border-white/5 mx-1 overflow-hidden">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                 <span className="material-symbols-outlined text-primary text-xl">payments</span>
                             </div>
-                            <div>
+                            <div className="flex-1 min-w-0">
                                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Total Cost</p>
-                                <div className="text-lg font-extrabold font-display text-white">
+                                <div className="text-lg font-extrabold font-display text-white truncate">
                                     Rp {formatCurrency(Math.round(totalCost))}
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-primary/20 text-primary px-3 py-1 rounded-lg text-xs font-bold">
+                        <div className="bg-primary/20 text-primary px-3 py-1 rounded-lg text-xs font-bold shrink-0 ml-4">
                             Estimated
                         </div>
                     </div>
@@ -266,34 +267,18 @@ export const OrderDetail: React.FC = () => {
             <main className="flex-1 flex flex-col gap-6 px-6 pt-6">
                 {/* Order Information */}
                 <section className="grid grid-cols-1 gap-4">
-                    <div className="bg-surface-dark rounded-2xl p-4 border border-white/5">
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">Order Name</label>
-                        <div className="flex items-center gap-3 bg-surface-dark/50 rounded-xl px-4 py-3 border border-white/5 focus-within:border-primary/50 transition-colors ring-1 ring-white/5">
-                            <span className="material-symbols-outlined text-gray-400 text-xl">edit_note</span>
-                            <input
-                                className="w-full bg-transparent border-0 p-0 text-base font-semibold text-white focus:ring-0 placeholder-gray-500"
-                                type="text"
-                                value={order.name}
-                                onChange={(e) => setOrder({ ...order, name: e.target.value })}
-                            />
-                        </div>
-                    </div>
-                    <div className="bg-surface-dark rounded-2xl p-4 border border-white/5">
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">Order Date</label>
-                        <div className="relative flex items-center gap-3 bg-surface-dark/50 rounded-xl px-4 py-3 border border-white/5 focus-within:border-primary/50 transition-colors ring-1 ring-white/5">
-                            <span className="material-symbols-outlined text-gray-400 text-xl">calendar_today</span>
-                            <div className="absolute inset-0 pl-11 pr-4 py-3 flex items-center pointer-events-none text-white text-base font-semibold">
-                                {order.date ? format(parseISO(order.date), 'd MMMM yyyy') : ''}
-                            </div>
-                            <input
-                                className="w-full bg-transparent border-none p-0 text-transparent placeholder-transparent focus:ring-0 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-clear-button]:appearance-none"
-                                type="date"
-                                value={format(parseISO(order.date), 'yyyy-MM-dd')}
-                                onChange={(e) => setOrder({ ...order, date: new Date(e.target.value).toISOString() })}
-                                onClick={(e) => e.currentTarget.showPicker()}
-                            />
-                        </div>
-                    </div>
+                    <Input
+                        label="Order Name"
+                        icon="edit_note"
+                        value={order.name}
+                        onChange={(e) => setOrder({ ...order, name: e.target.value })}
+                        placeholder="Enter order name"
+                    />
+                    <DatePicker
+                        label="Order Date"
+                        value={order.date}
+                        onChange={(date) => setOrder({ ...order, date: new Date(date).toISOString() })}
+                    />
                 </section>
 
                 {/* Selected Recipes */}
@@ -328,13 +313,21 @@ export const OrderDetail: React.FC = () => {
                                             <h3 className="font-bold text-lg text-white mb-1 group-hover:text-primary transition-colors cursor-default">{recipe.name}</h3>
                                             <p className="text-xs text-gray-400 mb-4">Portion scale: x{item.quantity}</p>
                                             <div className="flex items-center gap-3">
-                                                <div className="flex items-center bg-background-dark rounded-lg px-3 py-1.5 border border-white/5 h-10 ring-1 ring-white/5">
-                                                    <span className="text-[10px] text-gray-400 mr-2 font-bold uppercase">Qty</span>
+                                                <div className="flex items-center bg-background-dark/50 rounded-xl px-4 py-2 border border-white/10 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all shadow-sm">
+                                                    <span className="text-[10px] text-gray-500 mr-3 font-bold uppercase tracking-widest bg-white/5 px-1.5 py-0.5 rounded">Qty</span>
                                                     <input
-                                                        className="w-10 bg-transparent border-none p-0 text-center font-bold text-white focus:ring-0 text-sm"
-                                                        type="number"
+                                                        className="w-16 bg-transparent border-none p-0 text-center font-bold text-white focus:ring-0 focus:outline-none text-base"
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="[0-9]*"
                                                         value={item.quantity}
-                                                        onChange={(e) => updateItemQuantity(item.recipeId, parseInt(e.target.value) - item.quantity)}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/[^0-9]/g, '');
+                                                            if (val.length <= 4) {
+                                                                const numVal = parseInt(val) || 0;
+                                                                updateItemQuantity(item.recipeId, numVal - item.quantity);
+                                                            }
+                                                        }}
                                                     />
                                                 </div>
                                                 <span className="text-xs text-gray-500 font-medium tracking-tight">portions</span>
@@ -381,22 +374,32 @@ export const OrderDetail: React.FC = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="block font-bold text-lg text-white">
-                                            {ing.quantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-sm font-medium text-gray-500">{ing.unit}</span>
+                                            {ing.quantity.toLocaleString('id-ID', { maximumFractionDigits: 2 })} <span className="text-sm font-medium text-gray-500">{ing.unit}</span>
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="bg-background-dark rounded-xl p-4 border border-white/5 flex flex-col gap-3 ring-1 ring-white/5">
+                                <div className={clsx(
+                                    "bg-background-dark rounded-xl p-4 border transition-all flex flex-col gap-3 ring-1",
+                                    ing.isOverridden ? "border-primary ring-primary" : "border-white/5 ring-white/5 focus-within:border-primary focus-within:ring-primary"
+                                )}>
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col gap-1 w-full relative">
                                             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Price / Unit ({ing.unit})</label>
                                             <div className="relative group w-full flex items-center mt-1">
                                                 <span className="text-sm font-bold text-gray-400 mr-2 shrink-0">Rp</span>
                                                 <input
-                                                    className="w-full bg-transparent border-none p-0 text-lg font-bold text-white focus:ring-0 shadow-none"
-                                                    type="number"
+                                                    className="w-full bg-transparent border-none p-0 text-lg font-bold text-white focus:ring-0 shadow-none focus:outline-none"
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[0-9]*"
                                                     value={ing.currentPrice}
-                                                    onChange={(e) => handleIngredientPriceChange(ing.ingredientId, parseFloat(e.target.value) || 0)}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/[^0-9]/g, '');
+                                                        if (val.length <= 8) {
+                                                            handleIngredientPriceChange(ing.ingredientId, parseFloat(val) || 0);
+                                                        }
+                                                    }}
                                                 />
                                                 <span className={clsx(
                                                     "material-symbols-outlined text-sm ml-2 transition-colors",
