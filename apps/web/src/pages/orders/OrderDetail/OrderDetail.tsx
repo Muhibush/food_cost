@@ -6,10 +6,12 @@ import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { Order } from '../../../types';
 import { clsx } from 'clsx';
 import { formatCurrency } from '../../../utils/format';
+import { format } from 'date-fns';
 import { useOrderDraftStore } from '../../../store/useOrderDraftStore';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Header } from '../../../components/ui/Header';
 import { Input } from '../../../components/ui/Input';
+import { Textarea } from '../../../components/ui/Textarea';
 import { DatePicker } from '../../../components/ui/DatePicker';
 
 export const OrderDetail: React.FC = () => {
@@ -24,39 +26,72 @@ export const OrderDetail: React.FC = () => {
         date: draftDate,
         items: draftItems,
         notes: draftNotes,
+        ingredientOverrides: draftOverrides,
+        status: draftStatus,
         editingId,
+        setName,
+        setDate,
+        setItems,
+        setNotes,
+        setIngredientOverrides,
+        setDraft,
         resetDraft
     } = useOrderDraftStore();
 
-    const [order, setOrder] = useState<Order | null>(null);
     const [originalOrder, setOriginalOrder] = useState<Order | null>(null);
 
+    // Construct a reactive order object from draft store state
+    const currentOrder = useMemo(() => {
+        if (!id) return null;
+        return {
+            id,
+            name: draftName,
+            date: draftDate,
+            items: draftItems,
+            notes: draftNotes,
+            ingredientOverrides: draftOverrides,
+            status: draftStatus,
+            totalCost: 0 // Calculated separately
+        } as Order;
+    }, [id, draftName, draftDate, draftItems, draftNotes, draftOverrides, draftStatus]);
+
     const isDirty = useMemo(() => {
-        if (!order) return false;
+        if (!currentOrder) return false;
 
         // If we arrived from entry flow and the order isn't in the store yet, it's definitively "unsaved"
         if (location.state?.from === 'entry' && !originalOrder) return true;
 
         if (!originalOrder) return false;
 
-        const current = JSON.stringify(order);
-        const original = JSON.stringify(originalOrder);
-        const dirty = current !== original;
-        console.log('[OrderDetail] State Comparison:', {
-            isDirty: dirty,
-            currentName: order.name,
-            originalName: originalOrder.name,
-            itemCount: order.items.length,
-            originalItemCount: originalOrder.items.length
-        });
+        // Simple property comparison for performance/reliability
+        const hasNameChanged = draftName !== originalOrder.name;
+        const hasDateChanged = draftDate !== format(new Date(originalOrder.date), 'yyyy-MM-dd');
+        const hasItemsChanged = JSON.stringify(draftItems) !== JSON.stringify(originalOrder.items);
+        const hasNotesChanged = draftNotes !== (originalOrder.notes || '');
+        const hasOverridesChanged = JSON.stringify(draftOverrides) !== JSON.stringify(originalOrder.ingredientOverrides || []);
+
+        const dirty = hasNameChanged || hasDateChanged || hasItemsChanged || hasNotesChanged || hasOverridesChanged;
+
+        if (dirty) {
+            console.log('[OrderDetail] State comparison:', {
+                name: hasNameChanged,
+                date: hasDateChanged,
+                items: hasItemsChanged,
+                notes: hasNotesChanged,
+                overrides: hasOverridesChanged
+            });
+        }
         return dirty;
-    }, [order, originalOrder, location.state]);
+    }, [currentOrder, originalOrder, draftName, draftDate, draftItems, draftNotes, draftOverrides, location.state]);
 
     const isSavingRef = React.useRef(false);
 
     const blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
-            !isSavingRef.current && isDirty && currentLocation.pathname !== nextLocation.pathname
+            !isSavingRef.current &&
+            isDirty &&
+            currentLocation.pathname !== nextLocation.pathname &&
+            nextLocation.pathname !== '/orders/select-recipes'
     );
 
     // Removal of useEffect with window.confirm
@@ -64,35 +99,22 @@ export const OrderDetail: React.FC = () => {
     useEffect(() => {
         if (id) {
             const foundStoreOrder = getOrder(id);
-            const isFromEntry = location.state?.from === 'entry' && id === editingId;
+            const isEditingThisOrder = editingId === id;
 
-            if (isFromEntry) {
-                // When arriving from entry flow, we MUST use the latest draft values (which might overwrite store values)
-                console.log('[OrderDetail] Initialized from Draft Store:', draftName);
-                const draftBasedOrder: Order = {
-                    id: id,
-                    name: draftName,
-                    date: draftDate,
-                    items: draftItems,
-                    notes: draftNotes,
-                    status: foundStoreOrder?.status || 'pending',
-                    totalCost: 0, // Will be calculated by useMemo
-                    ingredientOverrides: foundStoreOrder?.ingredientOverrides || []
-                };
-                setOrder(draftBasedOrder);
-                // Set originalOrder to the ACTUAL store version so we can detect changes from store
-                setOriginalOrder(foundStoreOrder ? JSON.parse(JSON.stringify(foundStoreOrder)) : null);
-            } else if (foundStoreOrder) {
-                // Normal navigation from history/list, use the store version
-                console.log('[OrderDetail] Loaded from OrdersStore:', foundStoreOrder.name);
-                const cleanOrder = JSON.parse(JSON.stringify(foundStoreOrder));
-                setOrder(cleanOrder);
-                setOriginalOrder(cleanOrder);
-            } else {
-                navigate('/history');
+            if (!isEditingThisOrder && foundStoreOrder) {
+                // First time loading this specific order into draft
+                console.log('[OrderDetail] Loading order into Draft store:', foundStoreOrder.name);
+                setDraft(foundStoreOrder);
+                setOriginalOrder(JSON.parse(JSON.stringify(foundStoreOrder)));
+            } else if (!isEditingThisOrder && location.state?.from === 'entry') {
+                // Coming from entry but ID not set correctly in store yet? 
+                // This case is handled by OrderEntry setting setEditingId before navigating.
+            } else if (foundStoreOrder && !originalOrder) {
+                // Already editing, but need original for dirty check
+                setOriginalOrder(JSON.parse(JSON.stringify(foundStoreOrder)));
             }
         }
-    }, [id, getOrder, navigate, editingId, draftName, draftDate, draftItems, draftNotes, location.state]);
+    }, [id, getOrder, editingId, setDraft, originalOrder, location.state]);
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -105,33 +127,12 @@ export const OrderDetail: React.FC = () => {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [isDirty]);
 
-    const syncHandled = React.useRef(false);
-
-    useEffect(() => {
-        if (location.state?.selectedRecipeIds && order && !syncHandled.current) {
-            syncHandled.current = true;
-            const selectedIds = location.state.selectedRecipeIds as string[];
-            const newItems = [...order.items];
-
-            // Add new recipes
-            selectedIds.forEach(recipeId => {
-                if (!newItems.find(i => i.recipeId === recipeId)) {
-                    newItems.push({ recipeId, quantity: 1 });
-                }
-            });
-
-            // Note: On the detail page, we might NOT want to auto-remove recipes if they were dselected, 
-            // or maybe we should? The reference says "Select Recipes" so if they deselected it, it should be removed.
-            const updatedItems = newItems.filter(item => selectedIds.includes(item.recipeId));
-
-            setOrder({ ...order, items: updatedItems });
-            // Clear location state
-            window.history.replaceState({}, document.title);
-        }
-    }, [location.state, order]);
+    // Note: The previous sync logic using location.state is no longer needed 
+    // because RecipeSelection now syncs directly with useOrderDraftStore 
+    // before navigating back.
 
     const aggregatedIngredients = useMemo(() => {
-        if (!order) return [];
+        if (!currentOrder) return [];
 
         const agg: Record<string, {
             ingredientId: string;
@@ -139,7 +140,7 @@ export const OrderDetail: React.FC = () => {
             originRecipes: { name: string; qty: number }[]
         }> = {};
 
-        order.items.forEach(item => {
+        draftItems.forEach(item => {
             const recipe = recipes.find(r => r.id === item.recipeId);
             if (!recipe) return;
 
@@ -165,7 +166,7 @@ export const OrderDetail: React.FC = () => {
 
         return Object.values(agg).map(a => {
             const ingredient = getIngredient(a.ingredientId);
-            const override = order.ingredientOverrides?.find(o => o.ingredientId === a.ingredientId);
+            const override = draftOverrides?.find(o => o.ingredientId === a.ingredientId);
             const basePrice = ingredient?.price || 0;
             const currentPrice = override ? override.customPrice : basePrice;
 
@@ -178,20 +179,20 @@ export const OrderDetail: React.FC = () => {
                 total: currentPrice * a.quantity
             };
         });
-    }, [order, recipes, getIngredient]);
+    }, [draftItems, draftOverrides, recipes, getIngredient]);
 
     const totalCost = useMemo(() => {
         return aggregatedIngredients.reduce((sum, ing) => sum + ing.total, 0);
     }, [aggregatedIngredients]);
 
     const handleUpdateOrder = () => {
-        if (!order) return;
+        if (!currentOrder) return;
         isSavingRef.current = true;
-        const finalOrder = { ...order, totalCost };
+        const finalOrder = { ...currentOrder, totalCost };
 
-        const existingOrder = getOrder(order.id);
+        const existingOrder = getOrder(currentOrder.id);
         if (existingOrder) {
-            updateOrder(order.id, finalOrder);
+            updateOrder(currentOrder.id, finalOrder);
         } else {
             addOrder(finalOrder);
         }
@@ -201,38 +202,39 @@ export const OrderDetail: React.FC = () => {
     };
 
     const handleIngredientPriceChange = (ingredientId: string, newPrice: number) => {
-        if (!order) return;
-        const overrides = [...(order.ingredientOverrides || [])];
+        const overrides = [...(draftOverrides || [])];
         const existingIndex = overrides.findIndex(o => o.ingredientId === ingredientId);
 
+        // Enforce minimum price of 1
+        const validatedPrice = Math.max(1, newPrice);
+
         if (existingIndex >= 0) {
-            overrides[existingIndex].customPrice = newPrice;
+            overrides[existingIndex].customPrice = validatedPrice;
         } else {
-            overrides.push({ ingredientId, customPrice: newPrice });
+            overrides.push({ ingredientId, customPrice: validatedPrice });
         }
 
-        setOrder({ ...order, ingredientOverrides: overrides });
+        setIngredientOverrides(overrides);
     };
 
     const updateItemQuantity = (recipeId: string, delta: number) => {
-        if (!order) return;
-        const newItems = order.items.map(item => {
+        const newItems = draftItems.map(item => {
             if (item.recipeId === recipeId) {
-                return { ...item, quantity: Math.max(0, item.quantity + delta) };
+                // Enforce minimum quantity of 1
+                return { ...item, quantity: Math.max(1, item.quantity + delta) };
             }
             return item;
-        }).filter(item => item.quantity > 0);
+        });
 
-        setOrder({ ...order, items: newItems });
+        setItems(newItems);
     };
 
     const removeItem = (recipeId: string) => {
-        if (!order) return;
-        setOrder({ ...order, items: order.items.filter(i => i.recipeId !== recipeId) });
+        setItems(draftItems.filter(i => i.recipeId !== recipeId));
     };
 
 
-    if (!order) return null;
+    if (!currentOrder) return null;
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-10">
@@ -270,14 +272,21 @@ export const OrderDetail: React.FC = () => {
                     <Input
                         label="Order Name"
                         icon="edit_note"
-                        value={order.name}
-                        onChange={(e) => setOrder({ ...order, name: e.target.value })}
+                        value={draftName}
+                        onChange={(e) => setName(e.target.value)}
                         placeholder="Enter order name"
                     />
                     <DatePicker
                         label="Order Date"
-                        value={order.date}
-                        onChange={(date) => setOrder({ ...order, date: new Date(date).toISOString() })}
+                        value={draftDate}
+                        onChange={setDate}
+                    />
+                    <Textarea
+                        label="Notes"
+                        value={draftNotes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Allergies, packaging preferences, delivery instructions..."
+                        rows={3}
                     />
                 </section>
 
@@ -291,8 +300,8 @@ export const OrderDetail: React.FC = () => {
                         <button
                             onClick={() => navigate('/orders/select-recipes', {
                                 state: {
-                                    selectedRecipeIds: order.items.map(i => i.recipeId),
-                                    returnPath: `/orders/${order.id}`
+                                    selectedRecipeIds: draftItems.map(i => i.recipeId),
+                                    returnPath: `/orders/${id}`
                                 }
                             })}
                             className="flex items-center gap-1.5 bg-surface-dark hover:bg-gray-750 border border-white/10 px-3 py-1.5 rounded-lg transition-colors group"
@@ -302,7 +311,7 @@ export const OrderDetail: React.FC = () => {
                         </button>
                     </div>
                     <div className="flex flex-col gap-4">
-                        {order.items.map((item) => {
+                        {draftItems.map((item) => {
                             const recipe = recipes.find(r => r.id === item.recipeId);
                             if (!recipe) return null;
 
@@ -324,8 +333,9 @@ export const OrderDetail: React.FC = () => {
                                                         onChange={(e) => {
                                                             const val = e.target.value.replace(/[^0-9]/g, '');
                                                             if (val.length <= 4) {
-                                                                const numVal = parseInt(val) || 0;
-                                                                updateItemQuantity(item.recipeId, numVal - item.quantity);
+                                                                const numVal = parseInt(val) || 1;
+                                                                const validatedVal = Math.max(1, numVal);
+                                                                updateItemQuantity(item.recipeId, validatedVal - item.quantity);
                                                             }
                                                         }}
                                                     />
@@ -397,7 +407,8 @@ export const OrderDetail: React.FC = () => {
                                                     onChange={(e) => {
                                                         const val = e.target.value.replace(/[^0-9]/g, '');
                                                         if (val.length <= 8) {
-                                                            handleIngredientPriceChange(ing.ingredientId, parseFloat(val) || 0);
+                                                            const numVal = parseFloat(val) || 1;
+                                                            handleIngredientPriceChange(ing.ingredientId, Math.max(1, numVal));
                                                         }
                                                     }}
                                                 />
@@ -443,7 +454,12 @@ export const OrderDetail: React.FC = () => {
                 cancelLabel="Keep Editing"
                 isDestructive
                 onCancel={() => blocker.state === 'blocked' && blocker.reset()}
-                onConfirm={() => blocker.state === 'blocked' && blocker.proceed()}
+                onConfirm={() => {
+                    if (blocker.state === 'blocked') {
+                        resetDraft();
+                        blocker.proceed();
+                    }
+                }}
             />
         </div>
     );
