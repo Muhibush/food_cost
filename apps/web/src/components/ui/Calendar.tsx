@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { DayPicker, ChevronProps } from "react-day-picker";
-import { cn } from "./Button";
+import { cn } from "../../utils/cn";
 import { Icon } from "./Icon";
 import "react-day-picker/style.css";
 

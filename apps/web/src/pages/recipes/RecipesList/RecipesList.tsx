@@ -7,6 +7,8 @@ import { Recipe } from '../../../types';
 import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
 import { MediaCard } from '../../../components/ui/MediaCard';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { EmptyState } from '../../../components/ui/EmptyState';
 
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
@@ -54,23 +56,22 @@ export const RecipesList: React.FC = () => {
                 </div>
 
                 <section className="flex flex-col gap-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">My Recipes</h3>
-                        <span className="text-xs text-gray-500 font-medium">{filteredRecipes.length} items</span>
-                    </div>
+                    <SectionHeader
+                        title="My Recipes"
+                        rightElement={`${filteredRecipes.length} items`}
+                    />
 
                     <div className="grid grid-cols-1 gap-4">
                         {filteredRecipes.length === 0 ? (
-                            <div className="text-center text-gray-500 py-12">
-                                <span className="material-symbols-outlined text-6xl opacity-20 mb-4 block">menu_book</span>
-                                <p>No recipes found.</p>
-                                <button
-                                    onClick={() => navigate('/recipes/new')}
-                                    className="mt-4 text-primary font-bold hover:underline"
-                                >
-                                    Create your first recipe
-                                </button>
-                            </div>
+                            <EmptyState
+                                icon="menu_book"
+                                title="No recipes found"
+                                message={search ? "Try a different search term" : "Start by creating your first recipe"}
+                                action={{
+                                    label: search ? "Clear search" : "Create first recipe",
+                                    onClick: () => search ? setSearch('') : navigate('/recipes/new')
+                                }}
+                            />
                         ) : (
                             filteredRecipes.map((rec) => {
                                 const totalCost = calculateCost(rec);

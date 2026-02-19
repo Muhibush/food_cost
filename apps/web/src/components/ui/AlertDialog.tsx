@@ -1,5 +1,5 @@
 import React from 'react';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../../utils/cn';
 
 interface AlertDialogProps {
     isOpen: boolean;
@@ -35,7 +35,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
             {/* Dialog Card */}
             <div className="relative w-full max-w-sm bg-surface-dark border border-white/10 rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
                 <div className="p-8 text-center">
-                    <div className={twMerge(
+                    <div className={cn(
                         "w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4",
                         isDestructive ? "bg-red-500/10 text-red-500" : "bg-primary/10 text-primary"
                     )}>
@@ -58,7 +58,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
                     </button>
                     <button
                         onClick={onConfirm}
-                        className={twMerge(
+                        className={cn(
                             "flex-1 font-bold transition-colors active:opacity-80",
                             isDestructive ? "text-red-500 hover:bg-red-500/10" : "text-primary hover:bg-primary/10"
                         )}

@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { BottomSheet } from './BottomSheet';
-import { Icon } from './Icon';
-import { formatCurrency } from '../../utils/format';
 import { Ingredient } from '../../types';
 import { useIngredientsStore } from '../../store/useIngredientsStore';
+import { BottomSheet } from './BottomSheet';
+import { Icon } from './Icon';
+import { Input } from './Input';
+import { formatCurrency } from '../../utils/format';
 
 interface IngredientBottomSheetProps {
     isOpen: boolean;
@@ -48,20 +49,14 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
 
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Select Ingredient">
-            <div className="p-4 bg-navy-charcoal flex flex-col gap-5">
+            <div className="p-4 bg-surface-dark flex flex-col gap-5">
                 {/* Search Input */}
-                <div className="relative group">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
-                        <Icon name="search" size="md" />
-                    </span>
-                    <input
-                        type="text"
-                        className="w-full pl-12 pr-4 py-3.5 bg-[#252836] border border-gray-700/50 rounded-2xl text-base focus:ring-1 focus:ring-primary focus:border-primary outline-none text-white placeholder-gray-500 transition-all shadow-sm"
-                        placeholder="Search master list..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
+                <Input
+                    icon="search"
+                    placeholder="Search master list..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
 
                 {/* Create New Shortcut */}
                 <button className="text-primary font-bold text-sm flex items-center justify-center gap-2 hover:text-primary-dark transition-colors py-2">

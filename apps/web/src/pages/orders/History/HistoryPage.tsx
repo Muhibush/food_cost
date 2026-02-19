@@ -1,3 +1,4 @@
+// 🔒 LOCKED FILE: Do not modify this file without explicit double confirmation from the user.
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrdersStore } from '../../../store/useOrdersStore';
@@ -7,10 +8,11 @@ import { format, parseISO, startOfMonth, isSameMonth, compareDesc, isWithinInter
 import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
 import { MediaCard } from '../../../components/ui/MediaCard';
-import { Icon } from '../../../components/ui/Icon';
 import { BottomSheet } from '../../../components/ui/BottomSheet';
 import { DatePicker } from '../../../components/ui/DatePicker';
-import { cn } from '../../../components/ui/Button';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { FilterButton } from '../../../components/ui/FilterButton';
 
 export const HistoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -84,17 +86,10 @@ export const HistoryPage: React.FC = () => {
             <Header
                 title="History"
                 rightElement={
-                    <button
+                    <FilterButton
+                        isActive={isFilterActive}
                         onClick={() => setIsFilterOpen(true)}
-                        className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center border transition-all active:scale-[0.95] shadow-sm",
-                            isFilterActive
-                                ? "bg-primary border-primary text-white"
-                                : "bg-surface-dark border-white/5 text-white hover:bg-white/10"
-                        )}
-                    >
-                        <span className="material-symbols-outlined text-xl">calendar_month</span>
-                    </button>
+                    />
                 }
                 bottomElement={
                     <Input
@@ -111,12 +106,10 @@ export const HistoryPage: React.FC = () => {
                     {groupedOrders.length > 0 ? (
                         groupedOrders.map((group) => (
                             <div key={group.month.toISOString()}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">
-                                        {format(group.month, 'MMMM yyyy')}
-                                    </h3>
-                                    <span className="text-xs text-gray-500 font-medium">{group.orders.length} orders</span>
-                                </div>
+                                <SectionHeader
+                                    title={format(group.month, 'MMMM yyyy')}
+                                    rightElement={`${group.orders.length} orders`}
+                                />
 
                                 <div className="grid grid-cols-1 gap-4">
                                     {group.orders.map((order) => (
@@ -143,18 +136,15 @@ export const HistoryPage: React.FC = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-gray-500 gap-3">
-                            <Icon name="history_toggle_off" size="xl" className="text-gray-600" />
-                            <p className="text-sm font-medium">No order history found</p>
-                            {isFilterActive && (
-                                <button
-                                    onClick={clearFilters}
-                                    className="text-primary text-sm font-bold hover:underline"
-                                >
-                                    Clear date filters
-                                </button>
-                            )}
-                        </div>
+                        <EmptyState
+                            icon="history_toggle_off"
+                            title="No order history found"
+                            message={isFilterActive ? "Try adjusting your search or filters" : "You haven't placed any orders yet"}
+                            action={isFilterActive ? {
+                                label: "Clear date filters",
+                                onClick: clearFilters
+                            } : undefined}
+                        />
                     )}
                 </div>
             </main>

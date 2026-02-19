@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useIngredientsStore } from '../../../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
-import { clsx } from 'clsx';
+import { cn } from '../../../utils/cn';
 import { Input } from '../../../components/ui/Input';
+import { Header } from '../../../components/ui/Header';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { formatCurrency } from '../../../utils/format';
 
 export const IngredientsList: React.FC = () => {
@@ -41,27 +43,34 @@ export const IngredientsList: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5">
-                <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Ingredients</h1>
+            <Header
+                title="Ingredients"
+                rightElement={
                     <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
                         <span className="material-symbols-outlined text-[20px]">tune</span>
                     </button>
-                </div>
-                <Input
-                    icon="search"
-                    placeholder="Search ingredients..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </header>
+                }
+                bottomElement={
+                    <Input
+                        icon="search"
+                        placeholder="Search ingredients..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                }
+            />
 
             <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">
                 {filteredIngredients.length === 0 ? (
-                    <div className="text-center text-gray-500 py-10">
-                        <span className="material-symbols-outlined text-6xl opacity-20 mb-4">inventory_2</span>
-                        <p>No ingredients found.</p>
-                    </div>
+                    <EmptyState
+                        icon="inventory_2"
+                        title="No ingredients found"
+                        message={search ? "Try a different search term" : "Start by adding your first ingredient"}
+                        action={{
+                            label: search ? "Clear search" : "Add ingredient",
+                            onClick: () => search ? setSearch('') : navigate('/ingredients/new')
+                        }}
+                    />
                 ) : (
                     filteredIngredients.map((ing) => (
                         <div
@@ -70,7 +79,7 @@ export const IngredientsList: React.FC = () => {
                             className="bg-surface-dark p-4 rounded-2xl ring-1 ring-white/5 relative group active:scale-[0.99] transition-transform duration-200"
                         >
                             <div className="flex items-start gap-4">
-                                <div className={clsx("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
+                                <div className={cn("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
                                     <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0 pr-2">

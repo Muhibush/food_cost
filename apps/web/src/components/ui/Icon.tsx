@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './Button';
+import { cn } from '../../utils/cn';
 
 interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
     name: string;

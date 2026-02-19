@@ -10,11 +10,22 @@ import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { BottomSheet } from '../../../components/ui/BottomSheet';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { FilterButton } from '../../../components/ui/FilterButton';
+import { Card } from '../../../components/ui/Card';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/Popover';
+import { Calendar } from '../../../components/ui/Calendar';
+import { IngredientBottomSheet } from '../../../components/ui/IngredientBottomSheet';
 
 export const DesignSystem: React.FC = () => {
     const [date, setDate] = useState('2026-02-13');
     const [quantity, setQuantity] = useState(12);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [isIngredientSheetOpen, setIsIngredientSheetOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
     return (
         <div className="bg-background-dark min-h-screen text-white font-display">
@@ -22,9 +33,12 @@ export const DesignSystem: React.FC = () => {
                 title="Design System"
                 showBackButton
                 rightElement={
-                    <button className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
-                        <span className="material-symbols-outlined text-white text-xl">settings</span>
-                    </button>
+                    <div className="flex gap-2">
+                        <FilterButton isActive={true} onClick={() => { }} />
+                        <button className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
+                            <span className="material-symbols-outlined text-white text-xl">settings</span>
+                        </button>
+                    </div>
                 }
             />
 
@@ -56,7 +70,26 @@ export const DesignSystem: React.FC = () => {
                     </div>
                 </section>
 
-                {/* 02. Navigation & Layout */}
+                {/* 02. Typography & Icons */}
+                <section className="space-y-4">
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">02. Icons & Badges</h3>
+                    <div className="flex flex-col gap-6 bg-surface-dark/30 p-6 rounded-3xl border border-white/5">
+                        <div className="flex flex-wrap gap-6 items-center">
+                            <Icon name="home" size="sm" className="text-gray-400" />
+                            <Icon name="search" size="md" className="text-white" />
+                            <Icon name="settings" size="lg" className="text-primary" />
+                            <Icon name="delete" size="xl" className="text-danger" />
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            <Badge variant="default">Default Badge</Badge>
+                            <Badge variant="success">Success</Badge>
+                            <Badge variant="warning">Warning</Badge>
+                            <Badge variant="danger">Danger</Badge>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 03. Navigation & Layout */}
                 <section className="space-y-4">
                     <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">02. Navigation & Headers</h3>
                     <div className="space-y-4">
@@ -71,14 +104,23 @@ export const DesignSystem: React.FC = () => {
                     </div>
                 </section>
 
-                {/* 03. Interactive Buttons */}
+                {/* 04. Interactive Buttons */}
                 <section className="space-y-4">
-                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">03. Interactive Buttons</h3>
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">04. Interactive Buttons</h3>
                     <div className="flex flex-col gap-4">
-                        <Button className="w-full h-14 text-lg">Primary Large</Button>
                         <div className="flex gap-4">
-                            <Button className="flex-1">Normal</Button>
-                            <Button variant="secondary" className="flex-1">Secondary</Button>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button className="flex-1 h-14">Open Popover</Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold">Popover Title</h4>
+                                        <p className="text-sm text-gray-400">This is a standardized popover component for contextual actions.</p>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            <Button variant="secondary" className="flex-1 h-14">Secondary</Button>
                         </div>
                         <div className="flex gap-4">
                             <Button variant="ghost" className="flex-1">Ghost</Button>
@@ -87,7 +129,7 @@ export const DesignSystem: React.FC = () => {
                     </div>
                 </section>
 
-                {/* 04. Data Entry */}
+                {/* 05. Data Entry */}
                 <section className="space-y-4">
                     <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">04. Data Entry</h3>
                     <div className="space-y-6 bg-surface-dark/50 p-6 rounded-3xl border border-white/5">
@@ -105,10 +147,25 @@ export const DesignSystem: React.FC = () => {
                     </div>
                 </section>
 
-                {/* 05. List Items & Cards */}
+                {/* 06. Content Cards */}
                 <section className="space-y-4">
-                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">05. Content Media Cards</h3>
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1">06. Lists & Cards</h3>
                     <div className="space-y-3">
+                        <SectionHeader title="Base Card Showcase" />
+                        <Card hoverEffect className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
+                                    <Icon name="inventory_2" />
+                                </div>
+                                <div>
+                                    <p className="font-bold">Base Card with Hover</p>
+                                    <p className="text-xs text-text-muted">Standard container for items</p>
+                                </div>
+                            </div>
+                            <Badge variant="success">Active</Badge>
+                        </Card>
+
+                        <SectionHeader title="List Items" rightElement="12 items" />
                         <MediaCard
                             title="Indonesian Nasi Goreng"
                             image="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=400"
@@ -125,6 +182,12 @@ export const DesignSystem: React.FC = () => {
                                     <QuantitySelector value={5} onIncrement={() => { }} onDecrement={() => { }} />
                                 </div>
                             }
+                        />
+                        <EmptyState
+                            icon="search"
+                            title="Empty State Title"
+                            message="This is a sample message for empty states."
+                            action={{ label: "Sample Action", onClick: () => alert("Action!") }}
                         />
                     </div>
                 </section>
@@ -152,6 +215,28 @@ export const DesignSystem: React.FC = () => {
                         >
                             Open Sample Alert
                         </Button>
+                        <Button
+                            variant="secondary"
+                            className="flex-1 h-14"
+                            onClick={() => setIsSheetOpen(true)}
+                        >
+                            Generic Sheet
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            className="flex-1 h-14"
+                            onClick={() => setIsIngredientSheetOpen(true)}
+                        >
+                            Ingredient Sheet
+                        </Button>
+                    </div>
+
+                    <div className="bg-surface-dark border border-white/5 rounded-3xl p-4 overflow-hidden">
+                        <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={setSelectedDate}
+                        />
                     </div>
 
                     <AlertDialog
@@ -163,6 +248,34 @@ export const DesignSystem: React.FC = () => {
                         isDestructive
                         onCancel={() => setIsAlertOpen(false)}
                         onConfirm={() => setIsAlertOpen(false)}
+                    />
+
+                    <BottomSheet
+                        isOpen={isSheetOpen}
+                        onClose={() => setIsSheetOpen(false)}
+                        title="Sample Bottom Sheet"
+                    >
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <h4 className="font-bold text-lg">Sheet Content Area</h4>
+                                <p className="text-sm text-gray-400">
+                                    This is where your form fields, selection lists, or detailed information would go.
+                                    The sheet height automatically adjusts to its content but respects a max-height limit.
+                                </p>
+                            </div>
+                            <Button className="w-full" onClick={() => setIsSheetOpen(false)}>
+                                Got it
+                            </Button>
+                        </div>
+                    </BottomSheet>
+
+                    <IngredientBottomSheet
+                        isOpen={isIngredientSheetOpen}
+                        onClose={() => setIsIngredientSheetOpen(false)}
+                        onSelect={(ing) => {
+                            alert(`Selected: ${ing.name}`);
+                            setIsIngredientSheetOpen(false);
+                        }}
                     />
                 </section>
             </main>

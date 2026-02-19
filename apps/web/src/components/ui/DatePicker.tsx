@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format, parseISO, isValid } from 'date-fns';
-import { cn } from './Button';
+import { cn } from '../../utils/cn';
 import { Calendar } from './Calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { Icon } from './Icon';

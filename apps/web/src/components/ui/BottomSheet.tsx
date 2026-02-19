@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { cn } from './Button';
+import { cn } from '../../utils/cn';
 import { Icon } from './Icon';
 
 interface BottomSheetProps {
@@ -39,17 +39,17 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title
             {/* Bottom Sheet */}
             <div
                 className={cn(
-                    "fixed bottom-0 left-0 right-0 z-[70] bg-navy-charcoal rounded-t-[2rem] shadow-2xl transform transition-transform duration-300 max-h-[85vh] flex flex-col font-display",
+                    "fixed bottom-0 left-0 right-0 z-[70] bg-surface-dark rounded-t-[2rem] shadow-2xl transform transition-transform duration-300 max-h-[85vh] flex flex-col font-display border-t border-white/5",
                     isOpen ? "translate-y-0" : "translate-y-full"
                 )}
             >
                 {/* Handle */}
                 <div className="w-full flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
-                    <div className="w-12 h-1.5 bg-gray-600/50 rounded-full"></div>
+                    <div className="w-10 h-1 bg-white/10 rounded-full"></div>
                 </div>
 
                 {/* Header */}
-                <div className="px-5 pb-4 border-b border-gray-700/50 flex justify-between items-center">
+                <div className="px-5 pb-4 border-b border-white/5 flex justify-between items-center">
                     <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>
                     <button
                         onClick={onClose}
@@ -65,7 +65,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title
                 </div>
 
                 {/* Safe Area Spacer */}
-                <div className="pb-safe bg-navy-charcoal" />
+                <div className="pb-safe bg-surface-dark" />
             </div>
         </>
     );
