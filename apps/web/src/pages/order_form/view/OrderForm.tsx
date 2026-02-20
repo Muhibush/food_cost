@@ -7,6 +7,7 @@ import { Order, OrderItem, Recipe } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '../../../utils/format';
+import { ActionFooter } from '../../../components/ui/ActionFooter';
 
 export const OrderForm: React.FC = () => {
     const navigate = useNavigate();
@@ -283,21 +284,18 @@ export const OrderForm: React.FC = () => {
                     </div>
                 </section>
 
-                {/* Sticky Total Cost Footer */}
-                <div className="fixed bottom-[80px] left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-2 pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform">
-                    <div className="flex items-center justify-between mb-2">
-                        <div>
-                            <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">Total Cost Estimation</p>
-                            <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">Rp {formatCurrency(Math.round(formData.totalCost))}</div>
-                        </div>
-                        <button
-                            onClick={handleSubmit}
-                            className="bg-primary hover:bg-primary-dark text-white text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-primary/30 flex items-center gap-2 active:scale-95"
-                        >
-                            {id ? 'Update Order' : 'Create Order'}
-                        </button>
-                    </div>
-                </div>
+                <ActionFooter
+                    className="bottom-[88px]"
+                    primaryAction={{
+                        label: id ? 'Update Order' : 'Create Order',
+                        onClick: handleSubmit,
+                        isDisabled: formData.items.length === 0
+                    }}
+                    summary={{
+                        label: "Total Cost Estimation",
+                        value: `Rp ${formatCurrency(Math.round(formData.totalCost))}`
+                    }}
+                />
 
                 {/* Validating Product Selector reused from previous implementation but styled simpler? */}
                 {isProductSelectorOpen && (

@@ -5,20 +5,30 @@ import { BottomSheet } from './BottomSheet';
 import { Icon } from './Icon';
 import { Input } from './Input';
 import { formatCurrency } from '../../utils/format';
+import { cn } from '../../utils/cn';
 
 interface IngredientBottomSheetProps {
     isOpen: boolean;
     onClose: () => void;
     onSelect: (ingredient: Ingredient) => void;
+    selectedId?: string;
 }
 
 export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
     isOpen,
     onClose,
-    onSelect
+    onSelect,
+    selectedId
 }) => {
     const { ingredients } = useIngredientsStore();
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Reset search query when bottom sheet opens
+    React.useEffect(() => {
+        if (isOpen) {
+            setSearchQuery('');
+        }
+    }, [isOpen]);
 
     const filteredIngredients = useMemo(() => {
         return ingredients.filter((ing: Ingredient) =>
@@ -58,22 +68,22 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
 
-                {/* Create New Shortcut */}
-                <button className="text-primary font-bold text-sm flex items-center justify-center gap-2 hover:text-primary-dark transition-colors py-2">
-                    <Icon name="add" size="md" className="font-bold" />
-                    Create New Master Ingredient
-                </button>
-
                 {/* Ingredient List */}
                 <div className="space-y-3 pb-8">
                     {filteredIngredients.length > 0 ? (
                         filteredIngredients.map((ing: Ingredient) => {
                             const icon = getIngredientIcon(ing.name);
+                            const isSelected = ing.id === selectedId;
                             return (
                                 <button
                                     key={ing.id}
                                     onClick={() => onSelect(ing)}
-                                    className="w-full flex items-center justify-between p-4 bg-[#252836] hover:bg-[#2C3041] border border-gray-700/30 rounded-2xl transition-all group text-left shadow-sm active:scale-[0.98]"
+                                    className={cn(
+                                        "w-full flex items-center justify-between p-4 bg-[#252836] border rounded-2xl transition-all group text-left shadow-sm active:scale-[0.98]",
+                                        isSelected
+                                            ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                                            : "hover:bg-[#2C3041] border-gray-700/30"
+                                    )}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className={`h-12 w-12 rounded-full flex items-center justify-center border ${getIconColorClass(icon)}`}>

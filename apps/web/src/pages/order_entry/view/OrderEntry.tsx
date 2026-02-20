@@ -252,7 +252,7 @@ export const OrderPage: React.FC = () => {
                 </section>
 
                 <ActionFooter
-                    className="bottom-[84px]"
+                    className="bottom-[88px]"
                     summary={{
                         label: "Total Cost Estimation",
                         value: `Rp ${formatCurrency(Math.round(calculatedTotal))}`

@@ -23,7 +23,7 @@ export const ActionFooter: React.FC<ActionFooterProps> = ({
 }) => {
     return (
         <div className={cn(
-            "fixed bottom-[72px] left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-2 pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform",
+            "fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-safe pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform",
             className
         )}>
             <div className="flex items-center justify-between mb-2 max-w-lg mx-auto w-full">

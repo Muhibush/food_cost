@@ -16,9 +16,9 @@ export const RecipesList: React.FC = () => {
     const { getIngredient } = useIngredientsStore();
     const [search, setSearch] = useState('');
 
-    const filteredRecipes = recipes.filter(rec =>
-        rec.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredRecipes = recipes
+        .filter(rec => rec.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     const calculateCost = (recipe: Recipe) => {
         if (recipe.manualCost) return recipe.manualCost;
