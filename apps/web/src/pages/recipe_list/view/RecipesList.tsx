@@ -7,7 +7,6 @@ import { Recipe } from '../../../types';
 import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
 import { MediaCard } from '../../../components/ui/MediaCard';
-import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { EmptyState } from '../../../components/ui/EmptyState';
 
 export const RecipesList: React.FC = () => {
@@ -42,10 +41,7 @@ export const RecipesList: React.FC = () => {
                         <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>
                 }
-            />
-
-            <main className="flex-1 flex flex-col px-6 pt-6 pb-20">
-                <div className="mb-6">
+                bottomElement={
                     <Input
                         icon="search"
                         placeholder="Search recipes..."
@@ -53,63 +49,49 @@ export const RecipesList: React.FC = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
-                </div>
+                }
+            />
 
-                <section className="flex flex-col gap-6">
-                    <SectionHeader
-                        title="My Recipes"
-                        rightElement={`${filteredRecipes.length} items`}
+            <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">
+                {filteredRecipes.length === 0 ? (
+                    <EmptyState
+                        icon="menu_book"
+                        title="No recipes found"
+                        message={search ? "Try a different search term" : "Start by creating your first recipe"}
+                        action={{
+                            label: search ? "Clear search" : "Create first recipe",
+                            onClick: () => search ? setSearch('') : navigate('/recipes/new')
+                        }}
                     />
-
+                ) : (
                     <div className="grid grid-cols-1 gap-4">
-                        {filteredRecipes.length === 0 ? (
-                            <EmptyState
-                                icon="menu_book"
-                                title="No recipes found"
-                                message={search ? "Try a different search term" : "Start by creating your first recipe"}
-                                action={{
-                                    label: search ? "Clear search" : "Create first recipe",
-                                    onClick: () => search ? setSearch('') : navigate('/recipes/new')
-                                }}
-                            />
-                        ) : (
-                            filteredRecipes.map((rec) => {
-                                const totalCost = calculateCost(rec);
-                                const costPerPortion = totalCost / (rec.yield || 1);
+                        {filteredRecipes.map((rec) => {
+                            const totalCost = calculateCost(rec);
+                            const costPerPortion = totalCost / (rec.yield || 1);
 
-                                return (
-                                    <MediaCard
-                                        key={rec.id}
-                                        onClick={() => navigate(`/recipes/${rec.id}`)}
-                                        image={rec.image}
-                                        title={rec.name}
-                                        subtitle={
-                                            <p className="text-xs text-gray-400 line-clamp-1 mt-0.5 font-medium">
-                                                {rec.description || `${rec.ingredients.length} ingredients • Yields ${rec.yield} portions`}
-                                            </p>
-                                        }
-                                        bottomElement={
-                                            <div className="text-[15px] font-extrabold text-white">
-                                                Rp {formatCurrency(Math.round(costPerPortion))}
-                                                <span className="text-[11px] font-medium text-gray-500 ml-1 tracking-tight">/ portion</span>
-                                            </div>
-                                        }
-                                    />
-                                );
-                            })
-                        )}
+                            return (
+                                <MediaCard
+                                    key={rec.id}
+                                    onClick={() => navigate(`/recipes/${rec.id}`)}
+                                    image={rec.image}
+                                    title={rec.name}
+                                    subtitle={
+                                        <p className="text-xs text-text-muted line-clamp-1 mt-0.5 font-medium">
+                                            {rec.description || `${rec.ingredients.length} ingredients • Yields ${rec.yield} portions`}
+                                        </p>
+                                    }
+                                    bottomElement={
+                                        <div className="text-[15px] font-extrabold text-white">
+                                            Rp {formatCurrency(Math.round(costPerPortion))}
+                                            <span className="text-[11px] font-medium text-text-muted ml-1 tracking-tight">/ portion</span>
+                                        </div>
+                                    }
+                                />
+                            );
+                        })}
                     </div>
-                </section>
+                )}
             </main>
-
-            <div className="fixed bottom-28 right-6 z-40">
-                <button
-                    onClick={() => navigate('/recipes/new')}
-                    className="bg-primary hover:bg-primary-dark text-white h-14 w-14 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all hover:scale-105 active:scale-95 ring-4 ring-background-dark"
-                >
-                    <span className="material-symbols-outlined text-3xl">add</span>
-                </button>
-            </div>
         </div>
     );
 };

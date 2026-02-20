@@ -19,6 +19,8 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 import { Badge } from '../../../components/ui/Badge';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { InfoBanner } from '../../../components/ui/InfoBanner';
+import { MediaCard } from '../../../components/ui/MediaCard';
+import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -145,6 +147,18 @@ export const OrderDetail: React.FC = () => {
     // Note: The previous sync logic using location.state is no longer needed 
     // because RecipeSelection now syncs directly with useOrderDraftStore 
     // before navigating back.
+
+    const getRecipeCost = (recipeId: string) => {
+        const recipe = recipes.find(r => r.id === recipeId);
+        if (!recipe) return 0;
+        if (recipe.manualCost) return recipe.manualCost;
+
+        const total = recipe.ingredients.reduce((acc: number, item) => {
+            const ing = getIngredient(item.ingredientId);
+            return acc + (ing ? ing.price * item.quantity : 0);
+        }, 0);
+        return total / (recipe.yield || 1);
+    };
 
     const aggregatedIngredients = useMemo(() => {
         if (!currentOrder) return [];
@@ -338,44 +352,38 @@ export const OrderDetail: React.FC = () => {
                             const recipe = recipes.find(r => r.id === item.recipeId);
                             if (!recipe) return null;
 
+                            const unitCost = item.customPrice ?? getRecipeCost(item.recipeId);
+                            const subtotal = unitCost * item.quantity;
+
                             return (
-                                <div key={item.recipeId} className="bg-surface-dark rounded-2xl p-5 border border-white/5 relative shadow-sm">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-lg text-white mb-1 group-hover:text-primary transition-colors cursor-default">{recipe.name}</h3>
-                                            <p className="text-xs text-gray-400 mb-4">Portion scale: x{item.quantity}</p>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex items-center bg-background-dark/50 rounded-xl px-4 py-2 border border-white/10 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all shadow-sm">
-                                                    <span className="text-[10px] text-gray-500 mr-3 font-bold uppercase tracking-widest bg-white/5 px-1.5 py-0.5 rounded">Qty</span>
-                                                    <input
-                                                        className="w-16 bg-transparent border-none p-0 text-center font-bold text-white focus:ring-0 focus:outline-none text-base"
-                                                        type="text"
-                                                        inputMode="numeric"
-                                                        pattern="[0-9]*"
-                                                        value={item.quantity}
-                                                        onChange={(e) => {
-                                                            const val = e.target.value.replace(/[^0-9]/g, '');
-                                                            if (val.length <= 4) {
-                                                                const numVal = parseInt(val) || 1;
-                                                                const validatedVal = Math.max(1, numVal);
-                                                                updateItemQuantity(item.recipeId, validatedVal - item.quantity);
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
-                                                <span className="text-xs text-gray-500 font-medium tracking-tight">portions</span>
-                                            </div>
+                                <MediaCard
+                                    key={item.recipeId}
+                                    image={recipe.image}
+                                    title={recipe.name}
+                                    subtitle={
+                                        <div className="text-xs font-bold text-primary">
+                                            Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                         </div>
-                                        <div className="flex flex-col items-end gap-2 h-full justify-between min-h-[90px]">
-                                            <button
-                                                onClick={() => removeItem(item.recipeId)}
-                                                className="w-8 h-8 rounded-full bg-background-dark flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-all absolute top-4 right-4 ring-1 ring-white/5"
-                                            >
-                                                <span className="material-symbols-outlined text-sm font-bold">delete</span>
-                                            </button>
+                                    }
+                                    rightElement={
+                                        <button
+                                            onClick={() => removeItem(item.recipeId)}
+                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                        >
+                                            <span className="material-symbols-outlined text-xl">delete</span>
+                                        </button>
+                                    }
+                                    bottomElement={
+                                        <div className="flex items-center justify-between w-full">
+                                            <div className="text-xs font-semibold text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
+                                            <QuantitySelector
+                                                value={item.quantity}
+                                                onIncrement={() => updateItemQuantity(item.recipeId, 1)}
+                                                onDecrement={() => updateItemQuantity(item.recipeId, -1)}
+                                            />
                                         </div>
-                                    </div>
-                                </div>
+                                    }
+                                />
                             );
                         })}
                     </div>
