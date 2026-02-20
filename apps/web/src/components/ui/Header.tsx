@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
             "sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex flex-col gap-4",
             className
         )}>
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center justify-between w-full min-h-[40px]">
                 <div className="flex items-center gap-4 min-w-0">
                     {showBackButton && (
                         <button

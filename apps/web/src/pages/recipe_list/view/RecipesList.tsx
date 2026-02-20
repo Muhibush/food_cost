@@ -8,6 +8,7 @@ import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
+import { FAB } from '../../../components/ui/FAB';
 
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
@@ -33,14 +34,6 @@ export const RecipesList: React.FC = () => {
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
             <Header
                 title="Recipes"
-                rightElement={
-                    <button
-                        onClick={() => navigate('/recipes/new')}
-                        className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                    </button>
-                }
                 bottomElement={
                     <Input
                         icon="search"
@@ -92,6 +85,11 @@ export const RecipesList: React.FC = () => {
                     </div>
                 )}
             </main>
+
+            <FAB
+                icon="add"
+                onClick={() => navigate('/recipes/new')}
+            />
         </div>
     );
 };
