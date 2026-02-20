@@ -249,16 +249,23 @@ export const OrderDetail: React.FC = () => {
         setIngredientOverrides(overrides);
     };
 
-    const updateItemQuantity = (recipeId: string, delta: number) => {
+    const setItemQuantity = (recipeId: string, quantity: number) => {
         const newItems = draftItems.map(item => {
             if (item.recipeId === recipeId) {
-                // Enforce minimum quantity of 1
-                return { ...item, quantity: Math.max(1, item.quantity + delta) };
+                // Enforce minimum quantity of 1 (handled in store usually, but let's be safe)
+                return { ...item, quantity: Math.max(1, quantity) };
             }
             return item;
         });
 
         setItems(newItems);
+    };
+
+    const updateItemQuantity = (recipeId: string, delta: number) => {
+        const item = draftItems.find(i => i.recipeId === recipeId);
+        if (item) {
+            setItemQuantity(recipeId, item.quantity + delta);
+        }
     };
 
     const removeItem = (recipeId: string) => {
@@ -378,6 +385,7 @@ export const OrderDetail: React.FC = () => {
                                             <div className="text-xs font-semibold text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
                                             <QuantitySelector
                                                 value={item.quantity}
+                                                onChange={(val) => setItemQuantity(item.recipeId, val)}
                                                 onIncrement={() => updateItemQuantity(item.recipeId, 1)}
                                                 onDecrement={() => updateItemQuantity(item.recipeId, -1)}
                                             />

@@ -78,14 +78,18 @@ export const OrderPage: React.FC = () => {
         return draftName.trim().length > 0 && draftItems.length > 0;
     }, [draftName, draftItems]);
 
-    const updateItemQuantity = (index: number, delta: number) => {
+    const setItemQuantity = (index: number, quantity: number) => {
         const newItems = [...draftItems];
-        newItems[index].quantity += delta;
+        newItems[index].quantity = quantity;
         if (newItems[index].quantity <= 0) {
             setItems(newItems.filter((_, i) => i !== index));
         } else {
             setItems(newItems);
         }
+    };
+
+    const updateItemQuantity = (index: number, delta: number) => {
+        setItemQuantity(index, draftItems[index].quantity + delta);
     };
 
     const removeItem = (index: number) => {
@@ -220,6 +224,7 @@ export const OrderPage: React.FC = () => {
                                                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
                                                 <QuantitySelector
                                                     value={item.quantity}
+                                                    onChange={(val) => setItemQuantity(index, val)}
                                                     onIncrement={() => updateItemQuantity(index, 1)}
                                                     onDecrement={() => updateItemQuantity(index, -1)}
                                                 />
