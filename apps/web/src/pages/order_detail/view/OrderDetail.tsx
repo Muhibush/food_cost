@@ -358,7 +358,7 @@ export const OrderDetail: React.FC = () => {
                                     title={recipe.name}
                                     subtitle={
                                         <div className="space-y-1">
-                                            <div className="text-xs font-bold text-primary">
+                                            <div className="text-xs font-bold text-white">
                                                 Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
                                             {recipe.note && (
@@ -378,7 +378,7 @@ export const OrderDetail: React.FC = () => {
                                     }
                                     bottomElement={
                                         <div className="flex items-center justify-between w-full">
-                                            <div className="text-xs font-semibold text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
+                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: <span className="text-primary">Rp {formatCurrency(Math.round(subtotal))}</span></div>
                                             <QuantitySelector
                                                 value={item.quantity}
                                                 onChange={(val) => setItemQuantity(item.recipeId, val)}
