@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '../../../utils/format';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { useProfileStore } from '../../edit_profile/store/useProfileStore';
 
 export const OrderForm: React.FC = () => {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ export const OrderForm: React.FC = () => {
     const { addOrder, updateOrder, getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+    const { profile } = useProfileStore();
 
     const [formData, setFormData] = useState<Omit<Order, 'id'>>({
         name: '',
@@ -149,16 +151,24 @@ export const OrderForm: React.FC = () => {
                 >
                     <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
                 </button>
-                <h1 className="text-2xl font-extrabold text-white absolute left-1/2 -translate-x-1/2 tracking-tight whitespace-nowrap">
-                    {id ? 'Edit Order' : 'New Order'}
-                </h1>
-                <button
-                    onClick={handleReset}
-                    className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
-                    title="Reset Form"
-                >
-                    <span className="material-symbols-outlined text-red-400 text-xl font-bold">restart_alt</span>
-                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+                    <h1 className="text-xl font-extrabold text-white tracking-tight whitespace-nowrap">
+                        Order Page
+                    </h1>
+                    <span className="text-[10px] text-primary font-bold uppercase tracking-wider mt-0.5">
+                        {profile.name}
+                    </span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <img src={profile.avatar} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 object-cover shadow-sm bg-surface-dark" />
+                    <button
+                        onClick={handleReset}
+                        className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
+                        title="Reset Form"
+                    >
+                        <span className="material-symbols-outlined text-red-400 text-xl font-bold">restart_alt</span>
+                    </button>
+                </div>
             </header>
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-48 max-w-lg mx-auto w-full">
@@ -250,16 +260,17 @@ export const OrderForm: React.FC = () => {
                                                     <span className="material-symbols-outlined text-xl">delete</span>
                                                 </button>
                                             </div>
-                                            <div className="text-xs font-bold text-primary mt-0.5">
+                                            <div className="text-xs font-bold text-white mt-0.5">
                                                 Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between mt-2">
-                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
+                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: <span className="text-primary">Rp {formatCurrency(Math.round(subtotal))}</span></div>
                                             <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-0.5 border border-gray-200 dark:border-gray-600 h-8">
                                                 <button
                                                     onClick={() => updateItemQuantity(index, -1)}
-                                                    className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700"
+                                                    disabled={item.quantity <= 1}
+                                                    className={`w-8 h-full rounded-md flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50' : 'text-gray-500 active:text-primary active:bg-primary/20'}`}
                                                 >
                                                     <span className="material-symbols-outlined text-base">remove</span>
                                                 </button>
@@ -271,7 +282,7 @@ export const OrderForm: React.FC = () => {
                                                 />
                                                 <button
                                                     onClick={() => updateItemQuantity(index, 1)}
-                                                    className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700"
+                                                    className="w-8 h-full rounded-md text-gray-500 flex items-center justify-center transition-colors active:text-primary active:bg-primary/20"
                                                 >
                                                     <span className="material-symbols-outlined text-base">add</span>
                                                 </button>

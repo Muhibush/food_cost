@@ -41,7 +41,13 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                     e.stopPropagation();
                     onDecrement();
                 }}
-                className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700 transition-colors"
+                className={cn(
+                    "w-8 h-full rounded-md flex items-center justify-center transition-colors",
+                    value <= (min || 1)
+                        ? "text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50"
+                        : "text-gray-500 active:text-primary"
+                )}
+                disabled={value <= (min || 1)}
             >
                 <span className="material-symbols-outlined text-base">remove</span>
             </button>
@@ -59,7 +65,7 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                     e.stopPropagation();
                     onIncrement();
                 }}
-                className="w-8 h-full rounded-md text-gray-500 hover:text-primary flex items-center justify-center active:bg-gray-200 dark:active:bg-gray-700 transition-colors"
+                className="w-8 h-full rounded-md text-gray-500 flex items-center justify-center active:text-primary transition-colors"
             >
                 <span className="material-symbols-outlined text-base">add</span>
             </button>

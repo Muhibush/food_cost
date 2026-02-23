@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../../utils/format';
 import { useOrderDraftStore } from '../store/useOrderDraftStore';
+import { useProfileStore } from '../../edit_profile/store/useProfileStore';
 import { OrderItem } from '../../../types';
 import { Header } from '../../../components/ui/Header';
 import { DatePicker } from '../../../components/ui/DatePicker';
@@ -25,6 +26,7 @@ export const OrderPage: React.FC = () => {
     const { getOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const { getIngredient } = useIngredientsStore();
+    const { profile } = useProfileStore();
 
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
@@ -140,13 +142,22 @@ export const OrderPage: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
             <Header
-                title="Chef Anderson"
-                subtitle="Kitchen Manager"
+                title="Order Page"
+                subtitle={profile.name}
                 leftElement={
                     <div
-                        className="h-10 w-10 rounded-full bg-gray-700 bg-cover bg-center border-2 border-primary shadow-sm"
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCS04F1_8gxS_wh5p8aadS4dOwrUTeJEYiGA29E6WWvTahXdLcS9SdZPmZ2-S_ouAkT9R935-35Snl_Mi0eUDPq4ejBGgmISnmOVE85mnQf_P9BaIEhX-EpzKfrNtul39Crc0rQbXp1WXXMTzDGlV7dIXmtnTACD7TxEtO-r2IPVmcO1QmIvpAVwNRNydjD9f-krF--SW_R0_ZoY2Y9nw_ffRVBSAmcXHrEyejUi-osHG5cqA7ZGMOLU-7M_ha8lDCYiMzq373_qzc')" }}
+                        className="h-10 w-10 rounded-full bg-surface-dark bg-cover bg-center border border-white/10 shadow-sm"
+                        style={{ backgroundImage: `url('${profile.avatar}')` }}
                     ></div>
+                }
+                rightElement={
+                    <button
+                        onClick={handleReset}
+                        className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
+                        title="Reset Form"
+                    >
+                        <span className="material-symbols-outlined text-red-400 text-xl font-bold">restart_alt</span>
+                    </button>
                 }
             />
 
@@ -155,13 +166,6 @@ export const OrderPage: React.FC = () => {
                     <h1 className="text-3xl font-extrabold text-white tracking-tight whitespace-nowrap">
                         {id ? 'Edit Order' : 'New Order'}
                     </h1>
-                    <button
-                        onClick={handleReset}
-                        className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
-                        title="Reset Form"
-                    >
-                        <span className="material-symbols-outlined text-red-500 text-xl font-bold">restart_alt</span>
-                    </button>
                 </div>
 
                 <section className="flex flex-col gap-6">
@@ -207,7 +211,7 @@ export const OrderPage: React.FC = () => {
                                         image={recipe?.image}
                                         title={recipe?.name || 'Unknown'}
                                         subtitle={
-                                            <div className="text-xs font-bold text-primary">
+                                            <div className="text-xs font-bold text-white">
                                                 Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
                                             </div>
                                         }
@@ -221,7 +225,7 @@ export const OrderPage: React.FC = () => {
                                         }
                                         bottomElement={
                                             <div className="flex items-center justify-between w-full">
-                                                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: Rp {formatCurrency(Math.round(subtotal))}</div>
+                                                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: <span className="text-primary">Rp {formatCurrency(Math.round(subtotal))}</span></div>
                                                 <QuantitySelector
                                                     value={item.quantity}
                                                     onChange={(val) => setItemQuantity(index, val)}
