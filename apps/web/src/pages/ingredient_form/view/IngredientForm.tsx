@@ -1,9 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useParams, useBlocker } from 'react-router-dom';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
 import { Ingredient } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
-import { clsx } from 'clsx';
+import { Header } from '../../../components/ui/Header';
+import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
+import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { Badge } from '../../../components/ui/Badge';
+import { Icon } from '../../../components/ui/Icon';
+
+const UNIT_OPTIONS = [
+    { value: '', label: 'Select a unit', disabled: true },
+    { value: 'kg', label: 'Kilogram (KG)' },
+    { value: 'gr', label: 'Gram (GR)' },
+    { value: 'ltr', label: 'Liter (L)' },
+    { value: 'ml', label: 'Milliliter (ML)' },
+    { value: 'pcs', label: 'Piece (PCS)' },
+    { value: 'pack', label: 'Pack' },
+    { value: 'can', label: 'Can' },
+    { value: 'btl', label: 'Bottle' }
+];
 
 export const IngredientForm: React.FC = () => {
     const navigate = useNavigate();
@@ -12,26 +30,58 @@ export const IngredientForm: React.FC = () => {
 
     const [formData, setFormData] = useState<Omit<Ingredient, 'id'>>({
         name: '',
-        unit: 'kg',
+        unit: '',
         price: 0,
     });
+    const [originalData, setOriginalData] = useState<Omit<Ingredient, 'id'> | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const isDirty = useMemo(() => {
+        if (!originalData) {
+            return formData.name !== '' || formData.unit !== '' || formData.price !== 0;
+        }
+        return JSON.stringify(formData) !== JSON.stringify(originalData);
+    }, [formData, originalData]);
+
+    const isSavingRef = useRef(false);
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            !isSavingRef.current &&
+            isDirty &&
+            currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty]);
 
     useEffect(() => {
         if (id) {
             const existing = getIngredient(id);
             if (existing) {
                 setFormData(existing);
+                setOriginalData(JSON.parse(JSON.stringify(existing)));
             }
         }
     }, [id, getIngredient]);
 
-    const handleSubmit = (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
+    const isFormValid = formData.name.trim() !== '' && formData.unit !== '' && formData.price >= 0;
 
-        if (!formData.name || !formData.unit || formData.price <= 0) {
+    const handleSubmit = () => {
+        if (!isFormValid) {
             alert('Please fill in all required fields correctly.');
             return;
         }
+
+        isSavingRef.current = true;
 
         if (id) {
             updateIngredient(id, formData);
@@ -42,7 +92,14 @@ export const IngredientForm: React.FC = () => {
     };
 
     const handleDelete = () => {
-        if (id && confirm('Are you sure you want to delete this ingredient?')) {
+        if (id) {
+            setIsDeleteDialogOpen(true);
+        }
+    };
+
+    const confirmDelete = () => {
+        if (id) {
+            isSavingRef.current = true;
             removeIngredient(id);
             navigate('/ingredients');
         }
@@ -58,122 +115,126 @@ export const IngredientForm: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
-                >
-                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
-                </button>
-                <h1 className="text-2xl font-extrabold text-white absolute left-1/2 -translate-x-1/2 tracking-tight whitespace-nowrap">
-                    {id ? 'Edit Ingredient' : 'Add Ingredient'}
-                </h1>
-                <div className="w-10"></div>
-            </header>
+            <Header
+                title={id ? 'Edit Ingredient' : 'Add Ingredient'}
+                showBackButton
+                rightElement={isDirty && (
+                    <Badge
+                        variant="warning"
+                        rounded="full"
+                        className="animate-pulse tracking-widest"
+                    >
+                        Unsaved
+                    </Badge>
+                )}
+            />
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
                 {/* Photo Upload Placeholder */}
-                <div className="flex flex-col items-center mb-10">
-                    <div className="relative group cursor-pointer">
-                        <div className="h-32 w-32 rounded-full bg-[#1C1F2E] border-2 border-dashed border-white/20 flex items-center justify-center text-gray-400 group-hover:border-primary group-hover:text-primary transition-all overflow-hidden">
-                            <span className="material-symbols-outlined text-4xl">add_a_photo</span>
+                <div className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden mb-8">
+                    <div className="flex flex-col items-center">
+                        <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1">
+                            <Icon name="add_photo_alternate" className="text-primary" />
                         </div>
-                        <div className="absolute bottom-0 right-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-white border-4 border-background-dark shadow-sm">
-                            <span className="material-symbols-outlined text-lg">edit</span>
-                        </div>
+                        <span className="text-xs font-bold uppercase tracking-widest">Upload Photo</span>
                     </div>
-                    <p className="mt-3 text-sm font-medium text-gray-400">Upload Photo</p>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
+                        <Icon name="cloud_upload" className="text-white text-3xl" />
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8 flex-1">
-                    {/* Name */}
-                    <div className="space-y-3">
-                        <label className="block text-sm font-bold text-gray-200">Ingredient Name</label>
-                        <input
-                            name="name"
-                            value={formData.name}
+                <div className="space-y-6 flex-1">
+                    <Input
+                        label="Ingredient Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="e.g. Premium Brown Sugar"
+                        icon="inventory_2"
+                        required
+                        autoComplete="off"
+                        className="bg-[#1C1F2E] ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
+                    />
+
+                    <Select
+                        label="Unit Type"
+                        name="unit"
+                        value={formData.unit}
+                        onChange={handleChange}
+                        options={UNIT_OPTIONS}
+                        icon="scale"
+                        required
+                        className="bg-[#1C1F2E] ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
+                    />
+
+                    <div className="relative">
+                        <Input
+                            label="Price per Unit"
+                            name="price"
+                            value={formData.price || ''}
                             onChange={handleChange}
-                            className="w-full bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl px-5 py-5 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg placeholder-gray-500 shadow-sm"
-                            placeholder="e.g. Premium Brown Sugar"
-                            type="text"
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            icon="payments"
                             required
+                            className="bg-[#1C1F2E] ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
                         />
-                    </div>
-
-                    {/* Unit Type */}
-                    <div className="space-y-3">
-                        <label className="block text-sm font-bold text-gray-200">Unit Type</label>
-                        <div className="relative">
-                            <select
-                                name="unit"
-                                value={formData.unit}
-                                onChange={handleChange}
-                                className="w-full appearance-none bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl px-5 py-5 pr-12 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg shadow-sm"
-                                required
-                            >
-                                <option disabled value="">Select a unit</option>
-                                <option value="kg">Kilogram (KG)</option>
-                                <option value="gr">Gram (GR)</option>
-                                <option value="ltr">Liter (L)</option>
-                                <option value="ml">Milliliter (ML)</option>
-                                <option value="pcs">Piece (PCS)</option>
-                                <option value="pack">Pack</option>
-                                <option value="can">Can</option>
-                                <option value="btl">Bottle</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
-                                <span className="material-symbols-outlined">expand_more</span>
-                            </div>
+                        <div className="absolute right-4 bottom-3.5 pointer-events-none">
+                            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">RP</span>
                         </div>
                     </div>
 
-                    {/* Price */}
-                    <div className="space-y-3">
-                        <label className="block text-sm font-bold text-gray-200">Price per Unit</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-white font-semibold text-base">
-                                Rp
-                            </div>
-                            <input
-                                name="price"
-                                value={formData.price || ''}
-                                onChange={handleChange}
-                                className="w-full bg-[#1C1F2E] border border-transparent focus:border-primary/50 text-white rounded-2xl pl-14 pr-5 py-5 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg font-medium shadow-sm placeholder-gray-500"
-                                inputMode="numeric"
-                                placeholder="0"
-                                type="number"
-                                min="0"
-                                required
-                            />
-                        </div>
-                        <p className="text-xs text-gray-500 px-1">Enter the current market price for one unit.</p>
-                    </div>
-
-
-                </form>
-            </main>
-
-            <div className="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-white/5 pb-safe z-30">
-                <div className="px-6 py-4 flex items-center justify-between gap-4 max-w-lg mx-auto">
                     {id && (
                         <button
+                            type="button"
                             onClick={handleDelete}
-                            className="h-14 flex-1 bg-transparent border border-white/20 text-white font-bold text-base rounded-2xl transition-colors flex items-center justify-center hover:bg-white/5 hover:border-white/30 active:scale-95"
+                            className="w-full py-4 mt-8 border-2 border-dashed border-danger/40 bg-danger/5 hover:bg-danger/10 rounded-2xl flex items-center justify-center gap-2 text-danger font-bold transition-all active:scale-[0.99]"
                         >
-                            Delete
+                            <Icon name="delete" className="text-xl" />
+                            Delete Ingredient
                         </button>
                     )}
-                    <button
-                        onClick={() => handleSubmit()}
-                        className={clsx(
-                            "h-14 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-2xl shadow-lg shadow-primary/30 transition-all active:scale-95 flex items-center justify-center",
-                            id ? "flex-[2]" : "w-full"
-                        )}
-                    >
-                        Save
-                    </button>
                 </div>
-            </div>
+            </main>
+
+            <ActionFooter
+                className="bottom-0"
+                primaryAction={{
+                    label: id ? 'Update Ingredient' : 'Save Ingredient',
+                    onClick: handleSubmit,
+                    isDisabled: !isFormValid
+                }}
+            />
+
+            <AlertDialog
+                isOpen={blocker.state === 'blocked'}
+                title={!id ? "Discard New Ingredient?" : "Discard Changes?"}
+                message={!id
+                    ? "This ingredient hasn't been saved yet. If you leave now, all details will be lost."
+                    : "You have unsaved modifications to this ingredient. If you leave now, these changes will be lost."
+                }
+                confirmLabel="Discard"
+                cancelLabel="Keep Editing"
+                isDestructive
+                onCancel={() => blocker.state === 'blocked' && blocker.reset()}
+                onConfirm={() => {
+                    if (blocker.state === 'blocked') {
+                        blocker.proceed();
+                    }
+                }}
+            />
+
+            <AlertDialog
+                isOpen={isDeleteDialogOpen}
+                title="Delete Ingredient"
+                message={`Are you sure you want to delete "${formData.name}"? This action cannot be undone.`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                isDestructive
+                onCancel={() => setIsDeleteDialogOpen(false)}
+                onConfirm={confirmDelete}
+            />
         </div>
     );
 };
