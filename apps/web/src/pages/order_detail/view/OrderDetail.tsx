@@ -16,12 +16,12 @@ import { OrderItem, RecipeIngredient } from '../../../types';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/Textarea';
 import { DatePicker } from '../../../components/ui/DatePicker';
+import { SummaryCard } from '../../../components/ui/SummaryCard';
 import { Badge } from '../../../components/ui/Badge';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { InfoBanner } from '../../../components/ui/InfoBanner';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
-
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -290,22 +290,11 @@ export const OrderDetail: React.FC = () => {
                     </Badge>
                 )}
                 bottomElement={(
-                    <div className="flex items-center justify-between bg-surface-dark/50 rounded-2xl p-4 border border-white/5 mx-1 overflow-hidden">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                <span className="material-symbols-outlined text-primary text-xl">payments</span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Total Cost</p>
-                                <div className="text-lg font-extrabold font-display text-white truncate">
-                                    Rp {formatCurrency(Math.round(totalCost))}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-primary/20 text-primary px-3 py-1 rounded-lg text-xs font-bold shrink-0 ml-4">
-                            Estimated
-                        </div>
-                    </div>
+                    <SummaryCard
+                        label="Total Cost"
+                        value={`Rp ${formatCurrency(Math.round(totalCost))}`}
+                        badge="Estimated"
+                    />
                 )}
             />
 
@@ -368,8 +357,15 @@ export const OrderDetail: React.FC = () => {
                                     image={recipe.image}
                                     title={recipe.name}
                                     subtitle={
-                                        <div className="text-xs font-bold text-primary">
-                                            Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
+                                        <div className="space-y-1">
+                                            <div className="text-xs font-bold text-primary">
+                                                Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>
+                                            </div>
+                                            {recipe.note && (
+                                                <p className="text-[11px] text-text-muted font-medium italic line-clamp-1">
+                                                    {recipe.note}
+                                                </p>
+                                            )}
                                         </div>
                                     }
                                     rightElement={

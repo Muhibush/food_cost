@@ -6,15 +6,17 @@ import { Input } from '../../../components/ui/Input';
 import { Header } from '../../../components/ui/Header';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { formatCurrency } from '../../../utils/format';
+import { Card } from '../../../components/ui/Card';
+import { FAB } from '../../../components/ui/FAB';
 
 export const IngredientsList: React.FC = () => {
     const navigate = useNavigate();
     const { ingredients } = useIngredientsStore();
     const [search, setSearch] = useState('');
 
-    const filteredIngredients = ingredients.filter(ing =>
-        ing.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredIngredients = ingredients
+        .filter(ing => ing.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     // Helpers for coloring logic based on the HTML reference
     // We can randomize or hash the color based on the name if we want to stick to the design's variety
@@ -45,11 +47,6 @@ export const IngredientsList: React.FC = () => {
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
             <Header
                 title="Ingredients"
-                rightElement={
-                    <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-dark text-white border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
-                        <span className="material-symbols-outlined text-[20px]">tune</span>
-                    </button>
-                }
                 bottomElement={
                     <Input
                         icon="search"
@@ -73,34 +70,30 @@ export const IngredientsList: React.FC = () => {
                     />
                 ) : (
                     filteredIngredients.map((ing) => (
-                        <div
+                        <Card
                             key={ing.id}
+                            hoverEffect
                             onClick={() => navigate(`/ingredients/${ing.id}`)}
-                            className="bg-surface-dark p-4 rounded-2xl ring-1 ring-white/5 relative group active:scale-[0.99] transition-transform duration-200"
+                            className="flex items-center gap-4"
                         >
-                            <div className="flex items-start gap-4">
-                                <div className={cn("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
-                                    <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
-                                </div>
-                                <div className="flex-1 min-w-0 pr-2">
-                                    <h3 className="font-bold text-white text-[17px] leading-tight truncate">{ing.name}</h3>
-                                </div>
-                                <div className="flex flex-col items-end gap-1">
-                                    <span className="font-bold text-white text-[15px]">Rp {formatCurrency(ing.price)}</span>
-                                    <span className="text-[10px] text-gray-500 font-semibold tracking-wide uppercase bg-white/5 px-2 py-0.5 rounded-md">/{ing.unit}</span>
+                            <div className={cn("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
+                                <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
+                            </div>
+                            <div className="flex-1 min-w-0 pr-2">
+                                <h3 className="font-bold text-white text-[17px] leading-tight truncate">{ing.name}</h3>
+                                <div className="text-[14px] text-text-muted mt-0.5 font-medium truncate">
+                                    Rp {formatCurrency(ing.price)} <span className="text-[12px] opacity-70">/ {ing.unit}</span>
                                 </div>
                             </div>
-                        </div>
+                        </Card>
                     ))
                 )}
             </main>
 
-            <button
-                className="fixed bottom-[100px] right-5 h-14 w-14 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg shadow-primary/20 flex items-center justify-center transition-all z-30 active:scale-95 ring-4 ring-background-dark"
+            <FAB
+                icon="add"
                 onClick={() => navigate('/ingredients/new')}
-            >
-                <span className="material-symbols-outlined text-[32px]">add</span>
-            </button>
+            />
         </div>
     );
 };

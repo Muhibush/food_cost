@@ -23,31 +23,34 @@ export const ActionFooter: React.FC<ActionFooterProps> = ({
 }) => {
     return (
         <div className={cn(
-            "fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 pb-safe pt-4 px-5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl transform transition-transform",
+            "fixed bottom-0 left-0 right-0 z-30 bg-background-dark/80 backdrop-blur-md border-t border-white/5 pb-safe pt-4 px-5 shadow-lg rounded-t-2xl transform transition-transform",
             className
         )}>
-            <div className="flex items-center justify-between mb-2 max-w-lg mx-auto w-full">
+            <div className={cn(
+                "flex items-center gap-4 max-w-lg mx-auto w-full mb-2",
+                summary ? "justify-between" : "justify-center"
+            )}>
                 {summary && (
-                    <div>
-                        <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">
+                    <div className="flex-1 min-w-0 mr-4">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60 mb-0.5 mt-1">
                             {summary.label}
                         </p>
-                        <div className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">
+                        <div className="text-xl font-extrabold font-display text-white truncate leading-tight">
                             {summary.value}
                         </div>
                     </div>
                 )}
-                {!summary && <div />}
                 <button
                     onClick={primaryAction.onClick}
                     disabled={primaryAction.isLoading || primaryAction.isDisabled}
                     className={cn(
-                        "text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-lg flex items-center gap-2 active:scale-95 disabled:opacity-50",
+                        "font-bold transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2",
+                        !summary ? "w-full py-4 text-lg rounded-2xl" : "py-3 px-6 text-sm rounded-xl",
                         primaryAction.variant === 'secondary'
                             ? "bg-surface-dark text-white border border-white/10"
                             : primaryAction.variant === 'danger'
-                                ? "bg-danger text-white shadow-danger/10"
-                                : "bg-primary text-white shadow-primary/10"
+                                ? "bg-danger text-white shadow-danger/20"
+                                : "bg-primary text-white shadow-primary/20 hover:bg-primary-dark"
                     )}
                 >
                     {primaryAction.isLoading && (

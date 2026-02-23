@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useBlocker } from 'react-router-dom';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
 import { Recipe, RecipeIngredient, Ingredient } from '../../../types';
@@ -11,6 +11,11 @@ import { Input } from '../../../components/ui/Input';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { Icon } from '../../../components/ui/Icon';
+import { SummaryCard } from '../../../components/ui/SummaryCard';
+import { QuantitySelector } from '../../../components/ui/QuantitySelector';
+import { Textarea } from '../../../components/ui/Textarea';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { Badge } from '../../../components/ui/Badge';
 
 export const RecipeForm: React.FC = () => {
     const navigate = useNavigate();
@@ -21,11 +26,47 @@ export const RecipeForm: React.FC = () => {
     const [formData, setFormData] = useState<Omit<Recipe, 'id'>>({
         name: '',
         description: '',
+        note: '',
         yield: 1,
         ingredients: [],
         manualCost: undefined,
         image: undefined
     });
+    const [originalData, setOriginalData] = useState<Omit<Recipe, 'id'> | null>(null);
+
+    const isDirty = useMemo(() => {
+        if (!originalData) {
+            // New recipe: dirty if anything is typed
+            const isDefault = formData.name === '' &&
+                formData.yield === 1 &&
+                formData.ingredients.length === 0 &&
+                !formData.note;
+            return !isDefault;
+        }
+
+        // Editing existing: compare current with original
+        return JSON.stringify(formData) !== JSON.stringify(originalData);
+    }, [formData, originalData]);
+
+    const isSavingRef = React.useRef(false);
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            !isSavingRef.current &&
+            isDirty &&
+            currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty]);
 
     const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
     const [activeIngredientIndex, setActiveIngredientIndex] = useState<number | null>(null);
@@ -35,6 +76,7 @@ export const RecipeForm: React.FC = () => {
             const existing = getRecipe(id);
             if (existing) {
                 setFormData(existing);
+                setOriginalData(JSON.parse(JSON.stringify(existing)));
             }
         }
     }, [id, getRecipe]);
@@ -94,6 +136,8 @@ export const RecipeForm: React.FC = () => {
             ingredients: formData.ingredients.filter(i => i.ingredientId && i.quantity > 0)
         };
 
+        isSavingRef.current = true;
+
         if (id) {
             updateRecipe(id, cleanData);
         } else {
@@ -127,11 +171,26 @@ export const RecipeForm: React.FC = () => {
             <Header
                 title={id ? 'Edit Recipe' : 'Create Recipe'}
                 showBackButton
+                rightElement={isDirty && (
+                    <Badge
+                        variant="warning"
+                        rounded="full"
+                        className="animate-pulse tracking-widest"
+                    >
+                        Unsaved
+                    </Badge>
+                )}
+                bottomElement={
+                    <SummaryCard
+                        label="Cost / Portion"
+                        value={`Rp ${formatCurrency(Math.round(costPerPortion))}`}
+                        badge="Estimated"
+                    />
+                }
             />
 
-            <main className="flex-1 flex flex-col px-6 pt-8 pb-48 max-w-lg mx-auto w-full">
+            <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
                 <section className="flex flex-col gap-6">
-                    <SectionHeader title="Basic Information" />
 
                     {/* Photo Upload */}
                     <div className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden">
@@ -184,6 +243,16 @@ export const RecipeForm: React.FC = () => {
                                 <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">portions</span>
                             </div>
                         </div>
+
+                        <Textarea
+                            label="Note"
+                            name="note"
+                            value={formData.note || ''}
+                            onChange={handleChange}
+                            placeholder="Add special instructions or notes here..."
+                            rows={3}
+                            className="ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
+                        />
                     </div>
                 </section>
 
@@ -195,67 +264,55 @@ export const RecipeForm: React.FC = () => {
                         rightElement={<span className="text-xs text-gray-500 font-bold uppercase tracking-widest">{formData.ingredients.length} Items</span>}
                     />
 
-                    <div className="flex flex-col gap-4">
-                        {formData.ingredients.map((item, index) => (
-                            <div key={index} className="bg-surface-dark p-5 rounded-2xl border border-white/5 space-y-5 relative transition-all">
-                                <button
-                                    onClick={() => handleRemoveIngredient(index)}
-                                    className="absolute -top-2 -right-2 bg-background-dark border border-white/10 h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500/30 transition-colors z-10 shadow-lg"
-                                >
-                                    <Icon name="close" className="text-lg" />
-                                </button>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Select Ingredient</label>
-                                    <div
-                                        onClick={() => openIngredientPicker(index)}
-                                        className="block w-full px-5 py-3.5 bg-background-dark border border-white/5 rounded-xl text-white outline-none focus:ring-1 focus:ring-primary transition-all text-sm font-medium cursor-pointer flex items-center justify-between"
-                                    >
-                                        <span className={item.ingredientId ? "text-white" : "text-gray-500"}>
-                                            {ingredients.find(ing => ing.id === item.ingredientId)?.name || 'Choose ingredient...'}
-                                        </span>
-                                        <Icon name="expand_more" className="text-gray-500" />
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 items-end">
-                                    <div className="w-1/3 space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide px-1">Qty</label>
-                                        <div className="flex items-center bg-[#05060B] border border-white/10 rounded-xl h-[46px] px-1 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleIngredientChange(index, 'quantity', Math.max(0, (item.quantity || 0) - 1))}
-                                                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-primary active:bg-white/5 transition-colors"
+                    <div className="flex flex-col gap-3">
+                        {formData.ingredients.map((item, index) => {
+                            const ingredient = ingredients.find(ing => ing.id === item.ingredientId);
+                            return (
+                                <div key={index} className="bg-surface-dark p-4 rounded-2xl border border-white/5 space-y-4 relative transition-all">
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex-1 space-y-1.5">
+                                            <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Select Ingredient</label>
+                                            <div
+                                                onClick={() => openIngredientPicker(index)}
+                                                className="block w-full px-4 py-2.5 bg-background-dark border border-white/5 rounded-xl text-white outline-none focus:ring-1 focus:ring-primary transition-all text-sm font-medium cursor-pointer flex items-center justify-between"
                                             >
-                                                <span className="material-symbols-outlined text-lg">remove</span>
-                                            </button>
-                                            <input
-                                                type="number"
-                                                value={item.quantity || ''}
-                                                onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                                                placeholder="0"
-                                                step="any"
-                                                min="0"
-                                                className="flex-1 min-w-0 bg-transparent border-none text-center font-bold text-white focus:ring-0 focus:outline-none text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                <span className={item.ingredientId ? "text-white" : "text-gray-500"}>
+                                                    {ingredient?.name || 'Choose ingredient...'}
+                                                </span>
+                                                <Icon name="expand_more" className="text-gray-500" />
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRemoveIngredient(index)}
+                                            className="mt-7 text-gray-500 hover:text-red-500 transition-colors pt-1"
+                                        >
+                                            <Icon name="delete" size="md" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex gap-4 items-center">
+                                        <div className="flex-1 flex items-center gap-3">
+                                            <QuantitySelector
+                                                value={item.quantity}
+                                                onChange={(val) => handleIngredientChange(index, 'quantity', val)}
+                                                onIncrement={() => handleIngredientChange(index, 'quantity', (item.quantity || 0) + 1)}
+                                                onDecrement={() => handleIngredientChange(index, 'quantity', Math.max(0, (item.quantity - 1)))}
+                                                className="bg-background-dark border-white/10"
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleIngredientChange(index, 'quantity', (item.quantity || 0) + 1)}
-                                                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-primary active:bg-white/5 transition-colors"
-                                            >
-                                                <span className="material-symbols-outlined text-lg">add</span>
-                                            </button>
+                                            {ingredient && (
+                                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{ingredient.unit}</span>
+                                            )}
                                         </div>
-                                    </div>
-                                    <div className="flex-1 space-y-1.5 pb-1">
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-right block mr-1">Estimated Cost</label>
-                                        <div className="text-right text-base font-extrabold text-white px-2">
-                                            Rp {formatCurrency(Math.round(ingredientCosts[index]))}
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Cost</p>
+                                            <div className="text-sm font-extrabold text-white leading-none">
+                                                Rp {formatCurrency(Math.round(ingredientCosts[index]))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
 
                         <button
                             type="button"
@@ -276,10 +333,6 @@ export const RecipeForm: React.FC = () => {
                     onClick: handleSubmit,
                     isDisabled: !isFormValid
                 }}
-                summary={{
-                    label: "Cost / Portion",
-                    value: `Rp ${formatCurrency(Math.round(costPerPortion))}`
-                }}
             />
 
             <IngredientBottomSheet
@@ -287,6 +340,24 @@ export const RecipeForm: React.FC = () => {
                 onClose={() => setIsBottomSheetOpen(false)}
                 onSelect={handleSelectIngredient}
                 selectedId={activeIngredientIndex !== null ? formData.ingredients[activeIngredientIndex]?.ingredientId : undefined}
+            />
+
+            <AlertDialog
+                isOpen={blocker.state === 'blocked'}
+                title={!id ? "Discard New Recipe?" : "Discard Changes?"}
+                message={!id
+                    ? "This recipe hasn't been saved yet. If you leave now, all details will be lost."
+                    : "You have unsaved modifications to this recipe. If you leave now, these changes will be lost."
+                }
+                confirmLabel="Discard"
+                cancelLabel="Keep Editing"
+                isDestructive
+                onCancel={() => blocker.state === 'blocked' && blocker.reset()}
+                onConfirm={() => {
+                    if (blocker.state === 'blocked') {
+                        blocker.proceed();
+                    }
+                }}
             />
         </div>
     );

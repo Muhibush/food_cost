@@ -68,11 +68,11 @@ export const RecipesList: React.FC = () => {
                                     onClick={() => navigate(`/recipes/${rec.id}`)}
                                     image={rec.image}
                                     title={rec.name}
-                                    subtitle={
-                                        <p className="text-xs text-text-muted line-clamp-1 mt-0.5 font-medium">
-                                            {rec.description || `${rec.ingredients.length} ingredients • Yields ${rec.yield} portions`}
+                                    subtitle={rec.note && (
+                                        <p className="text-xs text-text-muted line-clamp-1 mt-0.5 font-medium italic">
+                                            {rec.note}
                                         </p>
-                                    }
+                                    )}
                                     bottomElement={
                                         <div className="text-[15px] font-extrabold text-white">
                                             Rp {formatCurrency(Math.round(costPerPortion))}
