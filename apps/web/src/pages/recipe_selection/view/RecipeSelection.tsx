@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
 import { Icon } from '../../../components/ui/Icon';
+import { Header } from '../../../components/ui/Header';
+import { Input } from '../../../components/ui/Input';
 import { useOrderDraftStore } from '../../order_entry/store/useOrderDraftStore';
 import { useOrderEditStore } from '../../order_detail/store/useOrderEditStore';
 import { formatCurrency } from '../../../utils/format';
@@ -73,31 +75,21 @@ export const RecipeSelection: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-32">
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center gap-4">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white hover:bg-white/10 transition-all active:scale-[0.95]"
-                >
-                    <span className="material-symbols-outlined text-2xl font-bold">arrow_back</span>
-                </button>
-                <h1 className="text-2xl font-extrabold text-white tracking-tight whitespace-nowrap">
-                    Select Recipes
-                </h1>
-            </header>
-
-            <main className="flex-1 flex flex-col gap-6 px-6 pt-4">
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
-                        <span className="material-symbols-outlined">search</span>
-                    </div>
-                    <input
-                        className="block w-full pl-10 pr-3 py-3 border-none ring-1 ring-white/10 rounded-xl leading-5 bg-surface-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm font-medium transition-all"
+            <Header
+                title="Select Recipes"
+                showBackButton
+                bottomElement={
+                    <Input
+                        icon="search"
                         placeholder="Search recipes..."
                         type="search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                </div>
+                }
+            />
+
+            <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">
                 <section className="flex flex-col gap-4">
                     <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1">Available Recipes</h3>
                     <div className="grid grid-cols-1 gap-4">
