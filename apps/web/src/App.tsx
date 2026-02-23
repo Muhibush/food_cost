@@ -7,7 +7,6 @@ import { IngredientForm } from './pages/ingredient_form/view/IngredientForm';
 import { RecipesList } from './pages/recipe_list/view/RecipesList';
 import { RecipeForm } from './pages/recipe_form/view/RecipeForm';
 import { OrdersList } from './pages/order_list/view/OrdersList';
-import { OrderForm } from './pages/order_form/view/OrderForm';
 import { HistoryPage } from './pages/order_history/view/HistoryPage';
 import { OrderDetail } from './pages/order_detail/view/OrderDetail';
 import { EditProfile } from './pages/edit_profile/view/EditProfile';
@@ -69,10 +68,6 @@ const router = createBrowserRouter([
             {
                 path: '/orders',
                 element: <OrdersList />,
-            },
-            {
-                path: '/orders/new',
-                element: <OrderForm />,
             },
             {
                 path: '/orders/select-recipes',

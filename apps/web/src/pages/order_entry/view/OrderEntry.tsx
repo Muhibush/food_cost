@@ -142,8 +142,8 @@ export const OrderPage: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
             <Header
-                title="Order Page"
-                subtitle={profile.name}
+                title={profile.name}
+                subtitle={profile.description}
                 leftElement={
                     <div
                         className="h-10 w-10 rounded-full bg-surface-dark bg-cover bg-center border border-white/10 shadow-sm"
