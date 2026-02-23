@@ -8,6 +8,7 @@ interface RecipesState {
     updateRecipe: (id: string, updates: Partial<Recipe>) => void;
     removeRecipe: (id: string) => void;
     getRecipe: (id: string) => Recipe | undefined;
+    clearAllRecipes: () => void;
 }
 
 export const useRecipesStore = create<RecipesState>()(
@@ -27,6 +28,7 @@ export const useRecipesStore = create<RecipesState>()(
                     recipes: state.recipes.filter((rec) => rec.id !== id),
                 })),
             getRecipe: (id) => get().recipes.find((rec) => rec.id === id),
+            clearAllRecipes: () => set({ recipes: [] }),
         }),
         {
             name: 'food-cost-recipes',

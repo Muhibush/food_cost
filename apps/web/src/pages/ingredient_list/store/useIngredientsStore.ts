@@ -8,6 +8,7 @@ interface IngredientsState {
     updateIngredient: (id: string, updates: Partial<Ingredient>) => void;
     removeIngredient: (id: string) => void;
     getIngredient: (id: string) => Ingredient | undefined;
+    clearAllIngredients: () => void;
 }
 
 export const useIngredientsStore = create<IngredientsState>()(
@@ -27,6 +28,7 @@ export const useIngredientsStore = create<IngredientsState>()(
                     ingredients: state.ingredients.filter((ing) => ing.id !== id),
                 })),
             getIngredient: (id) => get().ingredients.find((ing) => ing.id === id),
+            clearAllIngredients: () => set({ ingredients: [] }),
         }),
         {
             name: 'food-cost-ingredients',

@@ -8,6 +8,7 @@ interface OrdersState {
     updateOrder: (id: string, updates: Partial<Order>) => void;
     removeOrder: (id: string) => void;
     getOrder: (id: string) => Order | undefined;
+    clearAllOrders: () => void;
 }
 
 export const useOrdersStore = create<OrdersState>()(
@@ -26,6 +27,7 @@ export const useOrdersStore = create<OrdersState>()(
                     orders: state.orders.filter((ord) => ord.id !== id),
                 })),
             getOrder: (id) => get().orders.find((ord) => ord.id === id),
+            clearAllOrders: () => set({ orders: [] }),
         }),
         {
             name: 'food-cost-orders',

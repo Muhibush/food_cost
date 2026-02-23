@@ -1,11 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Header } from '../../../components/ui/Header';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
+import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
+import { useOrdersStore } from '../../order_list/store/useOrdersStore';
 
 export const Profile: React.FC = () => {
     const navigate = useNavigate();
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [clickCount, setClickCount] = useState(0);
     const clickTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const [isClearDataOpen, setIsClearDataOpen] = useState(false);
+
+    const { clearAllIngredients } = useIngredientsStore();
+    const { clearAllRecipes } = useRecipesStore();
+    const { clearAllOrders } = useOrdersStore();
+
+    const handleClearData = () => {
+        clearAllOrders();
+        clearAllRecipes();
+        clearAllIngredients();
+        setIsClearDataOpen(false);
+    };
 
     const handleVersionClick = () => {
         const newCount = clickCount + 1;
@@ -25,14 +43,7 @@ export const Profile: React.FC = () => {
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-20">
-            {/* Header */}
-            <header className="sticky top-0 z-50 bg-background-dark px-6 pt-12 pb-5 border-b border-white/5 flex items-center justify-between">
-                <h1 className="text-2xl font-extrabold text-white tracking-tight">Profile</h1>
-                <button
-                    className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm">
-                    <span className="material-symbols-outlined text-white text-xl">notifications</span>
-                </button>
-            </header>
+            <Header title="Profile" />
 
             <main className="flex-1 flex flex-col px-6 py-8 pb-32 gap-10">
                 {/* Profile Section */}
@@ -95,7 +106,7 @@ export const Profile: React.FC = () => {
                                 </div>
                                 <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                             </button>
-                            <button className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group border-b border-white/5 active:bg-white/5">
+                            <button className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group active:bg-white/5">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10 group-hover:scale-105 transition-transform">
                                         <span className="material-symbols-outlined text-xl font-bold">file_download</span>
@@ -104,21 +115,15 @@ export const Profile: React.FC = () => {
                                 </div>
                                 <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                             </button>
-                            <button className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group border-b border-white/5 active:bg-white/5">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10 group-hover:scale-105 transition-transform">
-                                        <span className="material-symbols-outlined text-xl font-bold">delete_sweep</span>
-                                    </div>
-                                    <span className="font-bold text-base text-red-400/90">Clear All Recipes</span>
-                                </div>
-                                <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
-                            </button>
-                            <button className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group active:bg-white/5">
+                            <button
+                                onClick={() => setIsClearDataOpen(true)}
+                                className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group active:bg-white/5"
+                            >
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10 group-hover:scale-105 transition-transform">
                                         <span className="material-symbols-outlined text-xl font-bold">delete_forever</span>
                                     </div>
-                                    <span className="font-bold text-base text-red-400/90">Clear All Ingredients</span>
+                                    <span className="font-bold text-base text-red-500">Clear All Data</span>
                                 </div>
                                 <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                             </button>
@@ -163,6 +168,17 @@ export const Profile: React.FC = () => {
                     </div>
                 </div>
             </main>
+
+            <AlertDialog
+                isOpen={isClearDataOpen}
+                title="Clear All Data?"
+                message="This will permanently delete all recipes, ingredients, and orders. This action cannot be undone."
+                cancelLabel="Cancel"
+                confirmLabel="Clear Data"
+                onCancel={() => setIsClearDataOpen(false)}
+                onConfirm={handleClearData}
+                isDestructive
+            />
         </div>
     );
 };
