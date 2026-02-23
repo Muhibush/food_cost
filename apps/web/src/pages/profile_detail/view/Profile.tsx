@@ -5,6 +5,7 @@ import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useOrdersStore } from '../../order_list/store/useOrdersStore';
+import { useProfileStore } from '../../edit_profile/store/useProfileStore';
 
 export const Profile: React.FC = () => {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const Profile: React.FC = () => {
     const { clearAllIngredients } = useIngredientsStore();
     const { clearAllRecipes } = useRecipesStore();
     const { clearAllOrders } = useOrdersStore();
+    const { profile } = useProfileStore();
 
     const handleClearData = () => {
         clearAllOrders();
@@ -52,13 +54,13 @@ export const Profile: React.FC = () => {
                         <div className="w-32 h-32 rounded-full bg-surface-dark border-[3px] border-primary p-1.5 shadow-2xl shadow-primary/20">
                             <div
                                 className="w-full h-full rounded-full bg-cover bg-center"
-                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtKh_wtIoQQkw7stwg6_dUbYwzRyj2JDYeuICxZ5vfvLYDunXRddDZNvt_PJrG_5LBOCORVFSs2vBYKeFDEWhZepFLX7ZWPedAVfpfZhov945Uni5JvkmStFuABKLhQ-jD1maP_jIpf9dV49Qk3YtkyQ4eOCI3oI6ttqN3o7anDnjg4eDU9QZ5-rImasTSSrfEkhK6eORC-six3CmewhQiV8-4Vegqbu3ZTOyQ4-03cdyJU69S23LB_zJaVpeqwdHqVOgOadH4CWM')" }}
+                                style={{ backgroundImage: `url('${profile.avatar}')` }}
                             ></div>
                         </div>
                     </div>
-                    <h2 className="text-3xl font-black mb-1">Thomas Chef</h2>
-                    <p className="text-gray-500 text-sm font-bold tracking-wide mb-2">@thomaschef</p>
-                    <p className="text-gray-400 text-sm font-medium bg-surface-dark px-4 py-1.5 rounded-full border border-white/5">Head Chef at La Bistro</p>
+                    <h2 className="text-3xl font-black mb-1">{profile.name}</h2>
+                    <p className="text-gray-500 text-sm font-bold tracking-wide mb-2">@{profile.username}</p>
+                    <p className="text-gray-400 text-sm font-medium bg-surface-dark px-4 py-1.5 rounded-full border border-white/5">{profile.description}</p>
                 </section>
 
                 <div className="space-y-8">

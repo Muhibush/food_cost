@@ -1,5 +1,12 @@
 export type UnitType = 'kg' | 'gr' | 'ltr' | 'ml' | 'pcs' | 'pack' | 'can' | 'btl';
 
+export interface UserProfile {
+    name: string;
+    username: string;
+    description: string;
+    avatar?: string;
+}
+
 export interface IngredientOverride {
     ingredientId: string;
     customPrice: number;
