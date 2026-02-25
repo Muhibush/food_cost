@@ -17,6 +17,7 @@ export interface Ingredient {
     name: string;
     unit: UnitType;
     price: number; // Base price per unit
+    image?: string;
 }
 
 export interface RecipeIngredient {

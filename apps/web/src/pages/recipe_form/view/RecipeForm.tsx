@@ -229,7 +229,7 @@ export const RecipeForm: React.FC = () => {
                         </label>
                         <div
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
+                            className="w-48 h-48 mx-auto rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
                         >
                             <input
                                 type="file"
@@ -239,9 +239,17 @@ export const RecipeForm: React.FC = () => {
                                 onChange={handleImageChange}
                             />
                             {formData.image ? (
-                                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${formData.image})` }} />
+                                <img
+                                    src={formData.image}
+                                    alt="Preview"
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
                             ) : (
-                                <div className="absolute inset-0 bg-cover bg-center opacity-40 grayscale" style={{ backgroundImage: `url(${DEFAULT_IMAGE})` }} />
+                                <img
+                                    src={DEFAULT_IMAGE}
+                                    alt="Default"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale"
+                                />
                             )}
                             {!formData.image && (
                                 <div className="flex flex-col items-center z-10">

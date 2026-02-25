@@ -57,6 +57,9 @@ Shared TypeScript interfaces and type definitions
 - **Business Logic**: Encapsulate logic within Zustand stores (`src/store`), not in components.
 - **Styling**: Use Tailwind CSS exclusively. Avoid CSS modules or inline styles.
 - **Icons**: Use the `Icon` component (wrapping Material Symbols).
+- **Ingredient Icons**: If no image is provided, ingredients use auto-generated icons based on their name. Logic is defined in `IngredientsList.tsx` and `IngredientBottomSheet.tsx`.
+    - **Icon Mapping**: Maps keywords (egg, beef, meat, basil, flour, water, etc.) to specific symbols.
+    - **Color Hashing**: Generates a consistent background color based on the ingredient name string.
 - **Navigation**: Use `useNavigate` from `react-router-dom`.
 - **State**: Persist critical data (recipes, ingredients, orders) using Zustand's `persist` middleware.
 

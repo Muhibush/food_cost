@@ -86,8 +86,15 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                                     )}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={`h-12 w-12 rounded-full flex items-center justify-center border ${getIconColorClass(icon)}`}>
-                                            <Icon name={icon} size="lg" />
+                                        <div className={cn(
+                                            "h-12 w-12 rounded-full flex items-center justify-center border overflow-hidden",
+                                            ing.image ? "border-white/10" : getIconColorClass(icon)
+                                        )}>
+                                            {ing.image ? (
+                                                <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Icon name={icon} size="lg" />
+                                            )}
                                         </div>
                                         <div>
                                             <p className="font-bold text-white text-base mb-0.5">{ing.name}</p>

@@ -76,8 +76,12 @@ export const IngredientsList: React.FC = () => {
                             onClick={() => navigate(`/ingredients/${ing.id}`)}
                             className="flex items-center gap-4"
                         >
-                            <div className={cn("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center", getIconColor(ing.name))}>
-                                <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
+                            <div className={cn("h-12 w-12 rounded-xl bg-[#2A2D3A] flex-shrink-0 flex items-center justify-center overflow-hidden", !ing.image && getIconColor(ing.name))}>
+                                {ing.image ? (
+                                    <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="material-symbols-outlined text-2xl font-light">{getIcon(ing.name)}</span>
+                                )}
                             </div>
                             <div className="flex-1 min-w-0 pr-2">
                                 <h3 className="font-bold text-white text-[17px] leading-tight truncate">{ing.name}</h3>

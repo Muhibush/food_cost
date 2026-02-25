@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useBlocker } from 'react-router-dom';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
-import { Ingredient } from '../../../types';
+import { Ingredient, UnitType } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import { Header } from '../../../components/ui/Header';
 import { Input } from '../../../components/ui/Input';
@@ -10,6 +10,8 @@ import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Badge } from '../../../components/ui/Badge';
 import { Icon } from '../../../components/ui/Icon';
+import { compressImage } from '../../../utils/imageUtils';
+import { cn } from '../../../utils/cn';
 
 const UNIT_OPTIONS = [
     { value: '', label: 'Select a unit', disabled: true },
@@ -27,18 +29,20 @@ export const IngredientForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { addIngredient, updateIngredient, getIngredient, removeIngredient } = useIngredientsStore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<Omit<Ingredient, 'id'>>({
         name: '',
-        unit: '',
+        unit: '' as UnitType,
         price: 0,
+        image: undefined
     });
     const [originalData, setOriginalData] = useState<Omit<Ingredient, 'id'> | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const isDirty = useMemo(() => {
         if (!originalData) {
-            return formData.name !== '' || formData.unit !== '' || formData.price !== 0;
+            return formData.name !== '' || (formData.unit as string) !== '' || formData.price !== 0;
         }
         return JSON.stringify(formData) !== JSON.stringify(originalData);
     }, [formData, originalData]);
@@ -73,7 +77,7 @@ export const IngredientForm: React.FC = () => {
         }
     }, [id, getIngredient]);
 
-    const isFormValid = formData.name.trim() !== '' && formData.unit !== '' && formData.price >= 0;
+    const isFormValid = formData.name.trim() !== '' && (formData.unit as string) !== '' && formData.price >= 0;
 
     const handleSubmit = () => {
         if (!isFormValid) {
@@ -113,6 +117,42 @@ export const IngredientForm: React.FC = () => {
         }));
     };
 
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            try {
+                // Resize ingredient photo to max 800x800, 60% quality
+                const compressedBase64 = await compressImage(file, 800, 0.6);
+                setFormData(prev => ({ ...prev, image: compressedBase64 }));
+            } catch (error) {
+                console.error("Failed to compress image", error);
+            }
+        }
+    };
+
+    const getIconColor = (name: string) => {
+        const colors = [
+            'text-orange-400', 'text-red-400', 'text-green-400',
+            'text-yellow-400', 'text-blue-400', 'text-purple-400'
+        ];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return colors[Math.abs(hash) % colors.length];
+    };
+
+    const getIcon = (name: string) => {
+        const n = name.toLowerCase();
+        if (n.includes('egg')) return 'egg_alt';
+        if (n.includes('beef') || n.includes('meat')) return 'set_meal';
+        if (n.includes('basil') || n.includes('plant') || n.includes('veg')) return 'potted_plant';
+        if (n.includes('flour') || n.includes('grain')) return 'grain';
+        if (n.includes('water') || n.includes('liquid')) return 'water_drop';
+        if (n.includes('extract') || n.includes('oil')) return 'science';
+        return 'grocery';
+    };
+
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
             <Header
@@ -130,16 +170,39 @@ export const IngredientForm: React.FC = () => {
             />
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
-                {/* Photo Upload Placeholder */}
-                <div className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden mb-8">
-                    <div className="flex flex-col items-center">
-                        <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1">
-                            <Icon name="add_photo_alternate" className="text-primary" />
+                {/* Photo Upload Section */}
+                <div className="flex flex-col gap-2 mb-8">
+                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1 flex items-center justify-between">
+                        Photo
+                        <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest italic">(Optional)</span>
+                    </label>
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-48 h-48 mx-auto rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
+                    >
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                        />
+                        {formData.image ? (
+                            <img
+                                src={formData.image}
+                                alt="Preview"
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center w-full h-full">
+                                <div className={cn("h-20 w-20 rounded-2xl bg-background-dark flex items-center justify-center shadow-lg border border-white/5", getIconColor(formData.name || ''))}>
+                                    <span className="material-symbols-outlined text-4xl">{getIcon(formData.name || '')}</span>
+                                </div>
+                            </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
+                            <Icon name="cloud_upload" className="text-white text-3xl" />
                         </div>
-                        <span className="text-xs font-bold uppercase tracking-widest">Upload Photo</span>
-                    </div>
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
-                        <Icon name="cloud_upload" className="text-white text-3xl" />
                     </div>
                 </div>
 
