@@ -82,6 +82,25 @@ export const OrderPage: React.FC = () => {
         return draftName.trim().length > 0 && draftItems.length > 0;
     }, [draftName, draftItems]);
 
+    const hasChanges = useMemo(() => {
+        if (!id) {
+            // For new orders, check if anything has been entered
+            return draftName !== '' || draftItems.length > 0 || draftNotes !== '';
+        }
+
+        const original = getOrder(id);
+        if (!original) return true;
+
+        const originalDate = format(new Date(original.date), 'yyyy-MM-dd');
+        const originalNotes = original.notes || '';
+
+        // Simple comparison for basic fields and JSON stringify for items
+        return draftName !== original.name ||
+            draftDate !== originalDate ||
+            draftNotes !== originalNotes ||
+            JSON.stringify(draftItems) !== JSON.stringify(original.items);
+    }, [id, draftName, draftDate, draftItems, draftNotes, getOrder]);
+
     const setItemQuantity = (index: number, quantity: number) => {
         const newItems = [...draftItems];
         newItems[index].quantity = quantity;
@@ -152,15 +171,7 @@ export const OrderPage: React.FC = () => {
                         style={{ backgroundImage: `url('${profile.avatar}')` }}
                     ></div>
                 }
-                rightElement={
-                    <button
-                        onClick={handleReset}
-                        className="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all active:scale-[0.95] shadow-sm"
-                        title="Reset Form"
-                    >
-                        <span className="material-symbols-outlined text-red-400 text-xl font-bold">restart_alt</span>
-                    </button>
-                }
+                rightElement={null}
             />
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-40 max-w-lg mx-auto w-full">
@@ -168,6 +179,17 @@ export const OrderPage: React.FC = () => {
                     <h1 className="text-3xl font-extrabold text-white tracking-tight whitespace-nowrap">
                         {id ? 'Edit Order' : 'New Order'}
                     </h1>
+                    <button
+                        onClick={handleReset}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 text-red-500 border border-red-500/10 hover:bg-red-500/20 transition-all active:scale-[0.95] shadow-sm font-bold text-sm",
+                            hasChanges ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                        )}
+                        title="Reset Form"
+                    >
+                        <span className="material-symbols-outlined text-lg font-bold">restart_alt</span>
+                        Reset
+                    </button>
                 </div>
 
                 <section className="flex flex-col gap-6">

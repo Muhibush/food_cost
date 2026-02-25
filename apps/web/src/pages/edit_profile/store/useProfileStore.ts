@@ -6,6 +6,7 @@ import { idbStorage } from '../../../utils/storageUtils';
 interface ProfileState {
     profile: UserProfile;
     updateProfile: (updates: Partial<UserProfile>) => void;
+    resetProfile: () => void;
 }
 
 const defaultProfile: UserProfile = {
@@ -23,6 +24,7 @@ export const useProfileStore = create<ProfileState>()(
                 set((state) => ({
                     profile: { ...state.profile, ...updates },
                 })),
+            resetProfile: () => set({ profile: defaultProfile }),
         }),
         {
             name: 'food-cost-profile',
