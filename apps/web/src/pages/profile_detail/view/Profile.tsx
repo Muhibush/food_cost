@@ -6,6 +6,7 @@ import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsS
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useOrdersStore } from '../../order_list/store/useOrdersStore';
 import { useProfileStore } from '../../edit_profile/store/useProfileStore';
+import { useConfigStore } from '../../../store/useConfigStore';
 import { exportAppData, importAppData } from '../../../utils/dataUtils';
 
 export const Profile: React.FC = () => {
@@ -30,12 +31,14 @@ export const Profile: React.FC = () => {
     const { recipes, addRecipe, clearAllRecipes } = useRecipesStore();
     const { orders, addOrder, clearAllOrders } = useOrdersStore();
     const { profile, resetProfile } = useProfileStore();
+    const { resetConfig } = useConfigStore();
 
     const handleResetApp = () => {
         clearAllOrders();
         clearAllRecipes();
         clearAllIngredients();
         resetProfile();
+        resetConfig(); // Allow re-seeding on next load
         setIsResetAppOpen(false);
         navigate('/'); // Redirect to home/login after reset
     };

@@ -101,11 +101,36 @@ const router = createBrowserRouter([
     },
 ]);
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SplashScreen } from './components/ui/SplashScreen';
+import { useConfigStore } from './store/useConfigStore';
+import { useIngredientsStore } from './pages/ingredient_list/store/useIngredientsStore';
+import { useRecipesStore } from './pages/recipe_list/store/useRecipesStore';
+import { useOrdersStore } from './pages/order_list/store/useOrdersStore';
+import { generateDummyData } from './utils/dummyData';
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
+    const { hasBeenSeeded, setHasBeenSeeded } = useConfigStore();
+    const { ingredients, addIngredient } = useIngredientsStore();
+    const { addRecipe } = useRecipesStore();
+    const { addOrder } = useOrdersStore();
+
+    useEffect(() => {
+        // Seed initial data if it's the first time and ingredients list is empty
+        if (!hasBeenSeeded && ingredients.length === 0) {
+            console.log('Seeding initial dummy data...');
+            const { ingredients: dummyIngredients, recipes: dummyRecipes, orders: dummyOrders } = generateDummyData();
+
+            // Populate stores
+            dummyIngredients.forEach(ing => addIngredient(ing));
+            dummyRecipes.forEach(rec => addRecipe(rec));
+            dummyOrders.forEach(ord => addOrder(ord));
+
+            setHasBeenSeeded(true);
+        }
+    }, [hasBeenSeeded, ingredients.length, addIngredient, addRecipe, addOrder, setHasBeenSeeded]);
+
 
     return (
         <>

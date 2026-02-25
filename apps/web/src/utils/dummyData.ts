@@ -32,6 +32,16 @@ export const generateDummyData = () => {
         { name: 'Terasi (Shrimp Paste)', unit: 'gr', price: 150 },
         { name: 'Beras Basmati', unit: 'gr', price: 35 },
 
+        // Takjil & Dessert
+        { name: 'Pisang Kepok (Banana)', unit: 'pcs', price: 3000 },
+        { name: 'Kolang Kaling', unit: 'gr', price: 25 },
+        { name: 'Daun Pandan', unit: 'pcs', price: 500 },
+        { name: 'Gula Aren (Palm Sugar)', unit: 'gr', price: 40 },
+        { name: 'Kurma (Dates)', unit: 'gr', price: 60 },
+        { name: 'Sirup Cocopandan', unit: 'ml', price: 30 },
+        { name: 'Biji Selasih', unit: 'gr', price: 50 },
+        { name: 'Susu Kental Manis', unit: 'ml', price: 45 },
+
         // Western (Keeping some for variety)
         { name: 'Wagyu Beef Patty', unit: 'pcs', price: 45000 },
         { name: 'Brioche Bun', unit: 'pcs', price: 8000 },
@@ -103,6 +113,31 @@ export const generateDummyData = () => {
                 { ingredientId: getIngId('Mayonnaise'), quantity: 25 },
                 { ingredientId: getIngId('Truffle Oil'), quantity: 5 },
             ]
+        },
+        // Takjil Recipes
+        {
+            name: 'Kolak Pisang Spesial',
+            description: 'Sweet banana and palm fruit compote with coconut milk, perfect for Takjil.',
+            yield: 5,
+            ingredients: [
+                { ingredientId: getIngId('Pisang Kepok (Banana)'), quantity: 5 },
+                { ingredientId: getIngId('Kolang Kaling'), quantity: 200 },
+                { ingredientId: getIngId('Santan (Coconut Milk)'), quantity: 300 },
+                { ingredientId: getIngId('Gula Aren (Palm Sugar)'), quantity: 150 },
+                { ingredientId: getIngId('Daun Pandan'), quantity: 2 },
+                { ingredientId: getIngId('Garam'), quantity: 2 }
+            ]
+        },
+        {
+            name: 'Es Buah Cocopandan',
+            description: 'Refreshing fruit syrup dessert with dates, basil seeds, and condensed milk.',
+            yield: 10,
+            ingredients: [
+                { ingredientId: getIngId('Kurma (Dates)'), quantity: 200 },
+                { ingredientId: getIngId('Biji Selasih'), quantity: 20 },
+                { ingredientId: getIngId('Sirup Cocopandan'), quantity: 150 },
+                { ingredientId: getIngId('Susu Kental Manis'), quantity: 100 },
+            ]
         }
     ];
 
@@ -111,23 +146,9 @@ export const generateDummyData = () => {
         ...t
     }));
 
-    // 3. Orders
-    const orderNames = [
-        'Pradesh Wedding Catering', 'Daily Lunch Batch - Mon', 'Corporate Event: Gojek',
-        'Dinner Rush - Saturday', 'Staff Meal Rendang Day', 'Family Gathering: Bintaro',
-        'Standard Restock', 'Gala Dinner Order', 'Custom Brunch Set'
-    ];
-
-    const orders: Order[] = orderNames.map((name, index) => {
-        const date = subDays(new Date(), index * 2);
-        const orderRecipes = recipes.filter(() => Math.random() > 0.4);
-        const items = orderRecipes.map(r => ({
-            recipeId: r.id,
-            quantity: Math.floor(Math.random() * 20) + 5 // 5-25 portions
-        }));
-
-        // Calculate total cost (rough estimate for dummy data)
-        const totalCost = items.reduce((sum, item) => {
+    // Cost calculation helper
+    const calculateTotalCost = (items: { recipeId: string; quantity: number }[]) => {
+        return items.reduce((sum, item) => {
             const recipe = recipes.find(r => r.id === item.recipeId);
             if (!recipe) return sum;
             const recipeBaseCost = recipe.ingredients.reduce((rs, ri) => {
@@ -137,6 +158,49 @@ export const generateDummyData = () => {
             const costPerPortion = recipeBaseCost / (recipe.yield || 1);
             return sum + (costPerPortion * item.quantity);
         }, 0);
+    };
+
+    // 3. Orders
+
+    // Explicit Takjil Order
+    const kolakRecipe = recipes.find(r => r.name === 'Kolak Pisang Spesial');
+    const esBuahRecipe = recipes.find(r => r.name === 'Es Buah Cocopandan');
+
+    const takjilItems = [];
+    if (kolakRecipe) takjilItems.push({ recipeId: kolakRecipe.id, quantity: 50 });
+    if (esBuahRecipe) takjilItems.push({ recipeId: esBuahRecipe.id, quantity: 50 });
+
+    const takjilOrder: Order = {
+        id: uuidv4(),
+        name: 'Buka Puasa Bersama - Masjid Raya',
+        date: formatISO(new Date()), // Today
+        items: takjilItems,
+        status: 'pending',
+        totalCost: calculateTotalCost(takjilItems),
+        notes: 'Special request for Ramadhan Takjil event.'
+    };
+
+    const regularOrderNames = [
+        'Pradesh Wedding Catering', 'Daily Lunch Batch - Mon', 'Corporate Event: Gojek',
+        'Dinner Rush - Saturday', 'Staff Meal Rendang Day', 'Family Gathering: Bintaro',
+        'Standard Restock', 'Gala Dinner Order', 'Custom Brunch Set'
+    ];
+
+    const regularOrders: Order[] = regularOrderNames.map((name, index) => {
+        const date = subDays(new Date(), index * 2 + 1); // Random past days
+        // Only include non-takjil recipes for regular dummy orders
+        const regularRecipePool = recipes.filter(r => !r.name.includes('Takjil') && !r.name.includes('Kolak'));
+        const orderRecipes = regularRecipePool.length > 0 ? regularRecipePool.filter(() => Math.random() > 0.4) : [recipes[0]];
+
+        // ensure at least one recipe is selected
+        if (orderRecipes.length === 0 && regularRecipePool.length > 0) {
+            orderRecipes.push(regularRecipePool[0]);
+        }
+
+        const items = orderRecipes.map(r => ({
+            recipeId: r.id,
+            quantity: Math.floor(Math.random() * 20) + 5 // 5-25 portions
+        }));
 
         return {
             id: uuidv4(),
@@ -144,9 +208,11 @@ export const generateDummyData = () => {
             date: formatISO(date),
             items,
             status: index < 2 ? 'pending' : 'completed',
-            totalCost
+            totalCost: calculateTotalCost(items)
         };
     });
+
+    const orders = [takjilOrder, ...regularOrders];
 
     return { ingredients, recipes, orders };
 };
