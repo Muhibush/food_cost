@@ -10,8 +10,9 @@ import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Badge } from '../../../components/ui/Badge';
 import { Icon } from '../../../components/ui/Icon';
-import { compressImage } from '../../../utils/imageUtils';
+import { ImageUpload } from '../../../components/ui/ImageUpload';
 import { cn } from '../../../utils/cn';
+import { getIngredientIconConfig } from '../../../utils/ingredientIcons';
 
 const UNIT_OPTIONS = [
     { value: '', label: 'Select a unit', disabled: true },
@@ -29,7 +30,6 @@ export const IngredientForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { addIngredient, updateIngredient, getIngredient, removeIngredient } = useIngredientsStore();
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<Omit<Ingredient, 'id'>>({
         name: '',
@@ -117,41 +117,8 @@ export const IngredientForm: React.FC = () => {
         }));
     };
 
-    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            try {
-                // Resize ingredient photo to max 800x800, 60% quality
-                const compressedBase64 = await compressImage(file, 800, 0.6);
-                setFormData(prev => ({ ...prev, image: compressedBase64 }));
-            } catch (error) {
-                console.error("Failed to compress image", error);
-            }
-        }
-    };
 
-    const getIconColor = (name: string) => {
-        const colors = [
-            'text-orange-400', 'text-red-400', 'text-green-400',
-            'text-yellow-400', 'text-blue-400', 'text-purple-400'
-        ];
-        let hash = 0;
-        for (let i = 0; i < name.length; i++) {
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        return colors[Math.abs(hash) % colors.length];
-    };
-
-    const getIcon = (name: string) => {
-        const n = name.toLowerCase();
-        if (n.includes('egg')) return 'egg_alt';
-        if (n.includes('beef') || n.includes('meat')) return 'set_meal';
-        if (n.includes('basil') || n.includes('plant') || n.includes('veg')) return 'potted_plant';
-        if (n.includes('flour') || n.includes('grain')) return 'grain';
-        if (n.includes('water') || n.includes('liquid')) return 'water_drop';
-        if (n.includes('extract') || n.includes('oil')) return 'science';
-        return 'grocery';
-    };
+    const iconConfig = useMemo(() => getIngredientIconConfig(formData.name), [formData.name]);
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
@@ -170,41 +137,24 @@ export const IngredientForm: React.FC = () => {
             />
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
-                {/* Photo Upload Section */}
-                <div className="flex flex-col gap-2 mb-8">
-                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1 flex items-center justify-between">
-                        Photo
-                        <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest italic">(Optional)</span>
-                    </label>
-                    <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-48 h-48 mx-auto rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
-                    >
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                        {formData.image ? (
-                            <img
-                                src={formData.image}
-                                alt="Preview"
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="flex flex-col items-center justify-center w-full h-full">
-                                <div className={cn("h-20 w-20 rounded-2xl bg-background-dark flex items-center justify-center shadow-lg border border-white/5", getIconColor(formData.name || ''))}>
-                                    <span className="material-symbols-outlined text-4xl">{getIcon(formData.name || '')}</span>
-                                </div>
-                            </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
-                            <Icon name="cloud_upload" className="text-white text-3xl" />
+                <ImageUpload
+                    label="Photo"
+                    optional
+                    value={formData.image}
+                    onChange={(val) => setFormData(prev => ({ ...prev, image: val }))}
+                    className="mb-6"
+                    previewClassName="w-48 mx-auto"
+                    placeholder={(
+                        <div className={cn(
+                            "h-20 w-20 rounded-2xl flex items-center justify-center shadow-lg border",
+                            iconConfig.bgClass,
+                            iconConfig.colorClass,
+                            iconConfig.borderClass
+                        )}>
+                            <Icon name={iconConfig.icon} size="xl" />
                         </div>
-                    </div>
-                </div>
+                    )}
+                />
 
                 <div className="space-y-6 flex-1">
                     <Input

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useBlocker } from 'react-router-dom';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
@@ -11,12 +11,12 @@ import { Input } from '../../../components/ui/Input';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { Icon } from '../../../components/ui/Icon';
+import { ImageUpload } from '../../../components/ui/ImageUpload';
 import { SummaryCard } from '../../../components/ui/SummaryCard';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { Textarea } from '../../../components/ui/Textarea';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Badge } from '../../../components/ui/Badge';
-import { compressImage } from '../../../utils/imageUtils';
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?auto=format&fit=crop&q=80&w=800';
 
@@ -25,7 +25,6 @@ export const RecipeForm: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { addRecipe, updateRecipe, getRecipe } = useRecipesStore();
     const { ingredients } = useIngredientsStore();
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<Omit<Recipe, 'id'>>({
         name: '',
@@ -40,15 +39,12 @@ export const RecipeForm: React.FC = () => {
 
     const isDirty = useMemo(() => {
         if (!originalData) {
-            // New recipe: dirty if anything is typed
             const isDefault = formData.name === '' &&
                 formData.yield === 1 &&
                 formData.ingredients.length === 0 &&
                 !formData.note;
             return !isDefault;
         }
-
-        // Editing existing: compare current with original
         return JSON.stringify(formData) !== JSON.stringify(originalData);
     }, [formData, originalData]);
 
@@ -100,10 +96,8 @@ export const RecipeForm: React.FC = () => {
             ingredients: [...prev.ingredients, { ingredientId: '', quantity: 0 }]
         }));
 
-        // Auto open bottom sheet for the new ingredient
         openIngredientPicker(newIndex);
 
-        // Auto scroll to bottom
         setTimeout(() => {
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
@@ -140,26 +134,12 @@ export const RecipeForm: React.FC = () => {
         setIsBottomSheetOpen(false);
     };
 
-    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            try {
-                // Resize recipe photo to max 800x800, 60% quality WebP/JPEG
-                const compressedBase64 = await compressImage(file, 800, 0.6);
-                setFormData(prev => ({ ...prev, image: compressedBase64 }));
-            } catch (error) {
-                console.error("Failed to compress image", error);
-            }
-        }
-    };
-
     const handleSubmit = () => {
         if (!formData.name || formData.yield <= 0) {
             alert('Please fill in basic information correctly.');
             return;
         }
 
-        // validation: remove empty ingredients
         const cleanData = {
             ...formData,
             ingredients: formData.ingredients.filter(i => i.ingredientId && i.quantity > 0)
@@ -220,50 +200,28 @@ export const RecipeForm: React.FC = () => {
 
             <main className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
                 <section className="flex flex-col gap-6">
-
-                    {/* Photo Upload */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1 flex items-center justify-between">
-                            Photo
-                            <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest italic">(Optional)</span>
-                        </label>
-                        <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-48 h-48 mx-auto rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
-                        >
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                            />
-                            {formData.image ? (
-                                <img
-                                    src={formData.image}
-                                    alt="Preview"
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                />
-                            ) : (
+                    <ImageUpload
+                        label="Photo"
+                        optional
+                        value={formData.image}
+                        onChange={(val) => setFormData(prev => ({ ...prev, image: val }))}
+                        previewClassName="w-48 mx-auto"
+                        placeholder={(
+                            <>
                                 <img
                                     src={DEFAULT_IMAGE}
                                     alt="Default"
                                     className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale"
                                 />
-                            )}
-                            {!formData.image && (
                                 <div className="flex flex-col items-center z-10">
                                     <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1 shadow-lg border border-white/5">
                                         <Icon name="add_photo_alternate" className="text-primary" />
                                     </div>
                                     <span className="text-xs font-bold uppercase tracking-widest text-white/70">Upload Photo</span>
                                 </div>
-                            )}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
-                                <Icon name="cloud_upload" className="text-white text-3xl" />
-                            </div>
-                        </div>
-                    </div>
+                            </>
+                        )}
+                    />
 
                     <div className="space-y-6">
                         <Input

@@ -6,6 +6,7 @@ import { Icon } from './Icon';
 import { Input } from './Input';
 import { formatCurrency } from '../../utils/format';
 import { cn } from '../../utils/cn';
+import { getIngredientIconConfig } from '../../utils/ingredientIcons';
 
 interface IngredientBottomSheetProps {
     isOpen: boolean;
@@ -36,26 +37,6 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
         );
     }, [ingredients, searchQuery]);
 
-    const getIngredientIcon = (name: string): string => {
-        const lowerName = name.toLowerCase();
-        if (lowerName.includes('egg')) return 'egg';
-        if (lowerName.includes('beef') || lowerName.includes('meat') || lowerName.includes('chicken')) return 'lunch_dining';
-        if (lowerName.includes('basil') || lowerName.includes('leaf') || lowerName.includes('veggie') || lowerName.includes('herb')) return 'eco';
-        if (lowerName.includes('flour') || lowerName.includes('grain') || lowerName.includes('rice')) return 'grain';
-        if (lowerName.includes('water') || lowerName.includes('oil') || lowerName.includes('milk') || lowerName.includes('liquid')) return 'water_drop';
-        return 'inventory_2';
-    };
-
-    const getIconColorClass = (icon: string): string => {
-        switch (icon) {
-            case 'egg': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-            case 'lunch_dining': return 'bg-red-500/10 text-red-400 border-red-500/20';
-            case 'eco': return 'bg-green-500/10 text-green-400 border-green-500/20';
-            case 'grain': return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-            case 'water_drop': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-            default: return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
-        }
-    };
 
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Select Ingredient">
@@ -72,7 +53,6 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                 <div className="space-y-3 pb-8">
                     {filteredIngredients.length > 0 ? (
                         filteredIngredients.map((ing: Ingredient) => {
-                            const icon = getIngredientIcon(ing.name);
                             const isSelected = ing.id === selectedId;
                             return (
                                 <button
@@ -86,16 +66,27 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                                     )}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={cn(
-                                            "h-12 w-12 rounded-full flex items-center justify-center border overflow-hidden",
-                                            ing.image ? "border-white/10" : getIconColorClass(icon)
-                                        )}>
-                                            {ing.image ? (
-                                                <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Icon name={icon} size="lg" />
-                                            )}
-                                        </div>
+                                        {(() => {
+                                            const iconConfig = getIngredientIconConfig(ing.name);
+                                            return (
+                                                <div className={cn(
+                                                    "h-12 w-12 rounded-full flex items-center justify-center border overflow-hidden",
+                                                    ing.image
+                                                        ? "border-white/10"
+                                                        : cn(iconConfig.bgClass, iconConfig.borderClass)
+                                                )}>
+                                                    {ing.image ? (
+                                                        <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Icon
+                                                            name={iconConfig.icon}
+                                                            size="lg"
+                                                            className={iconConfig.colorClass}
+                                                        />
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                         <div>
                                             <p className="font-bold text-white text-base mb-0.5">{ing.name}</p>
                                             <p className="text-xs font-medium text-gray-400">Unit: {ing.unit}</p>
