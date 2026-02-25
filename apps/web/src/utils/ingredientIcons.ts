@@ -7,7 +7,6 @@ export interface IngredientIconConfig {
     icon: string;
     colorClass: string;
     bgClass: string;
-    borderClass: string;
 }
 
 const ICON_MAPPING: { keywords: string[]; icon: string; color: string }[] = [
@@ -100,7 +99,6 @@ export const getIngredientIconConfig = (name: string): IngredientIconConfig => {
     return {
         icon,
         colorClass: `text-${color}-400`,
-        bgClass: `bg-${color}-500/10`,
-        borderClass: `border-${color}-500/20`
+        bgClass: `bg-${color}-500/10`
     };
 };

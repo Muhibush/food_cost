@@ -58,8 +58,8 @@ export const IngredientsList: React.FC = () => {
                                 const iconConfig = getIngredientIconConfig(ing.name);
                                 return (
                                     <div className={cn(
-                                        "h-12 w-12 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden border bg-gray-100 dark:bg-gray-800",
-                                        ing.image ? "border-white/10" : cn(iconConfig.bgClass, iconConfig.borderClass)
+                                        "h-12 w-12 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800",
+                                        !ing.image && iconConfig.bgClass
                                     )}>
                                         {ing.image ? (
                                             <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />

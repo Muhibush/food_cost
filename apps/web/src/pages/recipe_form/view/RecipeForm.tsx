@@ -295,8 +295,8 @@ export const RecipeForm: React.FC = () => {
                                                     const iconConfig = getIngredientIconConfig(ingredient?.name || '');
                                                     return (
                                                         <div className={cn(
-                                                            "h-10 w-10 mt-0.5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border bg-gray-100 dark:bg-gray-800 transition-all",
-                                                            ingredient?.image ? "border-white/10" : cn(iconConfig.bgClass, iconConfig.borderClass)
+                                                            "h-10 w-10 mt-0.5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800 transition-all",
+                                                            !ingredient?.image && iconConfig.bgClass
                                                         )}>
                                                             {ingredient?.image ? (
                                                                 <img src={ingredient.image} alt={ingredient.name} className="w-full h-full object-cover" />
