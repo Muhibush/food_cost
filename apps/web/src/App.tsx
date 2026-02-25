@@ -101,8 +101,18 @@ const router = createBrowserRouter([
     },
 ]);
 
+import { useState } from 'react';
+import { SplashScreen } from './components/ui/SplashScreen';
+
 function App() {
-    return <RouterProvider router={router} />;
+    const [showSplash, setShowSplash] = useState(true);
+
+    return (
+        <>
+            {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+            <RouterProvider router={router} />
+        </>
+    );
 }
 
 export default App;
