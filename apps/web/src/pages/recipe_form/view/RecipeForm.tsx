@@ -94,10 +94,22 @@ export const RecipeForm: React.FC = () => {
     };
 
     const handleAddIngredient = () => {
+        const newIndex = formData.ingredients.length;
         setFormData(prev => ({
             ...prev,
             ingredients: [...prev.ingredients, { ingredientId: '', quantity: 0 }]
         }));
+
+        // Auto open bottom sheet for the new ingredient
+        openIngredientPicker(newIndex);
+
+        // Auto scroll to bottom
+        setTimeout(() => {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
     };
 
     const handleRemoveIngredient = (index: number) => {

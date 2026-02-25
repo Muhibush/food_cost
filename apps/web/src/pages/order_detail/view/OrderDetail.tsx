@@ -355,6 +355,7 @@ export const OrderDetail: React.FC = () => {
                                 <MediaCard
                                     key={item.recipeId}
                                     image={recipe.image}
+                                    icon="menu_book"
                                     title={recipe.name}
                                     subtitle={
                                         <div className="space-y-1">

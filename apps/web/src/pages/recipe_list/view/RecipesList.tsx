@@ -10,8 +10,6 @@ import { MediaCard } from '../../../components/ui/MediaCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { FAB } from '../../../components/ui/FAB';
 
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?auto=format&fit=crop&q=80&w=800';
-
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
     const { recipes } = useRecipesStore();
@@ -68,7 +66,8 @@ export const RecipesList: React.FC = () => {
                                 <MediaCard
                                     key={rec.id}
                                     onClick={() => navigate(`/recipes/${rec.id}`)}
-                                    image={rec.image || DEFAULT_IMAGE}
+                                    image={rec.image}
+                                    icon="menu_book"
                                     title={rec.name}
                                     subtitle={
                                         <div className="flex items-center gap-2 text-xs text-text-muted mt-0.5 font-medium">

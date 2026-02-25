@@ -108,9 +108,13 @@ export const RecipeSelection: React.FC = () => {
                                 >
                                     <div className="flex gap-3">
                                         <div
-                                            className="h-24 w-24 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner"
-                                            style={{ backgroundImage: `url('${recipe.image || 'https://via.placeholder.com/150'}')` }}
-                                        ></div>
+                                            className="h-24 w-24 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden"
+                                            style={recipe.image ? { backgroundImage: `url('${recipe.image}')` } : {}}
+                                        >
+                                            {!recipe.image && (
+                                                <span className="material-symbols-outlined text-gray-600 dark:text-gray-400 text-4xl opacity-30">menu_book</span>
+                                            )}
+                                        </div>
                                         <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                                             <div>
                                                 <h4 className="font-bold text-base text-slate-900 dark:text-white truncate pr-6">{recipe.name}</h4>

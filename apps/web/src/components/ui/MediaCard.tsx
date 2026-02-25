@@ -3,6 +3,7 @@ import { cn } from '../../utils/cn';
 
 interface MediaCardProps {
     image?: string;
+    icon?: string;
     title: string;
     subtitle?: React.ReactNode;
     description?: React.ReactNode;
@@ -14,6 +15,7 @@ interface MediaCardProps {
 
 export const MediaCard: React.FC<MediaCardProps> = ({
     image,
+    icon = 'image',
     title,
     subtitle,
     description,
@@ -36,7 +38,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                 style={image ? { backgroundImage: `url('${image}')` } : {}}
             >
                 {!image && (
-                    <span className="material-symbols-outlined text-gray-600 text-3xl opacity-30">image</span>
+                    <span className="material-symbols-outlined text-gray-600 text-3xl opacity-30">{icon}</span>
                 )}
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">

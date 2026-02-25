@@ -209,6 +209,7 @@ export const OrderPage: React.FC = () => {
                                     <MediaCard
                                         key={index}
                                         image={recipe?.image}
+                                        icon="menu_book"
                                         title={recipe?.name || 'Unknown'}
                                         subtitle={
                                             <div className="text-xs font-bold text-white">
