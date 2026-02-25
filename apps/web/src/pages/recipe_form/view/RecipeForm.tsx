@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useBlocker } from 'react-router-dom';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
@@ -16,12 +16,16 @@ import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { Textarea } from '../../../components/ui/Textarea';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Badge } from '../../../components/ui/Badge';
+import { compressImage } from '../../../utils/imageUtils';
+
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?auto=format&fit=crop&q=80&w=800';
 
 export const RecipeForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { addRecipe, updateRecipe, getRecipe } = useRecipesStore();
     const { ingredients } = useIngredientsStore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<Omit<Recipe, 'id'>>({
         name: '',
@@ -124,6 +128,19 @@ export const RecipeForm: React.FC = () => {
         setIsBottomSheetOpen(false);
     };
 
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            try {
+                // Resize recipe photo to max 800x800, 60% quality WebP/JPEG
+                const compressedBase64 = await compressImage(file, 800, 0.6);
+                setFormData(prev => ({ ...prev, image: compressedBase64 }));
+            } catch (error) {
+                console.error("Failed to compress image", error);
+            }
+        }
+    };
+
     const handleSubmit = () => {
         if (!formData.name || formData.yield <= 0) {
             alert('Please fill in basic information correctly.');
@@ -193,19 +210,38 @@ export const RecipeForm: React.FC = () => {
                 <section className="flex flex-col gap-6">
 
                     {/* Photo Upload */}
-                    <div className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden">
-                        {formData.image ? (
-                            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${formData.image})` }} />
-                        ) : (
-                            <div className="flex flex-col items-center">
-                                <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1">
-                                    <Icon name="add_photo_alternate" className="text-primary" />
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1 flex items-center justify-between">
+                            Photo
+                            <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest italic">(Optional)</span>
+                        </label>
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-48 rounded-2xl border-2 border-dashed border-white/5 bg-surface-dark flex flex-col items-center justify-center gap-3 text-gray-500 cursor-pointer hover:bg-white/5 transition-all relative group overflow-hidden"
+                        >
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                            {formData.image ? (
+                                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${formData.image})` }} />
+                            ) : (
+                                <div className="absolute inset-0 bg-cover bg-center opacity-40 grayscale" style={{ backgroundImage: `url(${DEFAULT_IMAGE})` }} />
+                            )}
+                            {!formData.image && (
+                                <div className="flex flex-col items-center z-10">
+                                    <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1 shadow-lg border border-white/5">
+                                        <Icon name="add_photo_alternate" className="text-primary" />
+                                    </div>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-white/70">Upload Photo</span>
                                 </div>
-                                <span className="text-xs font-bold uppercase tracking-widest">Upload Photo</span>
+                            )}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
+                                <Icon name="cloud_upload" className="text-white text-3xl" />
                             </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
-                            <Icon name="cloud_upload" className="text-white text-3xl" />
                         </div>
                     </div>
 
@@ -244,15 +280,20 @@ export const RecipeForm: React.FC = () => {
                             </div>
                         </div>
 
-                        <Textarea
-                            label="Note"
-                            name="note"
-                            value={formData.note || ''}
-                            onChange={handleChange}
-                            placeholder="Add special instructions or notes here..."
-                            rows={3}
-                            className="ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
-                        />
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1 flex items-center justify-between">
+                                Note
+                                <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest italic">(Optional)</span>
+                            </label>
+                            <Textarea
+                                name="note"
+                                value={formData.note || ''}
+                                onChange={handleChange}
+                                placeholder="Add special instructions or notes here..."
+                                rows={3}
+                                className="ring-1 ring-gray-200 dark:ring-gray-700 border-none focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:border-none"
+                            />
+                        </div>
                     </div>
                 </section>
 
@@ -269,8 +310,8 @@ export const RecipeForm: React.FC = () => {
                             const ingredient = ingredients.find(ing => ing.id === item.ingredientId);
                             return (
                                 <div key={index} className="bg-surface-dark p-4 rounded-2xl border border-white/5 space-y-4 relative transition-all">
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex-1 space-y-1.5">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-1 space-y-1.5 pr-8">
                                             <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Select Ingredient</label>
                                             <div
                                                 onClick={() => openIngredientPicker(index)}
@@ -284,7 +325,7 @@ export const RecipeForm: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => handleRemoveIngredient(index)}
-                                            className="mt-7 text-gray-500 hover:text-red-500 transition-colors pt-1"
+                                            className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors"
                                         >
                                             <Icon name="delete" size="md" />
                                         </button>
@@ -305,7 +346,7 @@ export const RecipeForm: React.FC = () => {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Cost</p>
-                                            <div className="text-sm font-extrabold text-white leading-none">
+                                            <div className="text-sm font-extrabold text-primary leading-none">
                                                 Rp {formatCurrency(Math.round(ingredientCosts[index]))}
                                             </div>
                                         </div>

@@ -378,7 +378,7 @@ export const OrderDetail: React.FC = () => {
                                     }
                                     bottomElement={
                                         <div className="flex items-center justify-between w-full">
-                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: <span className="text-primary">Rp {formatCurrency(Math.round(subtotal))}</span></div>
+                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total: <span className="text-sm font-bold text-primary">Rp {formatCurrency(Math.round(subtotal))}</span></div>
                                             <QuantitySelector
                                                 value={item.quantity}
                                                 onChange={(val) => setItemQuantity(item.recipeId, val)}

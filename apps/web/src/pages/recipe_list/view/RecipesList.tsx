@@ -10,6 +10,8 @@ import { MediaCard } from '../../../components/ui/MediaCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { FAB } from '../../../components/ui/FAB';
 
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?auto=format&fit=crop&q=80&w=800';
+
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
     const { recipes } = useRecipesStore();
@@ -66,16 +68,18 @@ export const RecipesList: React.FC = () => {
                                 <MediaCard
                                     key={rec.id}
                                     onClick={() => navigate(`/recipes/${rec.id}`)}
-                                    image={rec.image}
+                                    image={rec.image || DEFAULT_IMAGE}
                                     title={rec.name}
-                                    subtitle={rec.note && (
-                                        <p className="text-xs text-text-muted line-clamp-1 mt-0.5 font-medium italic">
-                                            {rec.note}
-                                        </p>
-                                    )}
+                                    subtitle={
+                                        <div className="flex items-center gap-2 text-xs text-text-muted mt-0.5 font-medium">
+                                            <span>{rec.ingredients.length} Ingredients</span>
+                                            <span className="size-1 bg-white/10 rounded-full"></span>
+                                            <span>{rec.yield || 0} Base Yield</span>
+                                        </div>
+                                    }
                                     bottomElement={
                                         <div className="text-[15px] font-extrabold text-white">
-                                            Rp {formatCurrency(Math.round(costPerPortion))}
+                                            <span className="text-primary">Rp {formatCurrency(Math.round(costPerPortion))}</span>
                                             <span className="text-[11px] font-medium text-text-muted ml-1 tracking-tight">/ portion</span>
                                         </div>
                                     }
