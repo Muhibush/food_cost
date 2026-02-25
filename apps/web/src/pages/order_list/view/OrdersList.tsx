@@ -9,6 +9,9 @@ import { formatCurrency } from '../../../utils/format';
 import { Header } from '../../../components/ui/Header';
 import { Input } from '../../../components/ui/Input';
 import { EmptyState } from '../../../components/ui/EmptyState';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { cn } from '../../../utils/cn';
+import { Icon } from '../../../components/ui/Icon';
 
 export const OrdersList: React.FC = () => {
     const navigate = useNavigate();
@@ -63,30 +66,42 @@ export const OrdersList: React.FC = () => {
                         }}
                     />
                 ) : (
-                    filteredOrders.map((order: Order) => (
-                        <Card
-                            key={order.id}
-                            hoverEffect
-                            onClick={() => navigate(`/orders/${order.id}`)}
-                            className="flex justify-between items-start"
-                        >
-                            <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-bold text-base">{order.name}</h3>
-                                    <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
+                    filteredOrders.map((order: Order) => {
+                        const iconConfig = getRecipeIconConfig(order.name);
+                        return (
+                            <Card
+                                key={order.id}
+                                hoverEffect
+                                onClick={() => navigate(`/orders/${order.id}`)}
+                                className="flex justify-between items-start"
+                            >
+                                <div className="flex gap-4">
+                                    <div className={cn(
+                                        "h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border border-white/5 shadow-inner bg-gray-100 dark:bg-gray-800",
+                                        iconConfig.bgClass,
+                                        iconConfig.colorClass
+                                    )}>
+                                        <Icon name={iconConfig.icon} size="md" className={iconConfig.colorClass} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="font-bold text-base">{order.name}</h3>
+                                            <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
+                                        </div>
+                                        <p className="text-xs text-text-muted">
+                                            {format(new Date(order.date), 'd MMMM yyyy')}
+                                        </p>
+                                        <p className="text-xs text-text-muted mt-1">
+                                            {order.items.reduce((acc: number, item: OrderItem) => acc + item.quantity, 0)} Items
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-text-muted">
-                                    {format(new Date(order.date), 'd MMMM yyyy')}
-                                </p>
-                                <p className="text-xs text-text-muted mt-1">
-                                    {order.items.reduce((acc: number, item: OrderItem) => acc + item.quantity, 0)} Items
-                                </p>
-                            </div>
-                            <div className="text-right">
-                                <span className="font-bold text-base block">Rp {formatCurrency(order.totalCost)}</span>
-                            </div>
-                        </Card>
-                    ))
+                                <div className="text-right">
+                                    <span className="font-bold text-base block">Rp {formatCurrency(order.totalCost)}</span>
+                                </div>
+                            </Card>
+                        );
+                    })
                 )}
             </main>
         </div>

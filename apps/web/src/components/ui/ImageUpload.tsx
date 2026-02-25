@@ -75,20 +75,29 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 />
 
                 {value ? (
-                    <img
-                        src={value}
-                        alt="Preview"
-                        className="absolute inset-0 w-full h-full object-cover"
-                    />
+                    <>
+                        <img
+                            src={value}
+                            alt="Preview"
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onChange('');
+                            }}
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-lg z-20 hover:bg-danger transition-all active:scale-95 group/delete"
+                        >
+                            <Icon name="close" size="sm" className="group-hover/delete:scale-110 transition-transform" />
+                        </button>
+                    </>
                 ) : (
                     <div className="flex flex-col items-center justify-center w-full h-full">
                         {placeholder}
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all z-10">
-                    <Icon name="cloud_upload" className="text-white text-3xl" />
-                </div>
             </div>
         </div>
     );

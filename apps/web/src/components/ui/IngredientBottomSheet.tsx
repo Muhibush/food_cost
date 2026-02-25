@@ -70,7 +70,7 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
                                             const iconConfig = getIngredientIconConfig(ing.name);
                                             return (
                                                 <div className={cn(
-                                                    "h-12 w-12 rounded-full flex items-center justify-center border overflow-hidden",
+                                                    "h-12 w-12 rounded-xl flex items-center justify-center border overflow-hidden bg-gray-100 dark:bg-gray-800",
                                                     ing.image
                                                         ? "border-white/10"
                                                         : cn(iconConfig.bgClass, iconConfig.borderClass)

@@ -19,6 +19,8 @@ import { MediaCard } from '../../../components/ui/MediaCard';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { cn } from '../../../utils/cn';
 
 export const OrderPage: React.FC = () => {
     const navigate = useNavigate();
@@ -205,12 +207,18 @@ export const OrderPage: React.FC = () => {
                                 const unitCost = item.customPrice ?? getRecipeCost(item.recipeId);
                                 const subtotal = unitCost * item.quantity;
 
+                                const iconConfig = getRecipeIconConfig(recipe?.name || '');
+
                                 return (
                                     <MediaCard
                                         key={index}
                                         image={recipe?.image}
-                                        icon="menu_book"
+                                        icon={iconConfig.icon}
                                         title={recipe?.name || 'Unknown'}
+                                        iconContainerClassName={cn(
+                                            !recipe?.image && iconConfig.bgClass,
+                                            !recipe?.image && iconConfig.colorClass
+                                        )}
                                         subtitle={
                                             <div className="text-xs font-bold text-white">
                                                 Rp {formatCurrency(Math.round(unitCost))} <span className="text-gray-400 font-normal">/ portion</span>

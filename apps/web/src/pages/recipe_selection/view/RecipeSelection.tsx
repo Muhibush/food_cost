@@ -8,8 +8,9 @@ import { Input } from '../../../components/ui/Input';
 import { useOrderDraftStore } from '../../order_entry/store/useOrderDraftStore';
 import { useOrderEditStore } from '../../order_detail/store/useOrderEditStore';
 import { formatCurrency } from '../../../utils/format';
-import { clsx } from 'clsx';
+import { cn } from '../../../utils/cn';
 import { Recipe } from '../../../types';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
 
 interface SelectionState {
     selectedRecipeIds: string[];
@@ -96,23 +97,28 @@ export const RecipeSelection: React.FC = () => {
                         {filteredRecipes.map(recipe => {
                             const isSelected = selectedIds.includes(recipe.id);
                             const cost = getRecipeCost(recipe);
+                            const iconConfig = getRecipeIconConfig(recipe.name);
 
                             return (
                                 <div
                                     key={recipe.id}
                                     onClick={() => toggleSelection(recipe.id)}
-                                    className={clsx(
+                                    className={cn(
                                         "bg-white dark:bg-surface-dark p-3 rounded-2xl shadow-sm border-2 relative overflow-hidden group active:scale-[0.99] transition-all cursor-pointer",
                                         isSelected ? "border-primary shadow-lg shadow-primary/5" : "border-gray-100 dark:border-gray-700"
                                     )}
                                 >
                                     <div className="flex gap-3">
                                         <div
-                                            className="h-24 w-24 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden"
+                                            className={cn(
+                                                "h-24 w-24 rounded-xl bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800",
+                                                !recipe.image && iconConfig.bgClass,
+                                                !recipe.image && iconConfig.colorClass
+                                            )}
                                             style={recipe.image ? { backgroundImage: `url('${recipe.image}')` } : {}}
                                         >
                                             {!recipe.image && (
-                                                <span className="material-symbols-outlined text-gray-600 dark:text-gray-400 text-4xl opacity-30">menu_book</span>
+                                                <Icon name={iconConfig.icon} size="xl" className={iconConfig.colorClass} />
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
@@ -121,13 +127,13 @@ export const RecipeSelection: React.FC = () => {
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">{recipe.description || 'No description'}</p>
                                             </div>
                                             <div className="flex items-end justify-between mt-2">
-                                                <div className={clsx(
+                                                <div className={cn(
                                                     "text-sm font-extrabold",
                                                     isSelected ? "text-primary" : "text-slate-700 dark:text-gray-200"
                                                 )}>
                                                     Rp {formatCurrency(Math.round(cost))} <span className="text-xs font-normal text-gray-400">/ portion</span>
                                                 </div>
-                                                <button className={clsx(
+                                                <button className={cn(
                                                     "h-8 px-4 rounded-lg text-xs font-bold flex items-center gap-1 transition-all",
                                                     isSelected
                                                         ? "bg-primary text-white shadow-sm"
@@ -159,7 +165,7 @@ export const RecipeSelection: React.FC = () => {
 
             {/* Selection Summary Overlay */}
             <div className="fixed bottom-0 left-0 right-0 z-30 px-5 pb-8 pt-4 pointer-events-none bg-gradient-to-t from-background-light dark:from-background-dark to-transparent">
-                <div className={clsx(
+                <div className={cn(
                     "bg-white dark:bg-white text-slate-900 p-4 rounded-2xl shadow-2xl flex items-center justify-between transition-all duration-300 pointer-events-auto border border-gray-100",
                     selectedIds.length > 0 ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
                 )}>

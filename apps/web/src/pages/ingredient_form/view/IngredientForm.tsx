@@ -146,12 +146,12 @@ export const IngredientForm: React.FC = () => {
                     previewClassName="w-48 mx-auto"
                     placeholder={(
                         <div className={cn(
-                            "h-20 w-20 rounded-2xl flex items-center justify-center shadow-lg border",
+                            "w-full h-full flex flex-col items-center justify-center transition-colors px-4 bg-gray-100 dark:bg-gray-800",
                             iconConfig.bgClass,
-                            iconConfig.colorClass,
-                            iconConfig.borderClass
+                            iconConfig.colorClass
                         )}>
-                            <Icon name={iconConfig.icon} size="xl" />
+                            <Icon name={iconConfig.icon} className={cn("!text-[64px]", iconConfig.colorClass)} />
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Add Photo</p>
                         </div>
                     )}
                 />

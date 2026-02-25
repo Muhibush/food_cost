@@ -11,6 +11,7 @@ interface MediaCardProps {
     bottomElement?: React.ReactNode;
     onClick?: () => void;
     className?: string;
+    iconContainerClassName?: string;
 }
 
 export const MediaCard: React.FC<MediaCardProps> = ({
@@ -22,7 +23,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     rightElement,
     bottomElement,
     onClick,
-    className
+    className,
+    iconContainerClassName
 }) => {
     return (
         <div
@@ -34,11 +36,19 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             )}
         >
             <div
-                className="h-20 w-20 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden"
+                className={cn(
+                    "h-20 w-20 rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0 shadow-inner flex items-center justify-center overflow-hidden",
+                    iconContainerClassName
+                )}
                 style={image ? { backgroundImage: `url('${image}')` } : {}}
             >
                 {!image && (
-                    <span className="material-symbols-outlined text-gray-600 text-3xl opacity-30">{icon}</span>
+                    <span className={cn(
+                        "material-symbols-outlined text-3xl",
+                        !iconContainerClassName?.includes('text-') && "text-gray-600 opacity-30"
+                    )}>
+                        {icon}
+                    </span>
                 )}
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">

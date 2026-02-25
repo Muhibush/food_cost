@@ -9,6 +9,8 @@ import { Header } from '../../../components/ui/Header';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { FAB } from '../../../components/ui/FAB';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { cn } from '../../../utils/cn';
 
 export const RecipesList: React.FC = () => {
     const navigate = useNavigate();
@@ -61,14 +63,19 @@ export const RecipesList: React.FC = () => {
                         {filteredRecipes.map((rec) => {
                             const totalCost = calculateCost(rec);
                             const costPerPortion = totalCost / (rec.yield || 1);
+                            const iconConfig = getRecipeIconConfig(rec.name);
 
                             return (
                                 <MediaCard
                                     key={rec.id}
                                     onClick={() => navigate(`/recipes/${rec.id}`)}
                                     image={rec.image}
-                                    icon="menu_book"
+                                    icon={iconConfig.icon}
                                     title={rec.name}
+                                    iconContainerClassName={cn(
+                                        !rec.image && iconConfig.bgClass,
+                                        !rec.image && iconConfig.colorClass
+                                    )}
                                     subtitle={
                                         <div className="flex items-center gap-2 text-xs text-text-muted mt-0.5 font-medium">
                                             <span>{rec.ingredients.length} Ingredients</span>

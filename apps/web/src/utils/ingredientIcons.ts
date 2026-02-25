@@ -82,21 +82,14 @@ const COLOR_VARIANTS = ['orange', 'red', 'green', 'blue', 'purple', 'yellow', 'p
 export const getIngredientIconConfig = (name: string): IngredientIconConfig => {
     const lowerName = name.trim().toLowerCase();
 
-    // Find matching keyword
+    // Find matching keyword for the icon
     const match = ICON_MAPPING.find(m =>
         m.keywords.some(keyword => lowerName.includes(keyword))
     );
 
-    if (match) {
-        return {
-            icon: match.icon,
-            colorClass: `text-${match.color}-400`,
-            bgClass: `bg-${match.color}-500/10`,
-            borderClass: `border-${match.color}-500/20`
-        };
-    }
+    const icon = match ? match.icon : DEFAULT_ICON;
 
-    // Fallback: use hash to pick a consistent color
+    // Always use hash for color to provide maximum variety
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -105,7 +98,7 @@ export const getIngredientIconConfig = (name: string): IngredientIconConfig => {
     const color = COLOR_VARIANTS[colorIndex];
 
     return {
-        icon: DEFAULT_ICON,
+        icon,
         colorClass: `text-${color}-400`,
         bgClass: `bg-${color}-500/10`,
         borderClass: `border-${color}-500/20`

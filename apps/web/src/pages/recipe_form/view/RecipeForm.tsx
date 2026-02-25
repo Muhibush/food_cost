@@ -12,13 +12,15 @@ import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { ActionFooter } from '../../../components/ui/ActionFooter';
 import { Icon } from '../../../components/ui/Icon';
 import { ImageUpload } from '../../../components/ui/ImageUpload';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { getIngredientIconConfig } from '../../../utils/ingredientIcons';
+import { cn } from '../../../utils/cn';
 import { SummaryCard } from '../../../components/ui/SummaryCard';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
 import { Textarea } from '../../../components/ui/Textarea';
 import { AlertDialog } from '../../../components/ui/AlertDialog';
 import { Badge } from '../../../components/ui/Badge';
 
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?auto=format&fit=crop&q=80&w=800';
 
 export const RecipeForm: React.FC = () => {
     const navigate = useNavigate();
@@ -175,6 +177,8 @@ export const RecipeForm: React.FC = () => {
         formData.ingredients.length > 0 &&
         formData.ingredients.every(i => i.ingredientId && i.quantity > 0);
 
+    const iconConfig = useMemo(() => getRecipeIconConfig(formData.name), [formData.name]);
+
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-safe -mx-5 -mt-4">
             <Header
@@ -207,19 +211,14 @@ export const RecipeForm: React.FC = () => {
                         onChange={(val) => setFormData(prev => ({ ...prev, image: val }))}
                         previewClassName="w-48 mx-auto"
                         placeholder={(
-                            <>
-                                <img
-                                    src={DEFAULT_IMAGE}
-                                    alt="Default"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale"
-                                />
-                                <div className="flex flex-col items-center z-10">
-                                    <div className="h-12 w-12 rounded-full bg-background-dark flex items-center justify-center mb-1 shadow-lg border border-white/5">
-                                        <Icon name="add_photo_alternate" className="text-primary" />
-                                    </div>
-                                    <span className="text-xs font-bold uppercase tracking-widest text-white/70">Upload Photo</span>
-                                </div>
-                            </>
+                            <div className={cn(
+                                "w-full h-full flex flex-col items-center justify-center transition-colors px-4 bg-gray-100 dark:bg-gray-800",
+                                iconConfig.bgClass,
+                                iconConfig.colorClass
+                            )}>
+                                <Icon name={iconConfig.icon} className={cn("!text-[64px]", iconConfig.colorClass)} />
+                                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Add Photo</p>
+                            </div>
                         )}
                     />
 
@@ -291,14 +290,35 @@ export const RecipeForm: React.FC = () => {
                                     <div className="flex items-start gap-4">
                                         <div className="flex-1 space-y-1.5 pr-8">
                                             <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide ml-1">Select Ingredient</label>
-                                            <div
-                                                onClick={() => openIngredientPicker(index)}
-                                                className="block w-full px-4 py-2.5 bg-background-dark border border-white/5 rounded-xl text-white outline-none focus:ring-1 focus:ring-primary transition-all text-sm font-medium cursor-pointer flex items-center justify-between"
-                                            >
-                                                <span className={item.ingredientId ? "text-white" : "text-gray-500"}>
-                                                    {ingredient?.name || 'Choose ingredient...'}
-                                                </span>
-                                                <Icon name="expand_more" className="text-gray-500" />
+                                            <div className="flex gap-3">
+                                                {(() => {
+                                                    const iconConfig = getIngredientIconConfig(ingredient?.name || '');
+                                                    return (
+                                                        <div className={cn(
+                                                            "h-10 w-10 mt-0.5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border bg-gray-100 dark:bg-gray-800 transition-all",
+                                                            ingredient?.image ? "border-white/10" : cn(iconConfig.bgClass, iconConfig.borderClass)
+                                                        )}>
+                                                            {ingredient?.image ? (
+                                                                <img src={ingredient.image} alt={ingredient.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <Icon
+                                                                    name={ingredient ? iconConfig.icon : 'help'}
+                                                                    size="sm"
+                                                                    className={ingredient ? iconConfig.colorClass : "text-gray-500 opacity-30"}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                <div
+                                                    onClick={() => openIngredientPicker(index)}
+                                                    className="flex-1 px-4 py-2.5 bg-background-dark border border-white/5 rounded-xl text-white outline-none focus:ring-1 focus:ring-primary transition-all text-sm font-medium cursor-pointer flex items-center justify-between"
+                                                >
+                                                    <span className={item.ingredientId ? "text-white" : "text-gray-500"}>
+                                                        {ingredient?.name || 'Choose ingredient...'}
+                                                    </span>
+                                                    <Icon name="expand_more" className="text-gray-500" />
+                                                </div>
                                             </div>
                                         </div>
                                         <button

@@ -22,6 +22,8 @@ import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { InfoBanner } from '../../../components/ui/InfoBanner';
 import { MediaCard } from '../../../components/ui/MediaCard';
 import { QuantitySelector } from '../../../components/ui/QuantitySelector';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { cn } from '../../../utils/cn';
 export const OrderDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -351,12 +353,18 @@ export const OrderDetail: React.FC = () => {
                             const unitCost = item.customPrice ?? getRecipeCost(item.recipeId);
                             const subtotal = unitCost * item.quantity;
 
+                            const iconConfig = getRecipeIconConfig(recipe.name);
+
                             return (
                                 <MediaCard
                                     key={item.recipeId}
                                     image={recipe.image}
-                                    icon="menu_book"
+                                    icon={iconConfig.icon}
                                     title={recipe.name}
+                                    iconContainerClassName={cn(
+                                        !recipe.image && iconConfig.bgClass,
+                                        !recipe.image && iconConfig.colorClass
+                                    )}
                                     subtitle={
                                         <div className="space-y-1">
                                             <div className="text-xs font-bold text-white">
