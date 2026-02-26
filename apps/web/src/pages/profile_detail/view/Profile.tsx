@@ -31,14 +31,14 @@ export const Profile: React.FC = () => {
     const { recipes, addRecipe, clearAllRecipes } = useRecipesStore();
     const { orders, addOrder, clearAllOrders } = useOrdersStore();
     const { profile, resetProfile } = useProfileStore();
-    const { resetConfig } = useConfigStore();
+    const { setHasBeenSeeded } = useConfigStore();
 
     const handleResetApp = () => {
         clearAllOrders();
         clearAllRecipes();
         clearAllIngredients();
         resetProfile();
-        resetConfig(); // Allow re-seeding on next load
+        setHasBeenSeeded(true); // Prevent re-seeding on next load
         setIsResetAppOpen(false);
         navigate('/'); // Redirect to home/login after reset
     };
