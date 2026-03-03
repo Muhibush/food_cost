@@ -33,36 +33,36 @@ Auth method:
 
 ## PROJECT STRUCTURE
 
-/apps/web/src/pages
+/src/pages
 Flattened feature-driven structure. Each feature (e.g., `order_detail`, `recipe_list`) is a folder containing:
 - `view/`: Main screen components
 - `widgets/`: Feature-specific sub-components
 - `store/`: Feature-specific Zustand stores
 
-/apps/web/src/components/ui
+/src/components/ui
 Reusable atomic UI components (Button, Input, Icon, Header)
 
-/apps/web/src/store
+/src/store
 Reserved ONLY for truly global/shared state (if any). Business logic is localized to feature folders.
 
-/apps/web/src/utils
+/src/utils
 Helper functions (currency formatting) and dummy data generation
 
-/apps/web/src/types
+/src/types
 Shared TypeScript interfaces and type definitions
 
 ---
 
 ## COMMON TASK LOCATIONS
 
-Recipe Logic & State → apps/web/src/pages/recipe_list/store/useRecipesStore.ts
-Ingredient Logic → apps/web/src/pages/ingredient_list/store/useIngredientsStore.ts
-Order List Logic → apps/web/src/pages/order_list/store/useOrdersStore.ts
-Order Detail Edit Logic → apps/web/src/pages/order_detail/store/useOrderEditStore.ts
-Order Entry Draft Logic → apps/web/src/pages/order_entry/store/useOrderDraftStore.ts
-Routing Configuration → apps/web/src/App.tsx
-Data Models (Types) → apps/web/src/types/index.ts
-Mock Data Generation → apps/web/src/utils/dummyData.ts
+Recipe Logic & State → src/pages/recipe_list/store/useRecipesStore.ts
+Ingredient Logic → src/pages/ingredient_list/store/useIngredientsStore.ts
+Order List Logic → src/pages/order_list/store/useOrdersStore.ts
+Order Detail Edit Logic → src/pages/order_detail/store/useOrderEditStore.ts
+Order Entry Draft Logic → src/pages/order_entry/store/useOrderDraftStore.ts
+Routing Configuration → src/App.tsx
+Data Models (Types) → src/types/index.ts
+Mock Data Generation → src/utils/dummyData.ts
 
 ---
 

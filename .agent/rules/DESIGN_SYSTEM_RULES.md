@@ -12,9 +12,9 @@ This document defines the standardized design system components and patterns to 
 
 ## 🏗 Core UI Components
 
-All reusable components are located in `apps/web/src/components/ui/`.
+All reusable components are located in `src/components/ui/`.
 
-### **1. Header** ([Header.tsx](file:///Users/muhibush/projects/food_cost/apps/web/src/components/ui/Header.tsx))
+### **1. Header** ([Header.tsx](file:///Users/muhibush/projects/food_cost/src/components/ui/Header.tsx))
 *   **Usage:** Mandatory for all pages.
 *   **Props:**
     *   `title`: Main page title.
@@ -23,21 +23,21 @@ All reusable components are located in `apps/web/src/components/ui/`.
     *   `rightElement`: (Optional) Slot for settings, add buttons, etc.
     *   `leftElement`: (Optional) Slot for profile avatars (typically on Main Tabs).
 
-### **2. MediaCard** ([MediaCard.tsx](file:///Users/muhibush/projects/food_cost/apps/web/src/components/ui/MediaCard.tsx))
+### **2. MediaCard** ([MediaCard.tsx](file:///Users/muhibush/projects/food_cost/src/components/ui/MediaCard.tsx))
 *   **Usage:** Standardized layout for list items (Recipes, Ingredients, Orders).
 *   **Aesthetics:** 20x20 image on the left, multi-line content on the right.
 *   **Variants:** Supports `rightElement` (e.g., delete button) and `bottomElement` (e.g., price or quantity selector).
 
-### **3. ActionFooter** ([ActionFooter.tsx](file:///Users/muhibush/projects/food_cost/apps/web/src/components/ui/ActionFooter.tsx))
+### **3. ActionFooter** ([ActionFooter.tsx](file:///Users/muhibush/projects/food_cost/src/components/ui/ActionFooter.tsx))
 *   **Usage:** Sticky bottom bar for primary actions (Submit, Create, Update).
 *   **Positioning:** Must be pinned to the bottom, appearing above the Bottom Navigation Bar (if visible).
 *   **Features:** Displays an optional summary (e.g., Total Cost) and a primary action button.
 
-### **4. DatePicker** ([DatePicker.tsx](file:///Users/muhibush/projects/food_cost/apps/web/src/components/ui/DatePicker.tsx))
+### **4. DatePicker** ([DatePicker.tsx](file:///Users/muhibush/projects/food_cost/src/components/ui/DatePicker.tsx))
 *   **Usage:** Use for all date inputs.
 *   **Aesthetics:** Premium custom UI that wraps the native browser date picker. Displays formatted dates (e.g., "13 February 2026").
 
-### **5. QuantitySelector** ([QuantitySelector.tsx](file:///Users/muhibush/projects/food_cost/apps/web/src/components/ui/QuantitySelector.tsx))
+### **5. QuantitySelector** ([QuantitySelector.tsx](file:///Users/muhibush/projects/food_cost/src/components/ui/QuantitySelector.tsx))
 *   **Usage:** Standard control for incrementing/decrementing portion counts or quantities.
 
 ---

@@ -13,7 +13,7 @@ This document defines mandatory security practices for any AI assistant or agent
 
 ## 2. No Hardcoded Secrets
 - **NEVER** hardcode API keys, private keys, authentication tokens, or database credentials directly in the source code.
-- **USE** environment variables (e.g., `import.meta.env.VITE_*` for Vite/React) and document them in `apps/web/.env.example`.
+- **USE** environment variables (e.g., `import.meta.env.VITE_*` for Vite/React) and document them in `.env.example`.
 
 ## 3. Git Hygiene
 - **VERIFY** staged changes with `git status` before suggesting or performing a commit.
