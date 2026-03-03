@@ -1,36 +1,63 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Order } from '../../../types';
+import { db, auth } from '../../../lib/firebase';
+import { collection, doc, setDoc, deleteDoc, onSnapshot, query, getDocs } from 'firebase/firestore';
 
 interface OrdersState {
     orders: Order[];
-    addOrder: (order: Order) => void;
-    updateOrder: (id: string, updates: Partial<Order>) => void;
-    removeOrder: (id: string) => void;
+    addOrder: (order: Order) => Promise<void>;
+    updateOrder: (id: string, updates: Partial<Order>) => Promise<void>;
+    removeOrder: (id: string) => Promise<void>;
     getOrder: (id: string) => Order | undefined;
-    clearAllOrders: () => void;
+    clearAllOrders: () => Promise<void>;
+    initListener: () => () => void;
 }
 
-export const useOrdersStore = create<OrdersState>()(
-    persist(
-        (set, get) => ({
-            orders: [],
-            addOrder: (order) => set((state) => ({ orders: [order, ...state.orders] })),
-            updateOrder: (id, updates) =>
-                set((state) => ({
-                    orders: state.orders.map((ord) =>
-                        ord.id === id ? { ...ord, ...updates } : ord
-                    ),
-                })),
-            removeOrder: (id) =>
-                set((state) => ({
-                    orders: state.orders.filter((ord) => ord.id !== id),
-                })),
-            getOrder: (id) => get().orders.find((ord) => ord.id === id),
-            clearAllOrders: () => set({ orders: [] }),
-        }),
-        {
-            name: 'food-cost-orders',
+export const useOrdersStore = create<OrdersState>((set, get) => ({
+    orders: [],
+    addOrder: async (order) => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        const docRef = doc(db, `users/${uid}/orders`, order.id);
+        await setDoc(docRef, order);
+    },
+    updateOrder: async (id, updates) => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        const docRef = doc(db, `users/${uid}/orders`, id);
+        await setDoc(docRef, updates, { merge: true });
+    },
+    removeOrder: async (id) => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        const docRef = doc(db, `users/${uid}/orders`, id);
+        await deleteDoc(docRef);
+    },
+    getOrder: (id) => get().orders.find((ord) => ord.id === id),
+    clearAllOrders: async () => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+            set({ orders: [] });
+            return;
         }
-    )
-);
+        const q = query(collection(db, `users/${uid}/orders`));
+        const snapshot = await getDocs(q);
+        const deletePromises = snapshot.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletePromises);
+        set({ orders: [] });
+    },
+    initListener: () => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return () => { };
+        const q = query(collection(db, `users/${uid}/orders`));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const orders: Order[] = [];
+            snapshot.forEach((doc) => {
+                orders.push(doc.data() as Order);
+            });
+            // Sort by date mostly, but we'll prepend conceptually in UI or by timestamp
+            set({ orders });
+        });
+        return unsubscribe;
+    }
+}));

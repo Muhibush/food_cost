@@ -10,12 +10,11 @@ import { OrdersList } from './pages/order_list/view/OrdersList';
 import { HistoryPage } from './pages/order_history/view/HistoryPage';
 import { OrderDetail } from './pages/order_detail/view/OrderDetail';
 import { EditProfile } from './pages/edit_profile/view/EditProfile';
-import { ChangePin } from './pages/change_pin/view/ChangePin';
 import { Login } from './pages/auth_login/view/Login';
-import { Register } from './pages/auth_register/view/Register';
 import { RecipeSelection } from './pages/recipe_selection/view/RecipeSelection';
 import { Profile } from './pages/profile_detail/view/Profile';
 import { DeveloperPage } from './pages/developer_page/view/DeveloperPage';
+import { AuthGuard } from './components/layout/AuthGuard';
 
 const router = createBrowserRouter([
     {
@@ -27,11 +26,11 @@ const router = createBrowserRouter([
         element: <Login />,
     },
     {
-        path: '/register',
-        element: <Register />,
-    },
-    {
-        element: <Layout />,
+        element: (
+            <AuthGuard>
+                <Layout />
+            </AuthGuard>
+        ),
         children: [
             {
                 path: '/',
@@ -84,10 +83,6 @@ const router = createBrowserRouter([
             {
                 path: '/profile/edit',
                 element: <EditProfile />,
-            },
-            {
-                path: '/profile/change-pin',
-                element: <ChangePin />,
             },
             {
                 path: '/developer',

@@ -1,84 +1,55 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
-import { Input } from '../../../components/ui/Input';
 import { Icon } from '../../../components/ui/Icon';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');
-    const [pin, setPin] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Mock login logic
-        navigate('/');
+    const handleGoogleLogin = async () => {
+        setError('');
+        setIsLoading(true);
+        try {
+            const { signInWithPopup } = await import('firebase/auth');
+            const { auth, googleProvider } = await import('../../../lib/firebase');
+            await signInWithPopup(auth, googleProvider);
+            navigate('/');
+        } catch (err: any) {
+            setError(err.message || 'Failed to login with Google');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col px-6 pt-12 pb-10 antialiased -mx-5 -mt-4">
-            {/* Logo & Branding as Header-ish */}
-            <div className="flex flex-col items-center gap-4 mb-4 mt-12">
-                <div className="w-20 h-20 bg-primary rounded-[28px] flex items-center justify-center shadow-2xl shadow-primary/20 rotate-3 hover:rotate-0 transition-all duration-500 border border-white/10">
-                    <Icon name="restaurant_menu" size="xl" className="text-white font-bold" />
+        <div className="bg-background-dark font-display text-white min-h-screen flex flex-col px-6 pt-12 pb-10 antialiased -mx-5 -mt-4 justify-center">
+            {/* Logo & Branding */}
+            <div className="flex flex-col items-center gap-4 mb-16">
+                <div className="w-24 h-24 bg-primary rounded-[32px] flex items-center justify-center shadow-2xl shadow-primary/20 border border-white/10">
+                    <Icon name="restaurant_menu" size="xl" className="text-white font-bold scale-150" />
                 </div>
-                <div className="text-center">
-                    <h1 className="text-4xl font-extrabold tracking-tight mb-1 text-white">CookCost</h1>
-                    <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] opacity-80">Professional Food Costing</p>
+                <div className="text-center mt-4">
+                    <h1 className="text-4xl font-extrabold tracking-tight mb-2 text-white">CookCost</h1>
+                    <p className="text-xs font-black text-gray-500 uppercase tracking-[0.2em]">Professional Food Costing</p>
                 </div>
             </div>
 
-            {/* Login Form */}
-            <form onSubmit={handleLogin} className="flex flex-col gap-8">
-                <div className="space-y-4">
-                    <Input
-                        icon="person"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                        className="font-bold py-4 rounded-2xl"
-                    />
-
-                    <div className="space-y-2">
-                        <Input
-                            icon="lock"
-                            type="password"
-                            inputMode="numeric"
-                            placeholder="PIN"
-                            value={pin}
-                            onChange={(e) => setPin(e.target.value)}
-                            required
-                            className="tracking-[0.5em] font-black py-4 rounded-2xl"
-                        />
-                        <div className="flex justify-end pr-1">
-                            <button type="button" className="text-xs font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors">
-                                Forgot PIN?
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {/* Login Action */}
+            <div className="flex flex-col gap-6 mt-8">
+                {error && <p className="text-red-500 text-sm font-bold text-center">{error}</p>}
 
                 <Button
-                    type="submit"
-                    className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl transition-all"
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                    variant="secondary"
+                    className="w-full h-16 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 bg-white text-black hover:bg-gray-100"
                 >
-                    Login to Account
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" className="w-6 h-6" />
+                    {isLoading ? 'Connecting...' : 'Continue with Google'}
                 </Button>
-            </form>
-
-            {/* Register Link */}
-            <div className="text-center">
-                <p className="text-sm text-gray-500 font-bold">
-                    Don't have an account?
-                    <button
-                        onClick={() => navigate('/register')}
-                        type="button"
-                        className="text-primary font-black hover:text-primary-dark ml-2 transition-colors uppercase tracking-tight"
-                    >
-                        Register Now
-                    </button>
-                </p>
             </div>
 
             {/* Subtle Footer Detail */}

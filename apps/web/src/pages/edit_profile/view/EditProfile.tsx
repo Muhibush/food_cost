@@ -57,9 +57,7 @@ export const EditProfile: React.FC = () => {
         }
     };
 
-    const handleEditClick = () => {
-        fileInputRef.current?.click();
-    };
+    // handleEditClick removed for Firebase migration
 
     const handleSave = () => {
         isSavingRef.current = true;
@@ -92,12 +90,13 @@ export const EditProfile: React.FC = () => {
                                 className="w-full h-full rounded-full bg-cover bg-center overflow-hidden"
                                 style={{ backgroundImage: `url('${avatarUrl}')` }}
                             ></div>
-                            <button
+                            {/* Image upload hidden for Firebase migration */}
+                            {/* <button
                                 onClick={handleEditClick}
                                 className="absolute -bottom-1 -right-1 w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white shadow-lg border-2 border-background-dark hover:bg-primary-dark transition-all active:scale-95 z-10"
                             >
                                 <span className="material-symbols-outlined text-lg">edit</span>
-                            </button>
+                            </button> */}
                             <input
                                 type="file"
                                 accept="image/*"
