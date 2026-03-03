@@ -9,7 +9,7 @@ export const sanitizeData = <T extends object>(data: T): T => {
         if (result[k] === undefined) {
             delete result[k];
         } else if (result[k] !== null && typeof result[k] === 'object' && !Array.isArray(result[k])) {
-            result[k] = sanitizeData(result[k] as any);
+            result[k] = sanitizeData(result[k] as Record<string, unknown>) as T[keyof T];
         }
     });
     return result;

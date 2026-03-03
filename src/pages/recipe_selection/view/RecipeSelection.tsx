@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsStore';
@@ -16,7 +16,7 @@ interface SelectionState {
     selectedRecipeIds: string[];
     returnPath: string;
     storeType?: 'draft' | 'edit'; // New prop to determine which store to update
-    orderData?: any;
+    orderData?: unknown;
 }
 
 export const RecipeSelection: React.FC = () => {
@@ -45,13 +45,13 @@ export const RecipeSelection: React.FC = () => {
         );
     }, [recipes, searchQuery]);
 
-    const getRecipeCost = (recipe: Recipe) => {
+    const getRecipeCost = useCallback((recipe: Recipe) => {
         if (recipe.manualCost) return recipe.manualCost;
         return recipe.ingredients.reduce((acc, item) => {
             const ing = getIngredient(item.ingredientId);
             return acc + (ing ? ing.price * item.quantity : 0);
         }, 0) / (recipe.yield || 1);
-    };
+    }, [getIngredient]);
 
     const toggleSelection = (recipeId: string) => {
         setSelectedIds(prev =>
@@ -67,7 +67,7 @@ export const RecipeSelection: React.FC = () => {
 
     const totalBaseCost = useMemo(() => {
         return selectedRecipes.reduce((sum, r) => sum + getRecipeCost(r), 0);
-    }, [selectedRecipes, getIngredient]);
+    }, [selectedRecipes, getRecipeCost]);
 
     const handleConfirm = () => {
         syncItemsFromIds(selectedIds);

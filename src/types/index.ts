@@ -58,5 +58,5 @@ export interface Order {
 }
 
 export interface CartItem extends OrderItem {
-    // extended properties for UI state if needed
+    id?: string; // Add a dummy property or remove if strictly not needed
 }
