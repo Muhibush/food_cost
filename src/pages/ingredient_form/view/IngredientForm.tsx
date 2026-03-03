@@ -111,9 +111,20 @@ export const IngredientForm: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+
+        if (name === 'price') {
+            // Strictly allow only digits to prevent 'e', '.', '+', '-' etc.
+            const sanitizedValue = value.replace(/[^0-9]/g, '');
+            setFormData(prev => ({
+                ...prev,
+                price: sanitizedValue === '' ? 0 : parseInt(sanitizedValue, 10)
+            }));
+            return;
+        }
+
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'price' ? Number(value) : value
+            [name]: value
         }));
     };
 
@@ -186,8 +197,8 @@ export const IngredientForm: React.FC = () => {
                             name="price"
                             value={formData.price || ''}
                             onChange={handleChange}
-                            type="number"
-                            min="0"
+                            type="text"
+                            inputMode="numeric"
                             placeholder="0"
                             icon="payments"
                             required

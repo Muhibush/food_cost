@@ -55,16 +55,19 @@ export const IngredientsList: React.FC = () => {
                             className="flex items-center gap-4"
                         >
                             {(() => {
-                                const iconConfig = getIngredientIconConfig(ing.name);
+                                // Priority: Stored metadata > Calculated config
+                                const icon = ing.icon || getIngredientIconConfig(ing.name).icon;
+                                const color = ing.color || getIngredientIconConfig(ing.name).colorClass.replace('text-', '').replace('-400', '');
+
                                 return (
                                     <div className={cn(
                                         "h-12 w-12 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800",
-                                        !ing.image && iconConfig.bgClass
+                                        !ing.image && `bg-${color}-500/10`
                                     )}>
                                         {ing.image ? (
                                             <img src={ing.image} alt={ing.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <Icon name={iconConfig.icon} size="lg" className={iconConfig.colorClass} />
+                                            <Icon name={icon} size="lg" className={`text-${color}-400`} />
                                         )}
                                     </div>
                                 );

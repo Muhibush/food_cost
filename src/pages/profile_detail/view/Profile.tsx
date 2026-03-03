@@ -31,18 +31,17 @@ export const Profile: React.FC = () => {
     const { ingredients, addIngredient, clearAllIngredients } = useIngredientsStore();
     const { recipes, addRecipe, clearAllRecipes } = useRecipesStore();
     const { orders, addOrder, clearAllOrders } = useOrdersStore();
-    const { profile, resetProfile } = useProfileStore();
+    const { profile } = useProfileStore();
     const { logout } = useAuthStore();
     const { setHasBeenSeeded } = useConfigStore();
 
-    const handleResetApp = () => {
+    const handleClearData = () => {
         clearAllOrders();
         clearAllRecipes();
         clearAllIngredients();
-        resetProfile();
+        // Keep profile intact for "Clear Data"
         setHasBeenSeeded(true); // Prevent re-seeding on next load
         setIsResetAppOpen(false);
-        navigate('/'); // Redirect to home/login after reset
     };
 
     const handleExportData = () => {
@@ -168,13 +167,25 @@ export const Profile: React.FC = () => {
                             </div>
                             <button
                                 onClick={handleExportData}
-                                className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group active:bg-white/5"
+                                className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group border-b border-white/5 active:bg-white/5"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10 group-hover:scale-105 transition-transform">
                                         <span className="material-symbols-outlined text-xl font-bold">file_download</span>
                                     </div>
                                     <span className="font-bold text-base">Export Data</span>
+                                </div>
+                                <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
+                            </button>
+                            <button
+                                onClick={() => setIsResetAppOpen(true)}
+                                className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group active:bg-white/5"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/10 group-hover:scale-105 transition-transform">
+                                        <span className="material-symbols-outlined text-xl font-bold">delete_forever</span>
+                                    </div>
+                                    <span className="font-bold text-base">Clear Data</span>
                                 </div>
                                 <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                             </button>
@@ -185,23 +196,15 @@ export const Profile: React.FC = () => {
                     {/* Footer Actions */}
                     <div className="pt-4 flex flex-col items-center gap-8">
                         <button
-                            onClick={() => setIsResetAppOpen(true)}
-                            className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-8 py-5 rounded-2xl font-black text-base shadow-lg shadow-red-500/5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-                        >
-                            <span className="material-symbols-outlined text-xl font-bold">restart_alt</span>
-                            Reset App
-                        </button>
-
-                        <button
                             onClick={logout}
-                            className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-5 rounded-2xl font-black text-base transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                            className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-8 py-5 rounded-2xl font-black text-base shadow-lg shadow-red-500/5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                         >
                             <span className="material-symbols-outlined text-xl font-bold">logout</span>
                             Logout Account
                         </button>
                         <div
                             onClick={handleVersionClick}
-                            className="flex flex-col items-center gap-1 opacity-40 active:opacity-100 transition-opacity cursor-pointer select-none"
+                            className="flex flex-col items-center gap-1 opacity-40 cursor-pointer select-none"
                         >
                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">App Version 2.4.0</p>
                             <p className="text-[9px] font-bold text-gray-500">Build 102 • Production</p>
@@ -212,12 +215,12 @@ export const Profile: React.FC = () => {
 
             <AlertDialog
                 isOpen={isResetAppOpen}
-                title="Reset Application?"
-                message="This will permanently delete all recipes, ingredients, orders, and reset your profile. This action cannot be undone."
+                title="Clear Data?"
+                message="This will permanently delete all your ingredients, recipes, and orders. Your profile settings will remain intact. This action cannot be undone."
                 cancelLabel="Cancel"
-                confirmLabel="Reset App"
+                confirmLabel="Clear Data"
                 onCancel={() => setIsResetAppOpen(false)}
-                onConfirm={handleResetApp}
+                onConfirm={handleClearData}
                 isDestructive
             />
 

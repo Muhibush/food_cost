@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Order, OrderItem } from '../../../types';
 import { useOrdersStore } from '../store/useOrdersStore';
-import { Card } from '../../../components/ui/Card';
+import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { Badge } from '../../../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -11,11 +11,12 @@ import { Input } from '../../../components/ui/Input';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { getRecipeIconConfig } from '../../../utils/recipeIcons';
 import { cn } from '../../../utils/cn';
-import { Icon } from '../../../components/ui/Icon';
+import { MediaCard } from '../../../components/ui/MediaCard';
 
 export const OrdersList: React.FC = () => {
     const navigate = useNavigate();
     const { orders } = useOrdersStore();
+    const { recipes } = useRecipesStore();
     const [search, setSearch] = useState('');
 
     const filteredOrders = orders.filter(ord =>
@@ -66,42 +67,47 @@ export const OrdersList: React.FC = () => {
                         }}
                     />
                 ) : (
-                    filteredOrders.map((order: Order) => {
-                        const iconConfig = getRecipeIconConfig(order.name);
-                        return (
-                            <Card
-                                key={order.id}
-                                hoverEffect
-                                onClick={() => navigate(`/orders/${order.id}`)}
-                                className="flex justify-between items-start"
-                            >
-                                <div className="flex gap-4">
-                                    <div className={cn(
-                                        "h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border border-white/5 shadow-inner bg-gray-100 dark:bg-gray-800",
-                                        iconConfig.bgClass,
-                                        iconConfig.colorClass
-                                    )}>
-                                        <Icon name={iconConfig.icon} size="md" className={iconConfig.colorClass} />
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-bold text-base">{order.name}</h3>
+                    <div className="flex flex-col gap-4">
+                        {filteredOrders.map((order: Order) => {
+                            const firstItem = order.items[0];
+                            const recipe = firstItem ? recipes.find(r => r.id === firstItem.recipeId) : null;
+                            const iconConfig = getRecipeIconConfig(order.name);
+
+                            return (
+                                <MediaCard
+                                    key={order.id}
+                                    onClick={() => navigate(`/orders/${order.id}`)}
+                                    image={recipe?.image}
+                                    icon={recipe?.icon || iconConfig.icon}
+                                    title={
+                                        <div className="flex items-center gap-2">
+                                            <span className="truncate">{order.name}</span>
                                             <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
                                         </div>
-                                        <p className="text-xs text-text-muted">
-                                            {format(new Date(order.date), 'd MMMM yyyy')}
-                                        </p>
-                                        <p className="text-xs text-text-muted mt-1">
-                                            {order.items.reduce((acc: number, item: OrderItem) => acc + item.quantity, 0)} Items
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-bold text-base block">Rp {formatCurrency(order.totalCost)}</span>
-                                </div>
-                            </Card>
-                        );
-                    })
+                                    }
+                                    iconContainerClassName={cn(
+                                        !recipe?.image && (recipe?.color ? `bg-${recipe.color}-500/10` : iconConfig.bgClass),
+                                        !recipe?.image && (recipe?.color ? `text-${recipe.color}-400` : iconConfig.colorClass)
+                                    )}
+                                    subtitle={
+                                        <div className="flex flex-col gap-0.5 mt-0.5">
+                                            <p className="text-xs text-text-muted">
+                                                {format(new Date(order.date), 'd MMMM yyyy')}
+                                            </p>
+                                            <p className="text-xs text-text-muted font-medium">
+                                                {order.items.reduce((acc: number, item: OrderItem) => acc + item.quantity, 0)} Items
+                                            </p>
+                                        </div>
+                                    }
+                                    bottomElement={
+                                        <span className="text-white font-bold text-[15px]">
+                                            Rp {formatCurrency(order.totalCost)}
+                                        </span>
+                                    }
+                                />
+                            );
+                        })}
+                    </div>
                 )}
             </main>
         </div>

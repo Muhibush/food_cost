@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Order } from '../../../types';
 import { db, auth } from '../../../lib/firebase';
 import { collection, doc, setDoc, deleteDoc, onSnapshot, query, getDocs } from 'firebase/firestore';
+import { sanitizeData } from '../../../utils/sanitize';
 
 interface OrdersState {
     orders: Order[];
@@ -19,13 +20,13 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
         const uid = auth.currentUser?.uid;
         if (!uid) return;
         const docRef = doc(db, `users/${uid}/orders`, order.id);
-        await setDoc(docRef, order);
+        await setDoc(docRef, sanitizeData(order));
     },
     updateOrder: async (id, updates) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
         const docRef = doc(db, `users/${uid}/orders`, id);
-        await setDoc(docRef, updates, { merge: true });
+        await setDoc(docRef, sanitizeData(updates), { merge: true });
     },
     removeOrder: async (id) => {
         const uid = auth.currentUser?.uid;

@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn';
 interface MediaCardProps {
     image?: string;
     icon?: string;
-    title: string;
+    title: React.ReactNode;
     subtitle?: React.ReactNode;
     description?: React.ReactNode;
     rightElement?: React.ReactNode;
@@ -54,7 +54,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                 <div className="relative">
                     <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-base text-slate-900 dark:text-white truncate pr-6">
+                        <h4 className="font-bold text-base text-slate-900 dark:text-white truncate flex-1 min-w-0 pr-2">
                             {title}
                         </h4>
                         {rightElement && (

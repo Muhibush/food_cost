@@ -18,6 +18,8 @@ export interface Ingredient {
     unit: UnitType;
     price: number; // Base price per unit
     image?: string;
+    icon?: string;
+    color?: string;
 }
 
 export interface RecipeIngredient {
@@ -34,6 +36,8 @@ export interface Recipe {
     ingredients: RecipeIngredient[];
     image?: string;
     manualCost?: number; // Optional override cost manual
+    icon?: string;
+    color?: string;
 }
 
 export interface OrderItem {

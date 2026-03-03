@@ -359,11 +359,11 @@ export const OrderDetail: React.FC = () => {
                                 <MediaCard
                                     key={item.recipeId}
                                     image={recipe.image}
-                                    icon={iconConfig.icon}
+                                    icon={recipe.icon || iconConfig.icon}
                                     title={recipe.name}
                                     iconContainerClassName={cn(
-                                        !recipe.image && iconConfig.bgClass,
-                                        !recipe.image && iconConfig.colorClass
+                                        !recipe.image && (recipe.color ? `bg-${recipe.color}-500/10` : iconConfig.bgClass),
+                                        !recipe.image && (recipe.color ? `text-${recipe.color}-400` : iconConfig.colorClass)
                                     )}
                                     subtitle={
                                         <div className="space-y-1">

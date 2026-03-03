@@ -44,9 +44,11 @@ export const Header: React.FC<HeaderProps> = ({
                             {title}
                         </h1>
                         {subtitle && (
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5 truncate">
-                                {subtitle}
-                            </p>
+                            <div className="mt-1 flex">
+                                <p className="text-[10px] text-gray-400 font-medium bg-surface-dark px-2.5 py-0.5 rounded-full border border-white/5 truncate max-w-full">
+                                    {subtitle}
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>

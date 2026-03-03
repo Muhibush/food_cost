@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { UserProfile } from '../../../types';
 import { db, auth } from '../../../lib/firebase';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { sanitizeData } from '../../../utils/sanitize';
 
 interface ProfileState {
     profile: UserProfile;
@@ -24,14 +25,14 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         if (!uid) return;
         const newProfile = { ...get().profile, ...updates };
         const docRef = doc(db, `users`, uid);
-        await setDoc(docRef, newProfile, { merge: true });
+        await setDoc(docRef, sanitizeData(newProfile), { merge: true });
     },
     resetProfile: () => set({ profile: defaultProfile }),
     initListener: (firebaseUser) => {
         const uid = firebaseUser?.uid;
         if (!uid) return () => { };
         const docRef = doc(db, `users`, uid);
-        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        const unsubscribe = onSnapshot(docRef, async (docSnap) => {
             if (docSnap.exists()) {
                 set({ profile: docSnap.data() as UserProfile });
             } else {
@@ -43,7 +44,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
                     avatar: firebaseUser.photoURL || defaultProfile.avatar
                 };
                 set({ profile: initialProfile });
-                setDoc(docRef, initialProfile);
+                await setDoc(docRef, sanitizeData(initialProfile));
             }
         });
         return unsubscribe;

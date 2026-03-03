@@ -3,6 +3,9 @@ import { Ingredient } from '../../../types';
 import { db, auth } from '../../../lib/firebase';
 import { collection, doc, setDoc, deleteDoc, onSnapshot, query, getDocs } from 'firebase/firestore';
 
+import { getIngredientIconConfig } from '../../../utils/ingredientIcons';
+import { sanitizeData } from '../../../utils/sanitize';
+
 interface IngredientsState {
     ingredients: Ingredient[];
     addIngredient: (ingredient: Ingredient) => Promise<void>;
@@ -18,14 +21,22 @@ export const useIngredientsStore = create<IngredientsState>((set, get) => ({
     addIngredient: async (ingredient) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
+
+        // Auto-generate icon and color if not provided
+        if (!ingredient.icon || !ingredient.color) {
+            const config = getIngredientIconConfig(ingredient.name);
+            ingredient.icon = ingredient.icon || config.icon;
+            ingredient.color = ingredient.color || config.colorClass.replace('text-', '').replace('-400', '');
+        }
+
         const docRef = doc(db, `users/${uid}/ingredients`, ingredient.id);
-        await setDoc(docRef, ingredient);
+        await setDoc(docRef, sanitizeData(ingredient));
     },
     updateIngredient: async (id, updates) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
         const docRef = doc(db, `users/${uid}/ingredients`, id);
-        await setDoc(docRef, updates, { merge: true });
+        await setDoc(docRef, sanitizeData(updates), { merge: true });
     },
     removeIngredient: async (id) => {
         const uid = auth.currentUser?.uid;

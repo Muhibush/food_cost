@@ -13,6 +13,8 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { FilterButton } from '../../../components/ui/FilterButton';
+import { cn } from '../../../utils/cn';
+import { getRecipeIconConfig } from '../../../utils/recipeIcons';
 
 export const HistoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -62,13 +64,6 @@ export const HistoryPage: React.FC = () => {
         return groups.sort((a, b) => b.month.getTime() - a.month.getTime());
     }, [filteredOrders]);
 
-    const getOrderImage = (order: any) => {
-        if (order.items.length > 0) {
-            const firstRecipe = recipes.find(r => r.id === order.items[0].recipeId);
-            if (firstRecipe?.image) return firstRecipe.image;
-        }
-        return undefined;
-    };
 
     const getTotalPortions = (order: any) => {
         return order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
@@ -112,26 +107,37 @@ export const HistoryPage: React.FC = () => {
                                 />
 
                                 <div className="grid grid-cols-1 gap-4">
-                                    {group.orders.map((order) => (
-                                        <MediaCard
-                                            key={order.id}
-                                            onClick={() => navigate(`/orders/${order.id}`)}
-                                            image={getOrderImage(order)}
-                                            title={order.name}
-                                            subtitle={
-                                                <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5 font-medium">
-                                                    <span>{format(parseISO(order.date), 'd MMMM yyyy')}</span>
-                                                    <span className="size-1 bg-gray-600 rounded-full"></span>
-                                                    <span>{getTotalPortions(order)} Portions</span>
-                                                </div>
-                                            }
-                                            bottomElement={
-                                                <p className="text-primary font-bold text-[15px]">
-                                                    Rp {formatCurrency(Math.round(order.totalCost))}
-                                                </p>
-                                            }
-                                        />
-                                    ))}
+                                    {group.orders.map((order) => {
+                                        const firstItem = order.items[0];
+                                        const recipe = firstItem ? recipes.find(r => r.id === firstItem.recipeId) : null;
+                                        const iconConfig = getRecipeIconConfig(order.name);
+
+                                        return (
+                                            <MediaCard
+                                                key={order.id}
+                                                onClick={() => navigate(`/orders/${order.id}`)}
+                                                image={recipe?.image}
+                                                icon={recipe?.icon || iconConfig.icon}
+                                                title={order.name}
+                                                iconContainerClassName={cn(
+                                                    !recipe?.image && (recipe?.color ? `bg-${recipe.color}-500/10` : iconConfig.bgClass),
+                                                    !recipe?.image && (recipe?.color ? `text-${recipe.color}-400` : iconConfig.colorClass)
+                                                )}
+                                                subtitle={
+                                                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5 font-medium">
+                                                        <span>{format(parseISO(order.date), 'd MMMM yyyy')}</span>
+                                                        <span className="size-1 bg-gray-600 rounded-full"></span>
+                                                        <span>{getTotalPortions(order)} Portions</span>
+                                                    </div>
+                                                }
+                                                bottomElement={
+                                                    <p className="text-primary font-bold text-[15px]">
+                                                        Rp {formatCurrency(Math.round(order.totalCost))}
+                                                    </p>
+                                                }
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ))

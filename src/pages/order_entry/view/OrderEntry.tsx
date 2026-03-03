@@ -166,10 +166,12 @@ export const OrderPage: React.FC = () => {
                 title={profile.name}
                 subtitle={profile.description}
                 leftElement={
-                    <div
-                        className="h-10 w-10 rounded-full bg-surface-dark bg-cover bg-center border border-white/10 shadow-sm"
-                        style={{ backgroundImage: `url('${profile.avatar}')` }}
-                    ></div>
+                    <div className="h-10 w-10 flex-shrink-0 aspect-square rounded-full bg-surface-dark border-2 border-primary p-0.5 shadow-sm">
+                        <div
+                            className="w-full h-full rounded-full bg-cover bg-center"
+                            style={{ backgroundImage: `url('${profile.avatar}')` }}
+                        ></div>
+                    </div>
                 }
                 rightElement={null}
             />
@@ -235,11 +237,11 @@ export const OrderPage: React.FC = () => {
                                     <MediaCard
                                         key={index}
                                         image={recipe?.image}
-                                        icon={iconConfig.icon}
+                                        icon={recipe?.icon || iconConfig.icon}
                                         title={recipe?.name || 'Unknown'}
                                         iconContainerClassName={cn(
-                                            !recipe?.image && iconConfig.bgClass,
-                                            !recipe?.image && iconConfig.colorClass
+                                            !recipe?.image && (recipe?.color ? `bg-${recipe.color}-500/10` : iconConfig.bgClass),
+                                            !recipe?.image && (recipe?.color ? `text-${recipe.color}-400` : iconConfig.colorClass)
                                         )}
                                         subtitle={
                                             <div className="text-xs font-bold text-white">

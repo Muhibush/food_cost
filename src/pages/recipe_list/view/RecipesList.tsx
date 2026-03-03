@@ -70,11 +70,11 @@ export const RecipesList: React.FC = () => {
                                     key={rec.id}
                                     onClick={() => navigate(`/recipes/${rec.id}`)}
                                     image={rec.image}
-                                    icon={iconConfig.icon}
+                                    icon={rec.icon || iconConfig.icon}
                                     title={rec.name}
                                     iconContainerClassName={cn(
-                                        !rec.image && iconConfig.bgClass,
-                                        !rec.image && iconConfig.colorClass
+                                        !rec.image && (rec.color ? `bg-${rec.color}-500/10` : iconConfig.bgClass),
+                                        !rec.image && (rec.color ? `text-${rec.color}-400` : iconConfig.colorClass)
                                     )}
                                     subtitle={
                                         <div className="flex items-center gap-2 text-xs text-text-muted mt-0.5 font-medium">
