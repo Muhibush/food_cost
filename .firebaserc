@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "cookcost-4f003"
+    "default": "cookcost-dev",
+    "dev": "cookcost-dev",
+    "prod": "cookcost-prod"
   }
 }
