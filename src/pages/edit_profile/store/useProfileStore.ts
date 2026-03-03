@@ -7,7 +7,7 @@ interface ProfileState {
     profile: UserProfile;
     updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
     resetProfile: () => void;
-    initListener: () => () => void;
+    initListener: (firebaseUser: any) => () => void;
 }
 
 const defaultProfile: UserProfile = {
@@ -27,16 +27,23 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         await setDoc(docRef, newProfile, { merge: true });
     },
     resetProfile: () => set({ profile: defaultProfile }),
-    initListener: () => {
-        const uid = auth.currentUser?.uid;
+    initListener: (firebaseUser) => {
+        const uid = firebaseUser?.uid;
         if (!uid) return () => { };
         const docRef = doc(db, `users`, uid);
         const unsubscribe = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
                 set({ profile: docSnap.data() as UserProfile });
             } else {
-                set({ profile: defaultProfile });
-                setDoc(docRef, defaultProfile);
+                // If profile doesn't exist, create it from Firebase user data
+                const initialProfile: UserProfile = {
+                    name: firebaseUser.displayName || 'Thomas Chef',
+                    username: firebaseUser.email?.split('@')[0] || 'chef',
+                    description: 'Professional Chef',
+                    avatar: firebaseUser.photoURL || defaultProfile.avatar
+                };
+                set({ profile: initialProfile });
+                setDoc(docRef, initialProfile);
             }
         });
         return unsubscribe;

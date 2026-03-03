@@ -6,6 +6,7 @@ import { useIngredientsStore } from '../../ingredient_list/store/useIngredientsS
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
 import { useOrdersStore } from '../../order_list/store/useOrdersStore';
 import { useProfileStore } from '../../edit_profile/store/useProfileStore';
+import { useAuthStore } from '../../../store/useAuthStore';
 import { useConfigStore } from '../../../store/useConfigStore';
 import { exportAppData, importAppData } from '../../../utils/dataUtils';
 
@@ -31,6 +32,7 @@ export const Profile: React.FC = () => {
     const { recipes, addRecipe, clearAllRecipes } = useRecipesStore();
     const { orders, addOrder, clearAllOrders } = useOrdersStore();
     const { profile, resetProfile } = useProfileStore();
+    const { logout } = useAuthStore();
     const { setHasBeenSeeded } = useConfigStore();
 
     const handleResetApp = () => {
@@ -188,6 +190,14 @@ export const Profile: React.FC = () => {
                         >
                             <span className="material-symbols-outlined text-xl font-bold">restart_alt</span>
                             Reset App
+                        </button>
+
+                        <button
+                            onClick={logout}
+                            className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-5 rounded-2xl font-black text-base transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                        >
+                            <span className="material-symbols-outlined text-xl font-bold">logout</span>
+                            Logout Account
                         </button>
                         <div
                             onClick={handleVersionClick}

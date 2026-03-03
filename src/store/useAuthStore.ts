@@ -10,6 +10,7 @@ interface AuthState {
     user: User | null;
     isLoading: boolean;
     initialize: () => void;
+    logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => {
@@ -30,7 +31,7 @@ export const useAuthStore = create<AuthState>((set) => {
                     unsubs.push(useIngredientsStore.getState().initListener());
                     unsubs.push(useRecipesStore.getState().initListener());
                     unsubs.push(useOrdersStore.getState().initListener());
-                    unsubs.push(useProfileStore.getState().initListener());
+                    unsubs.push(useProfileStore.getState().initListener(user));
                 } else {
                     useIngredientsStore.getState().clearAllIngredients();
                     useRecipesStore.getState().clearAllRecipes();
@@ -38,6 +39,10 @@ export const useAuthStore = create<AuthState>((set) => {
                     useProfileStore.getState().resetProfile();
                 }
             });
+        },
+        logout: async () => {
+            const { signOut } = await import('firebase/auth');
+            await signOut(auth);
         }
     };
 });
