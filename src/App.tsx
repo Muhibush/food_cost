@@ -13,6 +13,7 @@ import { EditProfile } from './pages/edit_profile/view/EditProfile';
 import { Login } from './pages/auth_login/view/Login';
 import { RecipeSelection } from './pages/recipe_selection/view/RecipeSelection';
 import { Profile } from './pages/profile_detail/view/Profile';
+import { IntroPage } from './pages/intro/view/IntroPage';
 import { DeveloperPage } from './pages/developer_page/view/DeveloperPage';
 import { AuthGuard } from './components/layout/AuthGuard';
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
     {
         path: '/design-system',
         element: <DesignSystem />,
+    },
+    {
+        path: '/intro',
+        element: <IntroPage />,
     },
     {
         path: '/login',
