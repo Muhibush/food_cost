@@ -9,6 +9,7 @@ import { useProfileStore } from '../../edit_profile/store/useProfileStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useConfigStore } from '../../../store/useConfigStore';
 import { exportAppData, importAppData } from '../../../utils/dataUtils';
+import { generateDummyData } from '../../../utils/dummyData';
 
 export const Profile: React.FC = () => {
     const navigate = useNavigate();
@@ -86,6 +87,29 @@ export const Profile: React.FC = () => {
                     type: 'error'
                 });
             });
+    };
+
+    const handleImportDummyData = () => {
+        // Clear existing data before importing
+        clearAllIngredients();
+        clearAllRecipes();
+        clearAllOrders();
+
+        const data = generateDummyData();
+
+        // Add generated data
+        data.ingredients.forEach((ing) => addIngredient(ing));
+        data.recipes.forEach((rec) => addRecipe(rec));
+        data.orders.forEach((ord) => addOrder(ord));
+
+        setHasBeenSeeded(true);
+
+        setStatusModal({
+            isOpen: true,
+            title: 'Dummy Data Imported',
+            message: 'A comprehensive set of dummy data has been successfully imported.',
+            type: 'success'
+        });
     };
 
     const handleVersionClick = () => {
@@ -174,6 +198,18 @@ export const Profile: React.FC = () => {
                                         <span className="material-symbols-outlined text-xl font-bold">file_download</span>
                                     </div>
                                     <span className="font-bold text-base">Export Data</span>
+                                </div>
+                                <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
+                            </button>
+                            <button
+                                onClick={handleImportDummyData}
+                                className="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all text-left group border-b border-white/5 active:bg-white/5"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/10 group-hover:scale-105 transition-transform">
+                                        <span className="material-symbols-outlined text-xl font-bold">database</span>
+                                    </div>
+                                    <span className="font-bold text-base">Import Dummy Data</span>
                                 </div>
                                 <span className="material-symbols-outlined text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                             </button>

@@ -10,6 +10,7 @@ interface HeaderProps {
     leftElement?: React.ReactNode;
     bottomElement?: React.ReactNode;
     className?: string;
+    noSubtitleChip?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,7 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
     rightElement,
     leftElement,
     bottomElement,
-    className
+    className,
+    noSubtitleChip = false
 }) => {
     const navigate = useNavigate();
 
@@ -45,7 +47,12 @@ export const Header: React.FC<HeaderProps> = ({
                         </h1>
                         {subtitle && (
                             <div className="mt-1 flex">
-                                <p className="text-[10px] text-gray-400 font-medium bg-surface-dark px-2.5 py-0.5 rounded-full border border-white/5 truncate max-w-full">
+                                <p className={cn(
+                                    "text-[10px] truncate max-w-full",
+                                    noSubtitleChip
+                                        ? "text-gray-400 font-bold"
+                                        : "text-gray-400 font-medium bg-surface-dark px-2.5 py-0.5 rounded-full border border-white/5"
+                                )}>
                                     {subtitle}
                                 </p>
                             </div>

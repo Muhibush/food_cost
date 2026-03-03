@@ -1,0 +1,372 @@
+{
+    "ingredients": [
+        {
+            "id": "ing-shallots",
+            "name": "Bawang Merah (Shallots)",
+            "unit": "gr",
+            "price": 45
+        },
+        {
+            "id": "ing-garlic",
+            "name": "Bawang Putih (Garlic)",
+            "unit": "gr",
+            "price": 35
+        },
+        {
+            "id": "ing-chili-rawit",
+            "name": "Cabai Rawit (Bird Eye Chili)",
+            "unit": "gr",
+            "price": 60
+        },
+        {
+            "id": "ing-chili-red",
+            "name": "Cabai Merah Keriting",
+            "unit": "gr",
+            "price": 50
+        },
+        {
+            "id": "ing-turmeric",
+            "name": "Kunyit (Turmeric)",
+            "unit": "gr",
+            "price": 30
+        },
+        {
+            "id": "ing-ginger",
+            "name": "Jahe (Ginger)",
+            "unit": "gr",
+            "price": 30
+        },
+        {
+            "id": "ing-galangal",
+            "name": "Lengkuas (Galangal)",
+            "unit": "gr",
+            "price": 25
+        },
+        {
+            "id": "ing-lemongrass",
+            "name": "Sereh (Lemongrass)",
+            "unit": "pcs",
+            "price": 1000
+        },
+        {
+            "id": "ing-salam-leaf",
+            "name": "Daun Salam",
+            "unit": "pcs",
+            "price": 200
+        },
+        {
+            "id": "ing-lime-leaf",
+            "name": "Daun Jeruk",
+            "unit": "pcs",
+            "price": 200
+        },
+        {
+            "id": "ing-coriander",
+            "name": "Ketumbar (Coriander)",
+            "unit": "gr",
+            "price": 20
+        },
+        {
+            "id": "ing-candlenut",
+            "name": "Kemiri (Candlenut)",
+            "unit": "gr",
+            "price": 40
+        },
+        {
+            "id": "ing-pepper",
+            "name": "Merica (Pepper)",
+            "unit": "gr",
+            "price": 30
+        },
+        {
+            "id": "ing-cinnamon",
+            "name": "Kayu Manis (Cinnamon)",
+            "unit": "pcs",
+            "price": 2000
+        },
+        {
+            "id": "ing-cloves",
+            "name": "Cengkeh (Cloves)",
+            "unit": "gr",
+            "price": 150
+        },
+        {
+            "id": "ing-beef-chunk",
+            "name": "Daging Sapi (Beef Chunk)",
+            "unit": "gr",
+            "price": 140
+        },
+        {
+            "id": "ing-chicken",
+            "name": "Ayam Fillet (Chicken)",
+            "unit": "gr",
+            "price": 75
+        },
+        {
+            "id": "ing-egg",
+            "name": "Telur Ayam (Egg)",
+            "unit": "pcs",
+            "price": 2500
+        },
+        {
+            "id": "ing-shrimp",
+            "name": "Udang Kupas (Peeled Shrimp)",
+            "unit": "gr",
+            "price": 120
+        },
+        {
+            "id": "ing-salmon",
+            "name": "Ikan Salmon",
+            "unit": "gr",
+            "price": 350
+        },
+        {
+            "id": "ing-tiram",
+            "name": "Saus Tiram (Oyster Sauce)",
+            "unit": "ml",
+            "price": 60
+        },
+        {
+            "id": "ing-sesame-oil",
+            "name": "Minyak Wijen (Sesame Oil)",
+            "unit": "ml",
+            "price": 120
+        },
+        {
+            "id": "ing-mayo",
+            "name": "Mayonnaise",
+            "unit": "gr",
+            "price": 120
+        },
+        {
+            "id": "ing-truffle-oil",
+            "name": "Truffle Oil",
+            "unit": "ml",
+            "price": 5000
+        },
+        {
+            "id": "ing-sweet-soy",
+            "name": "Kecap Manis (Sweet Soy)",
+            "unit": "ml",
+            "price": 40
+        },
+        {
+            "id": "ing-coconut-milk",
+            "name": "Santan (Coconut Milk)",
+            "unit": "ml",
+            "price": 30
+        },
+        {
+            "id": "ing-cooking-oil",
+            "name": "Minyak Goreng",
+            "unit": "ml",
+            "price": 20
+        },
+        {
+            "id": "ing-palm-sugar",
+            "name": "Gula Merah",
+            "unit": "gr",
+            "price": 30
+        },
+        {
+            "id": "ing-salt",
+            "name": "Garam",
+            "unit": "gr",
+            "price": 15
+        },
+        {
+            "id": "ing-shrimp-paste",
+            "name": "Terasi (Shrimp Paste)",
+            "unit": "gr",
+            "price": 150
+        },
+        {
+            "id": "ing-basmati",
+            "name": "Beras Basmati",
+            "unit": "gr",
+            "price": 35
+        },
+        {
+            "id": "ing-wagyu-patty",
+            "name": "Wagyu Beef Patty",
+            "unit": "pcs",
+            "price": 45000
+        },
+        {
+            "id": "ing-brioche",
+            "name": "Brioche Bun",
+            "unit": "pcs",
+            "price": 8000
+        },
+        {
+            "id": "ing-cheddar",
+            "name": "Cheddar Cheese Slice",
+            "unit": "pcs",
+            "price": 3000
+        },
+        {
+            "id": "ing-milk",
+            "name": "Susu Cair (Milk)",
+            "unit": "ml",
+            "price": 25
+        },
+        {
+            "id": "ing-butter",
+            "name": "Mentega (Butter)",
+            "unit": "gr",
+            "price": 180
+        },
+        {
+            "id": "ing-palm-sugar-aren",
+            "name": "Gula Aren (Palm Sugar)",
+            "unit": "gr",
+            "price": 40
+        },
+        {
+            "id": "ing-dates",
+            "name": "Kurma (Dates)",
+            "unit": "gr",
+            "price": 60
+        },
+        {
+            "id": "ing-banana",
+            "name": "Pisang Kepok (Banana)",
+            "unit": "pcs",
+            "price": 3000
+        },
+        {
+            "id": "ing-coffee",
+            "name": "Kopi Bubuk (Coffee)",
+            "unit": "gr",
+            "price": 80
+        }
+    ],
+    "recipes": [
+        {
+            "id": "rec-nasi-goreng",
+            "name": "Nasi Goreng Spesial",
+            "description": "Indonesian fried rice with shrimp, egg, and sweet soy sauce.",
+            "yield": 2,
+            "ingredients": [
+                {
+                    "ingredientId": "ing-basmati",
+                    "quantity": 300
+                },
+                {
+                    "ingredientId": "ing-shrimp",
+                    "quantity": 100
+                },
+                {
+                    "ingredientId": "ing-egg",
+                    "quantity": 2
+                },
+                {
+                    "ingredientId": "ing-sweet-soy",
+                    "quantity": 40
+                },
+                {
+                    "ingredientId": "ing-shallots",
+                    "quantity": 40
+                },
+                {
+                    "ingredientId": "ing-cooking-oil",
+                    "quantity": 30
+                }
+            ]
+        },
+        {
+            "id": "rec-rendang",
+            "name": "Beef Rendang Padang",
+            "description": "Slow-cooked beef in coconut milk and rich spice paste.",
+            "yield": 4,
+            "ingredients": [
+                {
+                    "ingredientId": "ing-beef-chunk",
+                    "quantity": 500
+                },
+                {
+                    "ingredientId": "ing-coconut-milk",
+                    "quantity": 400
+                },
+                {
+                    "ingredientId": "ing-shallots",
+                    "quantity": 60
+                },
+                {
+                    "ingredientId": "ing-palm-sugar",
+                    "quantity": 40
+                }
+            ]
+        },
+        {
+            "id": "rec-burger",
+            "name": "Classic Truffle Burger",
+            "description": "Premium wagyu beef with truffle mayo and melted cheddar.",
+            "yield": 1,
+            "ingredients": [
+                {
+                    "ingredientId": "ing-wagyu-patty",
+                    "quantity": 1
+                },
+                {
+                    "ingredientId": "ing-brioche",
+                    "quantity": 1
+                },
+                {
+                    "ingredientId": "ing-cheddar",
+                    "quantity": 1
+                },
+                {
+                    "ingredientId": "ing-mayo",
+                    "quantity": 25
+                },
+                {
+                    "ingredientId": "ing-truffle-oil",
+                    "quantity": 5
+                }
+            ]
+        },
+        {
+            "id": "rec-kopi-susu",
+            "name": "Es Kopi Susu Aren",
+            "description": "Viral Indonesian iced coffee with palm sugar and milk.",
+            "yield": 5,
+            "ingredients": [
+                {
+                    "ingredientId": "ing-coffee",
+                    "quantity": 100
+                },
+                {
+                    "ingredientId": "ing-milk",
+                    "quantity": 1000
+                },
+                {
+                    "ingredientId": "ing-palm-sugar-aren",
+                    "quantity": 150
+                }
+            ]
+        }
+    ],
+    "orders": [
+        {
+            "id": "ord-wedding-1",
+            "name": "Wedding Breakfast - Grand Hyatt",
+            "date": "2026-03-01T08:00:00Z",
+            "status": "completed",
+            "totalCost": 4500000,
+            "items": [
+                {
+                    "recipeId": "rec-nasi-goreng",
+                    "quantity": 100
+                },
+                {
+                    "recipeId": "rec-kopi-susu",
+                    "quantity": 150
+                }
+            ],
+            "notes": "VIP Wedding event"
+        }
+    ],
+    "version": "1.0.0",
+    "timestamp": "2026-03-03T15:15:00Z"
+}

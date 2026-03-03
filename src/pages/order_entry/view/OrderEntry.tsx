@@ -165,6 +165,7 @@ export const OrderPage: React.FC = () => {
             <Header
                 title={profile.name}
                 subtitle={profile.description}
+                noSubtitleChip={true}
                 leftElement={
                     <div className="h-10 w-10 flex-shrink-0 aspect-square rounded-full bg-surface-dark border-2 border-primary p-0.5 shadow-sm">
                         <div
