@@ -4,6 +4,13 @@ import { Button } from '../../../components/ui/Button';
 import { Icon } from '../../../components/ui/Icon';
 
 export const IntroPage: React.FC = () => {
+    React.useLayoutEffect(() => {
+        window.scrollTo(0, 0);
+        // Backup for some mobile browsers that fight the scroll
+        const timer = setTimeout(() => window.scrollTo(0, 0), 100);
+        return () => clearTimeout(timer);
+    }, []);
+
     const navigate = useNavigate();
 
 

@@ -4,6 +4,10 @@ import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 
+if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+}
+
 const updateSW = registerSW({
     onNeedRefresh() {
         if (confirm('New content available. Reload?')) {

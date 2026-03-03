@@ -4,6 +4,10 @@ import { Button } from '../../../components/ui/Button';
 import { Icon } from '../../../components/ui/Icon';
 
 export const Login: React.FC = () => {
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
