@@ -39,10 +39,13 @@ export const IngredientsList: React.FC = () => {
                 {filteredIngredients.length === 0 ? (
                     <EmptyState
                         icon="inventory_2"
-                        title="No ingredients found"
-                        message={search ? "Try a different search term" : "Start by adding your first ingredient"}
+                        title={search ? "No matching ingredients" : "Your pantry is empty"}
+                        message={search
+                            ? `We couldn't find any ingredients matching "${search}". Try a different term or check your spelling.`
+                            : "Start by adding your basic ingredients to begin building your recipes and calculating costs."
+                        }
                         action={{
-                            label: search ? "Clear search" : "Add ingredient",
+                            label: search ? "Clear search" : "Add your first ingredient",
                             onClick: () => search ? setSearch('') : navigate('/ingredients/new')
                         }}
                     />

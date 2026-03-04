@@ -14,18 +14,25 @@ interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message, action }) => {
     return (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-500 gap-3">
-            <Icon name={icon} size="xl" className="text-gray-600 opacity-50" />
-            <div className="text-center">
-                <p className="text-sm font-bold text-white mb-1">{title}</p>
-                {message && <p className="text-xs font-medium text-gray-500">{message}</p>}
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center animate-in fade-in zoom-in duration-500 mt-10">
+            <div className="w-24 h-24 rounded-3xl bg-surface-dark border border-white/5 flex items-center justify-center mb-6 shadow-card rotate-3">
+                <Icon name={icon} className="text-[48px] text-primary/20 -rotate-3" />
             </div>
+
+            <h3 className="text-xl font-black text-white mb-2 tracking-tight">
+                {title}
+            </h3>
+
+            {message && (
+                <p className="text-[14px] text-text-muted max-w-[260px] mb-8 font-medium leading-relaxed">
+                    {message}
+                </p>
+            )}
+
             {action && (
                 <Button
-                    variant="ghost"
-                    size="sm"
                     onClick={action.onClick}
-                    className="mt-2 text-primary hover:text-primary-dark font-bold underline decoration-primary/30 underline-offset-4"
+                    className="rounded-2xl px-8 py-6 font-black shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                     {action.label}
                 </Button>

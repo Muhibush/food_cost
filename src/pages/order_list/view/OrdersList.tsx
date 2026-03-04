@@ -59,10 +59,13 @@ export const OrdersList: React.FC = () => {
                 {filteredOrders.length === 0 ? (
                     <EmptyState
                         icon="receipt_long"
-                        title="No orders found"
-                        message={search ? "Try a different search term" : "You haven't placed any orders yet"}
+                        title={search ? "No matching orders" : "No orders recorded"}
+                        message={search
+                            ? `We couldn't find any orders matching "${search}". Try search by name or ID.`
+                            : "Start recording your customer orders to track total costs and manage your kitchen profitability."
+                        }
                         action={{
-                            label: search ? "Clear search" : "Create new order",
+                            label: search ? "Clear search" : "Create first order",
                             onClick: () => search ? setSearch('') : navigate('/orders/new')
                         }}
                     />

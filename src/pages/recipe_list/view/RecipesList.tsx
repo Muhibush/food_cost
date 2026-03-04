@@ -50,9 +50,12 @@ export const RecipesList: React.FC = () => {
             <main className="flex-1 flex flex-col gap-6 px-6 pt-6 relative z-0">
                 {filteredRecipes.length === 0 ? (
                     <EmptyState
-                        icon="menu_book"
-                        title="No recipes found"
-                        message={search ? "Try a different search term" : "Start by creating your first recipe"}
+                        icon="restaurant_menu"
+                        title={search ? "No matching recipes" : "No recipes yet"}
+                        message={search
+                            ? `We couldn't find any recipes matching "${search}". Try a different term.`
+                            : "Create your first recipe to start calculating costs per portion and organizing your kitchen."
+                        }
                         action={{
                             label: search ? "Clear search" : "Create first recipe",
                             onClick: () => search ? setSearch('') : navigate('/recipes/new')
