@@ -245,6 +245,11 @@ export const Profile: React.FC = () => {
                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">App Version 2.4.0</p>
                             <p className="text-[9px] font-bold text-gray-500">Build 102 • Production</p>
                         </div>
+                        <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-500 -mt-2 opacity-50">
+                            <a href="/privacy.html" target="_blank" className="hover:text-white transition-colors py-2">Privacy Policy</a>
+                            <span className="py-2">•</span>
+                            <a href="/terms.html" target="_blank" className="hover:text-white transition-colors py-2">Terms of Service</a>
+                        </div>
                     </div>
                 </div>
             </main>

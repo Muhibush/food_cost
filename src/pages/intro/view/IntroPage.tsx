@@ -147,10 +147,15 @@ export const IntroPage: React.FC = () => {
                 <div className="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-primary/10 blur-3xl rounded-full translate-x-1/2" />
             </section>
 
-            <footer className="py-12 border-t border-white/5 text-center px-6">
+            <footer className="py-12 border-t border-white/5 text-center px-6 flex flex-col items-center gap-6">
                 <p className="text-sm font-bold text-white/20 uppercase tracking-[0.2em]">
                     &copy; 2026 CookCost &bull; Professional Food Costing Solutions
                 </p>
+                <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-white/20">
+                    <a href="/privacy.html" target="_blank" className="hover:text-white transition-colors py-2">Privacy Policy</a>
+                    <span className="py-2">•</span>
+                    <a href="/terms.html" target="_blank" className="hover:text-white transition-colors py-2">Terms of Service</a>
+                </div>
             </footer>
         </div>
     );
