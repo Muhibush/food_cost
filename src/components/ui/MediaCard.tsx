@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 
-interface MediaCardProps {
+interface MediaCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
     image?: string;
     icon?: string;
     title: React.ReactNode;
@@ -9,8 +9,6 @@ interface MediaCardProps {
     description?: React.ReactNode;
     rightElement?: React.ReactNode;
     bottomElement?: React.ReactNode;
-    onClick?: () => void;
-    className?: string;
     iconContainerClassName?: string;
 }
 
@@ -24,7 +22,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     bottomElement,
     onClick,
     className,
-    iconContainerClassName
+    iconContainerClassName,
+    ...props
 }) => {
     return (
         <div
@@ -34,6 +33,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                 onClick && "active:scale-[0.98] cursor-pointer",
                 className
             )}
+            {...props}
         >
             <div
                 className={cn(

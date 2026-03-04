@@ -1,5 +1,5 @@
 // 🔒 LOCKED FILE: Do not modify this file without explicit double confirmation from the user.
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrdersStore } from '../../order_list/store/useOrdersStore';
 import { useRecipesStore } from '../../recipe_list/store/useRecipesStore';
@@ -15,15 +15,75 @@ import { EmptyState } from '../../../components/ui/EmptyState';
 import { FilterButton } from '../../../components/ui/FilterButton';
 import { cn } from '../../../utils/cn';
 import { getRecipeIconConfig } from '../../../utils/recipeIcons';
+import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
+import { Icon } from '../../../components/ui/Icon';
 
 export const HistoryPage: React.FC = () => {
     const navigate = useNavigate();
-    const { orders } = useOrdersStore();
+    const { orders, removeOrder } = useOrdersStore();
     const { recipes } = useRecipesStore();
     const [searchQuery, setSearchQuery] = useState('');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+    const touchStartRef = useRef<{ x: number, y: number } | null>(null);
+
+    const handlePressStart = (id: string) => {
+        if (selectionMode) return;
+        const timer = setTimeout(() => {
+            setSelectionMode(true);
+            setSelectedIds([id]);
+        }, 500);
+        setPressTimer(timer);
+    };
+
+    const handleTouchStart = (e: React.TouchEvent, id: string) => {
+        touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        handlePressStart(id);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!touchStartRef.current || !pressTimer) return;
+        const deltaX = Math.abs(e.touches[0].clientX - touchStartRef.current.x);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartRef.current.y);
+        if (deltaX > 10 || deltaY > 10) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+            touchStartRef.current = null;
+        }
+    };
+
+    const handlePressEnd = () => {
+        if (pressTimer) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+        }
+        touchStartRef.current = null;
+    };
+
+    const toggleSelection = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const exitSelectionMode = () => {
+        setSelectionMode(false);
+        setSelectedIds([]);
+        setSearchQuery('');
+    };
+
+    const handleDeleteSelected = async () => {
+        setIsDeleteDialogOpen(false);
+        await Promise.all(selectedIds.map(id => removeOrder(id)));
+        exitSelectionMode();
+    };
 
     const filteredOrders = useMemo(() => {
         return orders
@@ -79,12 +139,21 @@ export const HistoryPage: React.FC = () => {
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col -mx-5 -mt-4 pb-20">
             <Header
-                title="History"
+                title={selectionMode ? "Select Orders" : "History"}
+                leftElement={
+                    selectionMode ? (
+                        <button onClick={exitSelectionMode} className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                    ) : undefined
+                }
                 rightElement={
-                    <FilterButton
-                        isActive={isFilterActive}
-                        onClick={() => setIsFilterOpen(true)}
-                    />
+                    !selectionMode ? (
+                        <FilterButton
+                            isActive={isFilterActive}
+                            onClick={() => setIsFilterOpen(true)}
+                        />
+                    ) : undefined
                 }
                 bottomElement={
                     <Input
@@ -92,6 +161,7 @@ export const HistoryPage: React.FC = () => {
                         placeholder="Search past orders..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        className={selectionMode ? "opacity-50 pointer-events-none" : ""}
                     />
                 }
             />
@@ -115,7 +185,25 @@ export const HistoryPage: React.FC = () => {
                                         return (
                                             <MediaCard
                                                 key={order.id}
-                                                onClick={() => navigate(`/orders/${order.id}`)}
+                                                onContextMenu={(e: React.MouseEvent) => { e.preventDefault(); }}
+                                                onTouchStart={(e: React.TouchEvent) => handleTouchStart(e, order.id)}
+                                                onTouchMove={handleTouchMove}
+                                                onTouchEnd={handlePressEnd}
+                                                onTouchCancel={handlePressEnd}
+                                                onMouseDown={() => handlePressStart(order.id)}
+                                                onMouseUp={handlePressEnd}
+                                                onMouseLeave={handlePressEnd}
+                                                onClick={() => {
+                                                    if (selectionMode) {
+                                                        toggleSelection(order.id);
+                                                    } else {
+                                                        navigate(`/orders/${order.id}`);
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    "select-none transition-all duration-200",
+                                                    selectionMode && selectedIds.includes(order.id) && "ring-2 ring-primary !bg-primary/20"
+                                                )}
                                                 image={recipe?.image}
                                                 icon={recipe?.icon || iconConfig.icon}
                                                 title={order.name}
@@ -131,9 +219,24 @@ export const HistoryPage: React.FC = () => {
                                                     </div>
                                                 }
                                                 bottomElement={
-                                                    <p className="text-primary font-bold text-[15px]">
-                                                        Rp {formatCurrency(Math.round(order.totalCost))}
-                                                    </p>
+                                                    <div className="flex justify-between items-center w-full">
+                                                        <p className="text-primary font-bold text-[15px]">
+                                                            Rp {formatCurrency(Math.round(order.totalCost))}
+                                                        </p>
+                                                    </div>
+                                                }
+                                                rightElement={
+                                                    selectionMode ? (
+                                                        <div className="flex-shrink-0 text-primary self-center ml-2">
+                                                            <Icon
+                                                                name={selectedIds.includes(order.id) ? "check_circle" : "radio_button_unchecked"}
+                                                                className={cn(
+                                                                    selectedIds.includes(order.id) ? "text-primary" : "text-gray-500",
+                                                                    "transition-colors"
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    ) : undefined
                                                 }
                                             />
                                         );
@@ -154,6 +257,33 @@ export const HistoryPage: React.FC = () => {
                     )}
                 </div>
             </main>
+
+            {selectionMode && (
+                <ActionFooter
+                    className="bottom-[88px]"
+                    summary={{
+                        label: "Selected Orders",
+                        value: `${selectedIds.length} Items`
+                    }}
+                    primaryAction={{
+                        label: 'Delete',
+                        onClick: () => setIsDeleteDialogOpen(true),
+                        isDisabled: selectedIds.length === 0,
+                        variant: 'danger'
+                    }}
+                />
+            )}
+
+            <AlertDialog
+                isOpen={isDeleteDialogOpen}
+                title="Delete Orders?"
+                message={`Are you sure you want to delete ${selectedIds.length} orders? This action cannot be undone.`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                isDestructive
+                onCancel={() => setIsDeleteDialogOpen(false)}
+                onConfirm={handleDeleteSelected}
+            />
 
             <BottomSheet
                 isOpen={isFilterOpen}
