@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useIngredientsStore } from '../store/useIngredientsStore';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../../utils/cn';
@@ -10,27 +10,93 @@ import { Card } from '../../../components/ui/Card';
 import { FAB } from '../../../components/ui/FAB';
 import { getIngredientIconConfig } from '../../../utils/ingredientIcons';
 import { Icon } from '../../../components/ui/Icon';
+import { ActionFooter } from '../../../components/ui/ActionFooter';
+import { AlertDialog } from '../../../components/ui/AlertDialog';
 
 export const IngredientsList: React.FC = () => {
     const navigate = useNavigate();
-    const { ingredients } = useIngredientsStore();
+    const { ingredients, removeIngredient } = useIngredientsStore();
     const [search, setSearch] = useState('');
+
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+    const touchStartRef = useRef<{ x: number, y: number } | null>(null);
 
     const filteredIngredients = ingredients
         .filter(ing => ing.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name));
 
+    const handlePressStart = (id: string) => {
+        if (selectionMode) return;
+        const timer = setTimeout(() => {
+            setSelectionMode(true);
+            setSelectedIds([id]);
+        }, 500);
+        setPressTimer(timer);
+    };
+
+    const handleTouchStart = (e: React.TouchEvent, id: string) => {
+        touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        handlePressStart(id);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!touchStartRef.current || !pressTimer) return;
+        const deltaX = Math.abs(e.touches[0].clientX - touchStartRef.current.x);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartRef.current.y);
+        if (deltaX > 10 || deltaY > 10) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+            touchStartRef.current = null;
+        }
+    };
+
+    const handlePressEnd = () => {
+        if (pressTimer) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+        }
+        touchStartRef.current = null;
+    };
+
+    const toggleSelection = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const exitSelectionMode = () => {
+        setSelectionMode(false);
+        setSelectedIds([]);
+        setSearch('');
+    };
+
+    const handleDeleteSelected = async () => {
+        setIsDeleteDialogOpen(false);
+        await Promise.all(selectedIds.map(id => removeIngredient(id)));
+        exitSelectionMode();
+    };
 
     return (
         <div className="bg-background-dark font-display text-white min-h-screen flex flex-col pb-32 -mx-5 -mt-4">
             <Header
-                title="Ingredients"
+                title={selectionMode ? "Select Ingredients" : "Ingredients"}
+                leftElement={
+                    selectionMode ? (
+                        <button onClick={exitSelectionMode} className="h-10 w-10 flex items-center justify-center -ml-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                    ) : undefined
+                }
                 bottomElement={
                     <Input
                         icon="search"
                         placeholder="Search ingredients..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        className={selectionMode ? "opacity-50 pointer-events-none" : ""}
                     />
                 }
             />
@@ -54,8 +120,25 @@ export const IngredientsList: React.FC = () => {
                         <Card
                             key={ing.id}
                             hoverEffect
-                            onClick={() => navigate(`/ingredients/${ing.id}`)}
-                            className="flex items-center gap-4"
+                            onContextMenu={(e) => { e.preventDefault(); }}
+                            onTouchStart={(e) => handleTouchStart(e, ing.id)}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handlePressEnd}
+                            onTouchCancel={handlePressEnd}
+                            onMouseDown={() => handlePressStart(ing.id)}
+                            onMouseUp={handlePressEnd}
+                            onMouseLeave={handlePressEnd}
+                            onClick={() => {
+                                if (selectionMode) {
+                                    toggleSelection(ing.id);
+                                } else {
+                                    navigate(`/ingredients/${ing.id}`);
+                                }
+                            }}
+                            className={cn(
+                                "flex items-center gap-4 select-none transition-all duration-200",
+                                selectionMode && selectedIds.includes(ing.id) && "ring-2 ring-primary !bg-primary/20"
+                            )}
                         >
                             {(() => {
                                 // Priority: Stored metadata > Calculated config
@@ -81,14 +164,54 @@ export const IngredientsList: React.FC = () => {
                                     Rp {formatCurrency(ing.price)} <span className="text-[12px] opacity-70">/ {ing.unit}</span>
                                 </div>
                             </div>
+                            {selectionMode && (
+                                <div className="flex-shrink-0 text-primary">
+                                    <Icon
+                                        name={selectedIds.includes(ing.id) ? "check_circle" : "radio_button_unchecked"}
+                                        className={cn(
+                                            selectedIds.includes(ing.id) ? "text-primary" : "text-gray-500",
+                                            "transition-colors"
+                                        )}
+                                    />
+                                </div>
+                            )}
                         </Card>
                     ))
                 )}
             </main>
 
-            <FAB
-                icon="add"
-                onClick={() => navigate('/ingredients/new')}
+            {selectionMode && (
+                <ActionFooter
+                    className="bottom-[88px]"
+                    summary={{
+                        label: "Selected Ingredients",
+                        value: `${selectedIds.length} Items`
+                    }}
+                    primaryAction={{
+                        label: 'Delete',
+                        onClick: () => setIsDeleteDialogOpen(true),
+                        isDisabled: selectedIds.length === 0,
+                        variant: 'danger'
+                    }}
+                />
+            )}
+
+            {!selectionMode && (
+                <FAB
+                    icon="add"
+                    onClick={() => navigate('/ingredients/new')}
+                />
+            )}
+
+            <AlertDialog
+                isOpen={isDeleteDialogOpen}
+                title="Delete Ingredients?"
+                message={`Are you sure you want to delete ${selectedIds.length} ingredients? This action cannot be undone.`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                isDestructive
+                onCancel={() => setIsDeleteDialogOpen(false)}
+                onConfirm={handleDeleteSelected}
             />
         </div>
     );
