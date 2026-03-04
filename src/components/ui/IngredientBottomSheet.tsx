@@ -32,9 +32,11 @@ export const IngredientBottomSheet: React.FC<IngredientBottomSheetProps> = ({
     }, [isOpen]);
 
     const filteredIngredients = useMemo(() => {
-        return ingredients.filter((ing: Ingredient) =>
-            ing.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        return ingredients
+            .filter((ing: Ingredient) =>
+                ing.name.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .sort((a, b) => a.name.localeCompare(b.name));
     }, [ingredients, searchQuery]);
 
 

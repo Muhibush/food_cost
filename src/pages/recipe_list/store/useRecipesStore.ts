@@ -8,6 +8,7 @@ import { sanitizeData } from '../../../utils/sanitize';
 
 interface RecipesState {
     recipes: Recipe[];
+    isReady: boolean;
     addRecipe: (recipe: Recipe) => Promise<void>;
     updateRecipe: (id: string, updates: Partial<Recipe>) => Promise<void>;
     removeRecipe: (id: string) => Promise<void>;
@@ -18,6 +19,7 @@ interface RecipesState {
 
 export const useRecipesStore = create<RecipesState>((set, get) => ({
     recipes: [],
+    isReady: false,
     addRecipe: async (recipe) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
@@ -66,7 +68,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
             snapshot.forEach((doc) => {
                 recipes.push(doc.data() as Recipe);
             });
-            set({ recipes });
+            set({ recipes, isReady: true });
         });
         return unsubscribe;
     }

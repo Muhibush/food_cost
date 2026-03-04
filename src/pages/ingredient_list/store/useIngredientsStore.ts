@@ -8,6 +8,7 @@ import { sanitizeData } from '../../../utils/sanitize';
 
 interface IngredientsState {
     ingredients: Ingredient[];
+    isReady: boolean;
     addIngredient: (ingredient: Ingredient) => Promise<void>;
     updateIngredient: (id: string, updates: Partial<Ingredient>) => Promise<void>;
     removeIngredient: (id: string) => Promise<void>;
@@ -18,6 +19,7 @@ interface IngredientsState {
 
 export const useIngredientsStore = create<IngredientsState>((set, get) => ({
     ingredients: [],
+    isReady: false,
     addIngredient: async (ingredient) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
@@ -66,7 +68,7 @@ export const useIngredientsStore = create<IngredientsState>((set, get) => ({
             snapshot.forEach((doc) => {
                 ingredients.push(doc.data() as Ingredient);
             });
-            set({ ingredients });
+            set({ ingredients, isReady: true });
         });
         return unsubscribe;
     }

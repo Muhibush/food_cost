@@ -39,10 +39,12 @@ export const RecipeSelection: React.FC = () => {
     const [selectedIds, setSelectedIds] = useState<string[]>(state?.selectedRecipeIds || []);
 
     const filteredRecipes = useMemo(() => {
-        return recipes.filter(r =>
-            r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.description?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        return recipes
+            .filter(r =>
+                r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.description?.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .sort((a, b) => a.name.localeCompare(b.name));
     }, [recipes, searchQuery]);
 
     const getRecipeCost = useCallback((recipe: Recipe) => {
